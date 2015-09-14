@@ -36,6 +36,7 @@ are:
   _sha3			extension
   _sha256		extension
   _sha512		extension
+  _signal		builtin
   _sitebuiltins		module
   _socket		extension
   _sre			builtin
@@ -45,9 +46,11 @@ are:
   _struct		extension
   _string		builtin
   _stringio		builtin
+  _strptime		module
   _symtable		builtin
   _sysconfigdata	module
   _thread		builtin
+  _threading_local	module
   _types		builtin
   _weakref		builtin
   _weakrefset		module
@@ -62,12 +65,14 @@ are:
   binascii		extension
   bisect		module
   builtins		builtin
+  calendar		module
   codecs		module
   collections		package
   compileall		module
   contextlib		module
   copy			module
   copyreg		module
+  datetime		module
   dis			module
   encodings		package
   enum			module
@@ -87,6 +92,7 @@ are:
   importlib		package
   inspect		module
   io			module
+  ipaddress		module
   itertools		extension
   keyword		module
   linecache		module
@@ -112,7 +118,7 @@ are:
   runpy			module
   select		extension
   selectors		module
-  signal		builtin
+  signal		module
   socket		module
   spwd			extension
   sre_compile		module

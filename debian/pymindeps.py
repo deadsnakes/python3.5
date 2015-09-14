@@ -109,12 +109,13 @@ excluded_imports = {
     'argparse': set(('gettext',)),
     'codecs': set(('encodings',)),
     'collections': set(('cPickle', 'pickle', 'doctest')),
+    'compileall': set(('concurrent',)),
     'copy': set(('reprlib',)),
-    'functools': set(('_dummy_thread',)),
+    #'functools': set(('_dummy_thread',)),
     'hashlib': set(('logging', '_hashlib')),
     #'hashlib': set(('_hashlib', '_md5', '_sha', '_sha256','_sha512',)),
     'heapq': set(('doctest',)),
-    'io': set(('_dummy_thread',)),
+    #'io': set(('_dummy_thread',)),
     'logging': set(('multiprocessing',)),
     'os': set(('nt', 'ntpath', 'os2', 'os2emxpath', 'mac', 'macpath',
                'riscos', 'riscospath', 'riscosenviron')),
@@ -127,7 +128,6 @@ excluded_imports = {
     'subprocess': set(('dummy_threading',)),
     'sysconfig': set(('pprint','_osx_support')),
     'tempfile': set(('_dummy_thread', 'shutil')),
-    'threading': set(('_threading_local',)),
     }
 
 def main(argv):
