@@ -127,6 +127,7 @@
  PyCodec_IncrementalEncoder@Base @VER@
  PyCodec_KnownEncoding@Base @VER@
  PyCodec_LookupError@Base @VER@
+ PyCodec_NameReplaceErrors@Base @VER@
  PyCodec_Register@Base @VER@
  PyCodec_RegisterError@Base @VER@
  PyCodec_ReplaceErrors@Base @VER@
@@ -142,6 +143,8 @@
  PyComplex_ImagAsDouble@Base @VER@
  PyComplex_RealAsDouble@Base @VER@
  PyComplex_Type@Base @VER@
+ PyCoro_New@Base @VER@
+ PyCoro_Type@Base @VER@
  PyDescr_NewClassMethod@Base @VER@
  PyDescr_NewGetSet@Base @VER@
  PyDescr_NewMember@Base @VER@
@@ -190,6 +193,7 @@
  PyErr_ExceptionMatches@Base @VER@
  PyErr_Fetch@Base @VER@
  PyErr_Format@Base @VER@
+ PyErr_FormatV@Base @VER@
  PyErr_GetExcInfo@Base @VER@
  PyErr_GivenExceptionMatches@Base @VER@
  PyErr_NewException@Base @VER@
@@ -290,11 +294,13 @@
  PyExc_PendingDeprecationWarning@Base @VER@
  PyExc_PermissionError@Base @VER@
  PyExc_ProcessLookupError@Base @VER@
+ PyExc_RecursionError@Base @VER@
  PyExc_RecursionErrorInst@Base @VER@
  PyExc_ReferenceError@Base @VER@
  PyExc_ResourceWarning@Base @VER@
  PyExc_RuntimeError@Base @VER@
  PyExc_RuntimeWarning@Base @VER@
+ PyExc_StopAsyncIteration@Base @VER@
  PyExc_StopIteration@Base @VER@
  PyExc_SyntaxError@Base @VER@
  PyExc_SyntaxWarning@Base @VER@
@@ -373,6 +379,7 @@
  PyGILState_Release@Base @VER@
  PyGen_NeedsFinalizing@Base @VER@
  PyGen_New@Base @VER@
+ PyGen_NewWithQualName@Base @VER@
  PyGen_Type@Base @VER@
  PyGetSetDescr_Type@Base @VER@
  PyGrammar_AddAccelerators@Base @VER@
@@ -478,9 +485,11 @@
  PyMarshal_WriteLongToFile@Base @VER@
  PyMarshal_WriteObjectToFile@Base @VER@
  PyMarshal_WriteObjectToString@Base @VER@
+ PyMem_Calloc@Base @VER@
  PyMem_Free@Base @VER@
  PyMem_GetAllocator@Base @VER@
  PyMem_Malloc@Base @VER@
+ PyMem_RawCalloc@Base @VER@
  PyMem_RawFree@Base @VER@
  PyMem_RawMalloc@Base @VER@
  PyMem_RawRealloc@Base @VER@
@@ -502,9 +511,13 @@
  PyMethod_New@Base @VER@
  PyMethod_Self@Base @VER@
  PyMethod_Type@Base @VER@
+ PyModuleDef_Init@Base @VER@
+ PyModuleDef_Type@Base @VER@
+ PyModule_AddFunctions@Base @VER@
  PyModule_AddIntConstant@Base @VER@
  PyModule_AddObject@Base @VER@
  PyModule_AddStringConstant@Base @VER@
+ PyModule_ExecDef@Base @VER@
  PyModule_GetDef@Base @VER@
  PyModule_GetDict@Base @VER@
  PyModule_GetFilename@Base @VER@
@@ -515,6 +528,7 @@
  PyModule_GetWarningsModule@Base @VER@
  PyModule_New@Base @VER@
  PyModule_NewObject@Base @VER@
+ PyModule_SetDocString@Base @VER@
  PyModule_Type@Base @VER@
  PyNode_AddChild@Base @VER@
  PyNode_Compile@Base @VER@
@@ -530,10 +544,12 @@
  PyNumber_Divmod@Base @VER@
  PyNumber_Float@Base @VER@
  PyNumber_FloorDivide@Base @VER@
+ PyNumber_InMatrixMultiply@Base @VER@
  PyNumber_InPlaceAdd@Base @VER@
  PyNumber_InPlaceAnd@Base @VER@
  PyNumber_InPlaceFloorDivide@Base @VER@
  PyNumber_InPlaceLshift@Base @VER@
+ PyNumber_InPlaceMatrixMultiply@Base @VER@
  PyNumber_InPlaceMultiply@Base @VER@
  PyNumber_InPlaceOr@Base @VER@
  PyNumber_InPlacePower@Base @VER@
@@ -546,6 +562,7 @@
  PyNumber_Invert@Base @VER@
  PyNumber_Long@Base @VER@
  PyNumber_Lshift@Base @VER@
+ PyNumber_MatrixMultiply@Base @VER@
  PyNumber_Multiply@Base @VER@
  PyNumber_Negative@Base @VER@
  PyNumber_Or@Base @VER@
@@ -557,6 +574,14 @@
  PyNumber_ToBase@Base @VER@
  PyNumber_TrueDivide@Base @VER@
  PyNumber_Xor@Base @VER@
+ PyODictItems_Type@Base @VER@
+ PyODictIter_Type@Base @VER@
+ PyODictKeys_Type@Base @VER@
+ PyODictValues_Type@Base @VER@
+ PyODict_DelItem@Base @VER@
+ PyODict_New@Base @VER@
+ PyODict_SetItem@Base @VER@
+ PyODict_Type@Base @VER@
  PyOS_AfterFork@Base @VER@
  PyOS_FiniInterrupts@Base @VER@
  PyOS_InitInterrupts@Base @VER@
@@ -589,6 +614,7 @@
  PyObject_CallMethod@Base @VER@
  PyObject_CallMethodObjArgs@Base @VER@
  PyObject_CallObject@Base @VER@
+ PyObject_Calloc@Base @VER@
  PyObject_CheckReadBuffer@Base @VER@
  PyObject_ClearWeakRefs@Base @VER@
  PyObject_CopyData@Base @VER@
@@ -973,7 +999,9 @@
  Py_CompileStringObject@Base @VER@
  Py_DebugFlag@Base @VER@
  Py_DecRef@Base @VER@
+ Py_DecodeLocale@Base @VER@
  Py_DontWriteBytecodeFlag@Base @VER@
+ Py_EncodeLocale@Base @VER@
  Py_EndInterpreter@Base @VER@
  Py_Exit@Base @VER@
  Py_FatalError@Base @VER@
@@ -1052,26 +1080,32 @@
  _PyBuiltin_Init@Base @VER@
  _PyByteArray_empty_string@Base @VER@
  _PyBytesIOBuffer_Type@Base @VER@
+ _PyBytes_Format@Base @VER@
  _PyBytes_Join@Base @VER@
  _PyBytes_Resize@Base @VER@
  _PyCFunction_DebugMallocStats@Base @VER@
- _PyCapsule_hack@Base @VER@
  _PyCode_CheckLineNumber@Base @VER@
  _PyCodecInfo_GetIncrementalDecoder@Base @VER@
  _PyCodecInfo_GetIncrementalEncoder@Base @VER@
  _PyCodec_DecodeText@Base @VER@
  _PyCodec_EncodeText@Base @VER@
- _PyCodec_Forget@Base 3.4.2
+ _PyCodec_Forget@Base @VER@
  _PyCodec_Lookup@Base @VER@
  _PyCodec_LookupTextEncoding@Base @VER@
  _PyComplex_FormatAdvancedWriter@Base @VER@
+ _PyCoroWrapper_Type@Base @VER@
+ _PyCoro_GetAwaitableIter@Base @VER@
  _PyDebugAllocatorStats@Base @VER@
  _PyDictKeys_DecRef@Base @VER@
+ _PyDictView_Intersect@Base @VER@
+ _PyDictView_New@Base @VER@
  _PyDict_Contains@Base @VER@
  _PyDict_DebugMallocStats@Base @VER@
  _PyDict_DelItemId@Base @VER@
+ _PyDict_FromKeys@Base @VER@
  _PyDict_GetItemId@Base @VER@
  _PyDict_GetItemIdWithError@Base @VER@
+ _PyDict_GetItem_KnownHash@Base @VER@
  _PyDict_HasOnlyStringKeys@Base @VER@
  _PyDict_KeysSize@Base @VER@
  _PyDict_LoadGlobal@Base @VER@
@@ -1079,13 +1113,18 @@
  _PyDict_NewKeysForClass@Base @VER@
  _PyDict_NewPresized@Base @VER@
  _PyDict_Next@Base @VER@
+ _PyDict_Pop@Base @VER@
+ _PyDict_SizeOf@Base @VER@
+ _PyDict_SetItemId@Base @VER@
+ _PyDict_SetItem_KnownHash@Base @VER@
  _PyErr_BadInternalCall@Base @VER@
- _PyErr_ChainExceptions@Base 3.4.3
+ _PyErr_ChainExceptions@Base @VER@
  _PyErr_SetKeyError@Base @VER@
  _PyErr_TrySetFromCause@Base @VER@
- _PyDict_SetItemId@Base @VER@
  _PyEval_CallTracing@Base @VER@
  _PyEval_FiniThreads@Base @VER@
+ _PyEval_GetCoroutineWrapper@Base @VER@
+ _PyEval_SetCoroutineWrapper@Base @VER@
  _PyEval_GetSwitchInterval@Base @VER@
  _PyEval_SetSwitchInterval@Base @VER@
  _PyEval_SignalAsyncExc@Base @VER@
@@ -1160,13 +1199,13 @@
  _PyImport_DynLoadFiletab@Base @VER@
  _PyImport_FindBuiltin@Base @VER@
  _PyImport_FindExtensionObject@Base @VER@
+ _PyImport_FindSharedFuncptr@Base @VER@
  _PyImport_Fini@Base @VER@
  _PyImport_FixupBuiltin@Base @VER@
  _PyImport_FixupExtensionObject@Base @VER@
- _PyImport_GetDynLoadFunc@Base @VER@
  _PyImport_Init@Base @VER@
  _PyImport_Inittab@Base @VER@
- _PyImport_LoadDynamicModule@Base @VER@
+ _PyImport_LoadDynamicModuleWithSpec@Base @VER@
  _PyImport_ReInitLock@Base @VER@
  _PyImport_ReleaseLock@Base @VER@
  _PyIncrementalNewlineDecoder_decode@Base @VER@
@@ -1188,6 +1227,7 @@
  _PyLong_FromNbInt@Base @VER@
  _PyLong_FromTime_t@Base @VER@
  _PyLong_FromUid@Base @VER@
+ _PyLong_GCD@Base @VER@
  _PyLong_Init@Base @VER@
  _PyLong_New@Base @VER@
  _PyLong_NumBits@Base @VER@
@@ -1198,7 +1238,7 @@
  _PyMethodWrapper_Type@Base @VER@
  _PyMethod_DebugMallocStats@Base @VER@
  _PyModule_Clear@Base @VER@
- _PyModule_ClearDict@Base 3.4~rc3
+ _PyModule_ClearDict@Base @VER@
  _PyNamespace_New@Base @VER@
  _PyNamespace_Type@Base @VER@
  _PyNode_SizeOf@Base @VER@
@@ -1222,6 +1262,7 @@
  _PyObject_DebugMallocStats@Base @VER@
  _PyObject_DebugTypeStats@Base @VER@
  _PyObject_Dump@Base @VER@
+ _PyObject_GC_Calloc@Base @VER@
  _PyObject_GC_Malloc@Base @VER@
  _PyObject_GC_New@Base @VER@
  _PyObject_GC_NewVar@Base @VER@
@@ -1256,7 +1297,7 @@
  _PyState_ClearModules@Base @VER@
  _PyStructSequence_Init@Base @VER@
  _PySys_GetObjectId@Base @VER@
- _PySys_GetSizeOf@Base 3.4.2
+ _PySys_GetSizeOf@Base @VER@
  _PySys_ImplCacheTag@Base @VER@
  _PySys_ImplName@Base @VER@
  _PySys_Init@Base @VER@
@@ -1267,15 +1308,28 @@
  _PyThreadState_Init@Base @VER@
  _PyThreadState_Prealloc@Base @VER@
  _PyThread_CurrentFrames@Base @VER@
+ _PyTime_AsMicroseconds@Base @VER@
+ _PyTime_AsMilliseconds@Base @VER@
+ _PyTime_AsNanosecondsObject@Base @VER@
+ _PyTime_AsSecondsDouble@Base @VER@
+ _PyTime_AsTimespec@Base @VER@
+ _PyTime_AsTimeval@Base @VER@
+ _PyTime_AsTimeval_noraise@Base @VER@
+ _PyTime_FromMillisecondsObject@Base @VER@
+ _PyTime_FromNanoseconds@Base @VER@
+ _PyTime_FromSeconds@Base @VER@
+ _PyTime_FromSecondsObject@Base @VER@
+ _PyTime_GetMonotonicClock@Base @VER@
+ _PyTime_GetMonotonicClockWithInfo@Base @VER@
+ _PyTime_GetSystemClock@Base @VER@
+ _PyTime_GetSystemClockWithInfo@Base @VER@
  _PyTime_Init@Base @VER@
  _PyTime_ObjectToTime_t@Base @VER@
  _PyTime_ObjectToTimespec@Base @VER@
  _PyTime_ObjectToTimeval@Base @VER@
- _PyTime_gettimeofday@Base @VER@
- _PyTime_gettimeofday_info@Base @VER@
- _PyTraceMalloc_Init@Base @VER@
  _PyTraceMalloc_Fini@Base @VER@
- _PyTraceback_Add@Base 3.4.3
+ _PyTraceMalloc_Init@Base @VER@
+ _PyTraceback_Add@Base @VER@
  _PyTrash_delete_later@Base @VER@
  _PyTrash_delete_nesting@Base @VER@
  _PyTrash_deposit_object@Base @VER@
@@ -1323,10 +1377,10 @@
  _PyUnicode_FindMaxChar@Base @VER@
  _PyUnicode_Fini@Base @VER@
  _PyUnicode_FormatAdvancedWriter@Base @VER@
+ _PyUnicode_FormatLong@Base @VER@
  _PyUnicode_FromASCII@Base @VER@
  _PyUnicode_FromId@Base @VER@
  _PyUnicode_Init@Base @VER@
- _PyUnicode_HasNULChars@Base @VER@
  _PyUnicode_InsertThousandsGrouping@Base @VER@
  _PyUnicode_IsAlpha@Base @VER@
  _PyUnicode_IsCaseIgnorable@Base @VER@
@@ -1365,8 +1419,12 @@
  _PyWeakref_RefType@Base @VER@
  _Py_Assert@Base @VER@
  _Py_Assign@Base @VER@
+ _Py_AsyncFor@Base @VER@
+ _Py_AsyncFunctionDef@Base @VER@
+ _Py_AsyncWith@Base @VER@
  _Py_Attribute@Base @VER@
  _Py_AugAssign@Base @VER@
+ _Py_Await@Base @VER@
  _Py_BinOp@Base @VER@
  _Py_BoolOp@Base @VER@
  _Py_Break@Base @VER@
@@ -1374,6 +1432,7 @@
  _Py_BuildValue_SizeT@Base @VER@
  _Py_Bytes@Base @VER@
  _Py_Call@Base @VER@
+ _Py_CheckFunctionResult@Base @VER@
  _Py_CheckRecursionLimit@Base @VER@
  _Py_CheckRecursiveCall@Base @VER@
  _Py_ClassDef@Base @VER@
@@ -1416,6 +1475,7 @@
  _Py_List@Base @VER@
  _Py_ListComp@Base @VER@
  _Py_M__importlib@Base @VER@
+ _Py_M__importlib_external@Base @VER@
  _Py_Mangle@Base @VER@
  _Py_Module@Base @VER@
  _Py_Name@Base @VER@
@@ -1489,7 +1549,6 @@
  _Py_c_quot@Base @VER@
  _Py_c_sum@Base @VER@
  _Py_capitalize__doc__@Base @VER@
- _Py_char2wchar@Base @VER@
  _Py_comprehension@Base @VER@
  _Py_ctype_table@Base @VER@
  _Py_ctype_tolower@Base @VER@
@@ -1506,6 +1565,11 @@
  _Py_findlabel@Base @VER@
  _Py_fopen@Base @VER@
  _Py_fopen_obj@Base @VER@
+ (arch=i386 lpia)_Py_force_double@Base @VER@
+ _Py_fstat@Base @VER@
+ _Py_fstat_noraise@Base @VER@
+ (arch=amd64 i386 lpia)_Py_get_387controlword@Base @VER@
+ _Py_get_blocking@Base @VER@
  _Py_get_inheritable@Base @VER@
  _Py_hashtable_clear@Base @VER@
  _Py_hashtable_compare_direct@Base @VER@
@@ -1542,22 +1606,28 @@
  _Py_normalize_encoding@Base @VER@
  _Py_open@Base @VER@
  _Py_open_cloexec_works@Base @VER@
+ _Py_open_noraise@Base @VER@
  _Py_parse_inf_or_nan@Base @VER@
  _Py_pgen@Base @VER@
+ _Py_read@Base @VER@
  _Py_samebitset@Base @VER@
+ (arch=amd64 i386 lpia)_Py_set_387controlword@Base @VER@
+ _Py_set_blocking@Base @VER@
  _Py_set_inheritable@Base @VER@
  _Py_stat@Base @VER@
+ _Py_strhex@Base @VER@
+ _Py_strhex_bytes@Base @VER@
  _Py_swapcase__doc__@Base @VER@
  _Py_title__doc__@Base @VER@
  _Py_translatelabels@Base @VER@
  _Py_upper__doc__@Base @VER@
- _Py_wchar2char@Base @VER@
  _Py_wfopen@Base @VER@
  _Py_wgetcwd@Base @VER@
  _Py_withitem@Base @VER@
  _Py_wreadlink@Base @VER@
  _Py_wrealpath@Base @VER@
- _Py_wstat@Base @VER@
+ _Py_write@Base @VER@
+ _Py_write_noraise@Base @VER@
 
  (optional|regex)"^_ctypes_.*@Base$" @VER@
  (optional|regex)"^ffi_type_.*@Base$" @VER@
