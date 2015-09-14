@@ -2,11 +2,9 @@
 # DP: the python build, when CFLAGS, CPPFLAGS, LDSHARED) are not set
 # DP: in the environment.
 
-Index: b/Lib/distutils/sysconfig.py
-===================================================================
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -180,9 +180,11 @@ def customize_compiler(compiler):
+@@ -180,9 +180,11 @@
                  _osx_support.customize_compiler(_config_vars)
                  _config_vars['CUSTOMIZED_OSX_COMPILER'] = 'True'
  
@@ -20,7 +18,7 @@ Index: b/Lib/distutils/sysconfig.py
  
          if 'CC' in os.environ:
              newcc = os.environ['CC']
-@@ -203,13 +205,22 @@ def customize_compiler(compiler):
+@@ -203,13 +205,22 @@
              cpp = cc + " -E"           # not always
          if 'LDFLAGS' in os.environ:
              ldshared = ldshared + ' ' + os.environ['LDFLAGS']

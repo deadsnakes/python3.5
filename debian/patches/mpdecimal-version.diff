@@ -1,7 +1,5 @@
 # DP: Relax the mpdecimal version check
 
-Index: b/Modules/_decimal/_decimal.c
-===================================================================
 --- a/Modules/_decimal/_decimal.c
 +++ b/Modules/_decimal/_decimal.c
 @@ -39,10 +39,6 @@

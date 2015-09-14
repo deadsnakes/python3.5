@@ -7,5 +7,5 @@
 -needs_sphinx = '1.2'
 +#needs_sphinx = '1.2'
  
- 
- # Options for HTML output
+ # Ignore any .rst files in the venv/ directory.
+ exclude_patterns = ['venv/*']

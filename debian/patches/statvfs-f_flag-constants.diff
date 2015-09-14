@@ -9,7 +9,7 @@ Subject: [PATCH] Add flags for statvfs.f_flag to constant list.
 
 --- a/Modules/posixmodule.c
 +++ b/Modules/posixmodule.c
-@@ -12012,6 +12012,43 @@
+@@ -12739,6 +12739,43 @@
      if (PyModule_AddIntMacro(m, F_TEST)) return -1;
  #endif
  

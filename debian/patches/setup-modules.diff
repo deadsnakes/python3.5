@@ -1,10 +1,8 @@
 # DP: Modules/Setup.dist: patches to build some extensions statically
 
-Index: b/Modules/Setup.dist
-===================================================================
 --- a/Modules/Setup.dist
 +++ b/Modules/Setup.dist
-@@ -175,7 +175,7 @@ _symtable symtablemodule.c
+@@ -175,7 +175,7 @@
  #_weakref _weakref.c	# basic weak reference support
  #_testcapi _testcapimodule.c    # Python C API test module
  #_random _randommodule.c	# Random number generator
@@ -13,7 +11,7 @@ Index: b/Modules/Setup.dist
  #_pickle _pickle.c	# pickle accelerator
  #_datetime _datetimemodule.c	# datetime accelerator
  #_bisect _bisectmodule.c	# Bisection algorithms
-@@ -204,10 +204,7 @@ _symtable symtablemodule.c
+@@ -204,10 +204,7 @@
  
  # Socket module helper for SSL support; you must comment out the other
  # socket line above, and possibly edit the SSL variable:
@@ -25,7 +23,7 @@ Index: b/Modules/Setup.dist
  
  # The crypt module is now disabled by default because it breaks builds
  # on many systems (where -lcrypt is needed), e.g. Linux (I believe).
-@@ -249,6 +246,7 @@ _symtable symtablemodule.c
+@@ -249,6 +246,7 @@
  #_sha256 sha256module.c
  #_sha512 sha512module.c
  
@@ -33,7 +31,7 @@ Index: b/Modules/Setup.dist
  
  # The _tkinter module.
  #
-@@ -337,6 +335,7 @@ _symtable symtablemodule.c
+@@ -337,6 +335,7 @@
  # Fred Drake's interface to the Python parser
  #parser parsermodule.c
  
@@ -41,7 +39,7 @@ Index: b/Modules/Setup.dist
  
  # Lee Busby's SIGFPE modules.
  # The library to link fpectl with is platform specific.
-@@ -371,7 +370,7 @@ _symtable symtablemodule.c
+@@ -371,7 +370,7 @@
  #
  # More information on Expat can be found at www.libexpat.org.
  #

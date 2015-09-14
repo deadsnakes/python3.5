@@ -1,10 +1,8 @@
 # DP: Build getbuildinfo.o with DATE/TIME values when defined
 
-Index: b/Makefile.pre.in
-===================================================================
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -728,6 +728,8 @@ Modules/getbuildinfo.o: $(PARSER_OBJS) \
+@@ -719,6 +719,8 @@
  	      -DHGVERSION="\"`LC_ALL=C $(HGVERSION)`\"" \
  	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
  	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \

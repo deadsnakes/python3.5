@@ -1,7 +1,5 @@
 # DP: Don't add standard library dirs to library_dirs and runtime_library_dirs.
 
-Index: b/Lib/distutils/unixccompiler.py
-===================================================================
 --- a/Lib/distutils/unixccompiler.py
 +++ b/Lib/distutils/unixccompiler.py
 @@ -153,6 +153,17 @@

@@ -1,10 +1,8 @@
 # DP: suggest installation of python-tk package on failing _tkinter import
 
-Index: b/Lib/tkinter/__init__.py
-===================================================================
 --- a/Lib/tkinter/__init__.py
 +++ b/Lib/tkinter/__init__.py
-@@ -32,7 +32,10 @@ tk.mainloop()
+@@ -32,7 +32,10 @@
  
  import sys
  

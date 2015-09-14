@@ -2,11 +2,9 @@
 # DP: - installs into $prefix/dist-packages instead of $prefix/site-packages.
 # DP: - doesn't encode the python version into the egg name.
 
-Index: b/Lib/distutils/command/install_egg_info.py
-===================================================================
 --- a/Lib/distutils/command/install_egg_info.py
 +++ b/Lib/distutils/command/install_egg_info.py
-@@ -14,18 +14,38 @@ class install_egg_info(Command):
+@@ -14,18 +14,38 @@
      description = "Install package's PKG-INFO metadata as an .egg-info file"
      user_options = [
          ('install-dir=', 'd', "directory to install to"),
@@ -50,11 +48,9 @@ Index: b/Lib/distutils/command/install_egg_info.py
          self.target = os.path.join(self.install_dir, basename)
          self.outputs = [self.target]
  
-Index: b/Lib/distutils/command/install.py
-===================================================================
 --- a/Lib/distutils/command/install.py
 +++ b/Lib/distutils/command/install.py
-@@ -35,6 +35,20 @@ INSTALL_SCHEMES = {
+@@ -35,6 +35,20 @@
          'scripts': '$base/bin',
          'data'   : '$base',
          },
@@ -75,7 +71,7 @@ Index: b/Lib/distutils/command/install.py
      'unix_home': {
          'purelib': '$base/lib/python',
          'platlib': '$base/lib/python',
-@@ -131,6 +145,9 @@ class install(Command):
+@@ -131,6 +145,9 @@
  
          ('record=', None,
           "filename in which to record list of installed files"),
@@ -85,7 +81,7 @@ Index: b/Lib/distutils/command/install.py
          ]
  
      boolean_options = ['compile', 'force', 'skip-build']
-@@ -151,6 +168,7 @@ class install(Command):
+@@ -151,6 +168,7 @@
          self.exec_prefix = None
          self.home = None
          self.user = 0
@@ -93,7 +89,7 @@ Index: b/Lib/distutils/command/install.py
  
          # These select only the installation base; it's up to the user to
          # specify the installation scheme (currently, that means supplying
-@@ -172,6 +190,9 @@ class install(Command):
+@@ -172,6 +190,9 @@
          self.install_userbase = USER_BASE
          self.install_usersite = USER_SITE
  
@@ -103,7 +99,7 @@ Index: b/Lib/distutils/command/install.py
          self.compile = None
          self.optimize = None
  
-@@ -411,6 +432,7 @@ class install(Command):
+@@ -411,6 +432,7 @@
              self.install_base = self.install_platbase = self.home
              self.select_scheme("unix_home")
          else:
@@ -111,7 +107,7 @@ Index: b/Lib/distutils/command/install.py
              if self.prefix is None:
                  if self.exec_prefix is not None:
                      raise DistutilsOptionError(
-@@ -425,7 +447,26 @@ class install(Command):
+@@ -425,7 +447,26 @@
  
              self.install_base = self.prefix
              self.install_platbase = self.exec_prefix
@@ -139,11 +135,9 @@ Index: b/Lib/distutils/command/install.py
  
      def finalize_other(self):
          """Finalizes options for non-posix platforms"""
-Index: b/Lib/distutils/sysconfig.py
-===================================================================
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -125,6 +125,7 @@ def get_python_lib(plat_specific=0, stan
+@@ -125,6 +125,7 @@
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -151,7 +145,7 @@ Index: b/Lib/distutils/sysconfig.py
      if prefix is None:
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-@@ -136,6 +137,12 @@ def get_python_lib(plat_specific=0, stan
+@@ -136,6 +137,12 @@
                                   "lib", "python" + get_python_version())
          if standard_lib:
              return libpython
@@ -164,11 +158,9 @@ Index: b/Lib/distutils/sysconfig.py
          else:
              return os.path.join(libpython, "site-packages")
      elif os.name == "nt":
-Index: b/Lib/site.py
-===================================================================
 --- a/Lib/site.py
 +++ b/Lib/site.py
-@@ -288,6 +288,13 @@ def addusersitepackages(known_paths):
+@@ -288,6 +288,13 @@
  
      if ENABLE_USER_SITE and os.path.isdir(user_site):
          addsitedir(user_site, known_paths)
@@ -182,11 +174,9 @@ Index: b/Lib/site.py
      return known_paths
  
  def getsitepackages(prefixes=None):
-Index: b/Lib/test/test_site.py
-===================================================================
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -243,9 +243,10 @@ class HelperFunctionsTests(unittest.Test
+@@ -243,9 +243,10 @@
              self.assertEqual(dirs[1], wanted)
          elif os.sep == '/':
              # OS X non-framwework builds, Linux, FreeBSD, etc
@@ -200,11 +190,9 @@ Index: b/Lib/test/test_site.py
              self.assertEqual(dirs[0], wanted)
          else:
              # other platforms
-Index: b/Lib/distutils/tests/test_bdist_dumb.py
-===================================================================
 --- a/Lib/distutils/tests/test_bdist_dumb.py
 +++ b/Lib/distutils/tests/test_bdist_dumb.py
-@@ -85,7 +85,7 @@ class BuildDumbTestCase(support.TempdirM
+@@ -85,7 +85,7 @@
              fp.close()
  
          contents = sorted(os.path.basename(fn) for fn in contents)
@@ -213,11 +201,9 @@ Index: b/Lib/distutils/tests/test_bdist_dumb.py
          if not sys.dont_write_bytecode:
              wanted.append('foo.%s.pyc' % sys.implementation.cache_tag)
          self.assertEqual(contents, sorted(wanted))
-Index: b/Lib/distutils/tests/test_install.py
-===================================================================
 --- a/Lib/distutils/tests/test_install.py
 +++ b/Lib/distutils/tests/test_install.py
-@@ -192,7 +192,7 @@ class InstallTestCase(support.TempdirMan
+@@ -192,7 +192,7 @@
          found = [os.path.basename(line) for line in content.splitlines()]
          expected = ['hello.py', 'hello.%s.pyc' % sys.implementation.cache_tag,
                      'sayhi',
@@ -226,7 +212,7 @@ Index: b/Lib/distutils/tests/test_install.py
          self.assertEqual(found, expected)
  
      def test_record_extensions(self):
-@@ -222,7 +222,7 @@ class InstallTestCase(support.TempdirMan
+@@ -222,7 +222,7 @@
  
          found = [os.path.basename(line) for line in content.splitlines()]
          expected = [_make_ext_name('xx'),
@@ -235,11 +221,9 @@ Index: b/Lib/distutils/tests/test_install.py
          self.assertEqual(found, expected)
  
      def test_debug_mode(self):
-Index: b/Lib/pydoc.py
-===================================================================
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -404,6 +404,7 @@ class Doc:
+@@ -404,6 +404,7 @@
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and

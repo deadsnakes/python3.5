@@ -3,11 +3,9 @@
 # DP: prefer the newer one
 # DP: Upstream status: Ubuntu-Specific
 
-Index: b/Lib/gettext.py
-===================================================================
 --- a/Lib/gettext.py
 +++ b/Lib/gettext.py
-@@ -394,11 +394,26 @@ def find(domain, localedir=None, languag
+@@ -394,11 +394,26 @@
          if lang == 'C':
              break
          mofile = os.path.join(localedir, lang, 'LC_MESSAGES', '%s.mo' % domain)

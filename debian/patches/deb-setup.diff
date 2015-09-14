@@ -1,10 +1,8 @@
 # DP: Don't include /usr/local/include and /usr/local/lib as gcc search paths
 
-Index: b/setup.py
-===================================================================
 --- a/setup.py
 +++ b/setup.py
-@@ -254,8 +254,10 @@ class PyBuildExt(build_ext):
+@@ -254,8 +254,10 @@
          # unfortunately, distutils doesn't let us provide separate C and C++
          # compilers
          if compiler is not None:
@@ -17,7 +15,7 @@ Index: b/setup.py
          self.compiler.set_executables(**args)
  
          build_ext.build_extensions(self)
-@@ -465,12 +467,7 @@ class PyBuildExt(build_ext):
+@@ -465,12 +467,7 @@
              os.unlink(tmpfile)
  
      def detect_modules(self):

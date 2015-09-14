@@ -1,8 +1,6 @@
-Index: b/Modules/Setup.dist
-===================================================================
 --- a/Modules/Setup.dist
 +++ b/Modules/Setup.dist
-@@ -118,7 +118,7 @@ _collections _collectionsmodule.c # Cont
+@@ -118,7 +118,7 @@
  itertools itertoolsmodule.c    # Functions creating iterators for efficient looping
  atexit atexitmodule.c      # Register functions to be run at interpreter-shutdown
  _stat _stat.c			# stat.h interface

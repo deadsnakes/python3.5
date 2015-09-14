@@ -1,10 +1,8 @@
 # DP: Use /etc/lsb-release to identify the platform.
 
-Index: b/Lib/platform.py
-===================================================================
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
-@@ -266,7 +266,7 @@ _release_version = re.compile(r'([^0-9]+
+@@ -266,7 +266,7 @@
  _supported_dists = (
      'SuSE', 'debian', 'fedora', 'redhat', 'centos',
      'mandrake', 'mandriva', 'rocks', 'slackware', 'yellowdog', 'gentoo',
@@ -13,7 +11,7 @@ Index: b/Lib/platform.py
  
  def _parse_release_file(firstline):
  
-@@ -295,6 +295,10 @@ def _parse_release_file(firstline):
+@@ -295,6 +295,10 @@
              id = l[1]
      return '', version, id
  
@@ -24,7 +22,7 @@ Index: b/Lib/platform.py
  def linux_distribution(distname='', version='', id='',
  
                         supported_dists=_supported_dists,
-@@ -328,6 +332,25 @@ def _linux_distribution(distname, versio
+@@ -328,6 +332,25 @@
          args given as parameters.
  
      """
@@ -52,7 +50,7 @@ Index: b/Lib/platform.py
      except OSError:
 --- a/Lib/test/test_platform.py
 +++ b/Lib/test/test_platform.py
-@@ -304,28 +304,6 @@ class PlatformTest(unittest.TestCase):
+@@ -304,28 +304,6 @@
                      returncode = ret >> 8
                  self.assertEqual(returncode, len(data))
  

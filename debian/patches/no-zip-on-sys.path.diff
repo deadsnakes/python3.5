@@ -1,10 +1,8 @@
 # DP: Do not add /usr/lib/pythonXY.zip on sys.path.
 
-Index: b/Modules/getpath.c
-===================================================================
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -487,7 +487,9 @@ calculate_path(void)
+@@ -487,7 +487,9 @@
      wchar_t *path = NULL;
      wchar_t *prog = Py_GetProgramName();
      wchar_t argv0_path[MAXPATHLEN+1];
@@ -14,7 +12,7 @@ Index: b/Modules/getpath.c
      int pfound, efound; /* 1 if found; -1 if found build directory */
      wchar_t *buf;
      size_t bufsz;
-@@ -692,6 +694,7 @@ calculate_path(void)
+@@ -692,6 +694,7 @@
      else
          reduce(prefix);
  
@@ -22,7 +20,7 @@ Index: b/Modules/getpath.c
      wcsncpy(zip_path, prefix, MAXPATHLEN);
      zip_path[MAXPATHLEN] = L'\0';
      if (pfound > 0) { /* Use the reduced prefix returned by Py_GetPrefix() */
-@@ -704,6 +707,7 @@ calculate_path(void)
+@@ -704,6 +707,7 @@
      bufsz = wcslen(zip_path);   /* Replace "00" with version */
      zip_path[bufsz - 6] = VERSION[0];
      zip_path[bufsz - 5] = VERSION[2];
@@ -30,7 +28,7 @@ Index: b/Modules/getpath.c
  
      efound = search_for_exec_prefix(argv0_path, home,
                                      _exec_prefix, lib_python);
-@@ -749,7 +753,9 @@ calculate_path(void)
+@@ -749,7 +753,9 @@
          defpath = delim + 1;
      }
  
@@ -40,7 +38,7 @@ Index: b/Modules/getpath.c
      bufsz += wcslen(exec_prefix) + 1;
  
      buf = PyMem_New(wchar_t, bufsz);
-@@ -766,9 +772,11 @@ calculate_path(void)
+@@ -766,9 +772,11 @@
      else
          buf[0] = '\0';
  
