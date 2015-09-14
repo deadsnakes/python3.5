@@ -22,7 +22,6 @@ statvfs-f_flag-constants.diff
 # Ubuntu specific
 langpack-gettext.diff
 
-hurd-path_max.diff
 #link-system-expat.diff
 disable-sem-check.diff
 lib-argparse.diff

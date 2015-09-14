@@ -56,6 +56,7 @@ class install_lib(Command):
         self.compile = None
         self.optimize = None
         self.skip_build = None
+        self.multiarch = None # if we should rename the extensions
 
     def finalize_options(self):
         # Get all the information we need to install pure Python modules
@@ -68,6 +69,7 @@ class install_lib(Command):
                                    ('compile', 'compile'),
                                    ('optimize', 'optimize'),
                                    ('skip_build', 'skip_build'),
+                                   ('multiarch', 'multiarch'),
                                   )
 
         if self.compile is None:
@@ -108,6 +110,8 @@ class install_lib(Command):
 
     def install(self):
         if os.path.isdir(self.build_dir):
+            import distutils.dir_util
+            distutils.dir_util._multiarch = self.multiarch
             outfiles = self.copy_tree(self.build_dir, self.install_dir)
         else:
             self.warn("'%s' does not exist -- no Python modules to install" %

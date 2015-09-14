@@ -119,7 +119,10 @@ def load_grammar(gt="Grammar.txt", gp=None,
     if force or not _newer(gp, gt):
         logger.info("Generating grammar tables from %s", gt)
         g = pgen.generate_grammar(gt)
-        if save:
+        # the pickle files mismatch, when built on different architectures.
+        # don't save these for now. An alternative solution might be to
+        # include the multiarch triplet into the file name
+        if False:
             logger.info("Writing grammar tables to %s", gp)
             try:
                 g.dump(gp)

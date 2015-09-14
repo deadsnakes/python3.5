@@ -854,7 +854,12 @@ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
     AC_MSG_ERROR([internal configure error for the platform triplet, please file a bug report])
   fi
 fi 
-PLATDIR=plat-$MACHDEP
+
+if test x$PLATFORM_TRIPLET = x; then
+  PLATDIR=plat-$MACHDEP
+else
+  PLATDIR=plat-$PLATFORM_TRIPLET
+fi
 AC_SUBST(PLATDIR)
 AC_SUBST(PLATFORM_TRIPLET)
 
@@ -2244,8 +2249,8 @@ then
 		fi
 		;;
 	Linux*|GNU*|QNX*)
-		LDSHARED='$(CC) -shared'
-		LDCXXSHARED='$(CXX) -shared';;
+		LDSHARED='$(CC) -shared -Wl,-O1 -Wl,-Bsymbolic-functions'
+		LDCXXSHARED='$(CXX) -shared -Wl,-O1 -Wl,-Bsymbolic-functions';;
 	BSD/OS*/4*)
 		LDSHARED="gcc -shared"
 		LDCXXSHARED="g++ -shared";;
@@ -2343,7 +2348,7 @@ then
 	    LINKFORSHARED="-Wl,-E -Wl,+s";;
 #	    LINKFORSHARED="-Wl,-E -Wl,+s -Wl,+b\$(BINLIBDEST)/lib-dynload";;
 	BSD/OS/4*) LINKFORSHARED="-Xlinker -export-dynamic";;
-	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic";;
+	Linux*|GNU*) LINKFORSHARED="-Xlinker -export-dynamic -Wl,-O1 -Wl,-Bsymbolic-functions";;
 	# -u libsys_s pulls in all symbols in libsys
 	Darwin/*) 
 		LINKFORSHARED="$extra_undefs -framework CoreFoundation"
@@ -4173,8 +4178,13 @@ int main(void) {
 AC_MSG_RESULT($ac_cv_posix_semaphores_enabled)
 if test $ac_cv_posix_semaphores_enabled = no
 then
-  AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
-            [Define if POSIX semaphores aren't enabled on your system])
+  case $ac_sys_system in
+    Linux*) # assume yes, see https://launchpad.net/bugs/630511
+      ;;
+    *)
+      AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
+                [Define if POSIX semaphores aren't enabled on your system])
+  esac
 fi
 
 # Multiprocessing check for broken sem_getvalue
@@ -4209,8 +4219,13 @@ int main(void){
 AC_MSG_RESULT($ac_cv_broken_sem_getvalue)
 if test $ac_cv_broken_sem_getvalue = yes
 then
-  AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
-  [define to 1 if your sem_getvalue is broken.])
+  case $ac_sys_system in
+    Linux*) # assume yes, see https://launchpad.net/bugs/630511
+      ;;
+    *)
+      AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
+      [define to 1 if your sem_getvalue is broken.])
+  esac
 fi
 
 # determine what size digit to use for Python's longs
@@ -4331,7 +4346,7 @@ AC_MSG_RESULT($LDVERSION)
 
 dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
 AC_SUBST(PY_ENABLE_SHARED)
-LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
+LIBPL='${prefix}'"/lib/python${VERSION}/config-${LDVERSION}-${MULTIARCH}"
 AC_SUBST(LIBPL)
 
 # Check whether right shifting a negative integer extends the sign bit

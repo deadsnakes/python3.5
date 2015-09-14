@@ -133,7 +133,7 @@ CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(LDVERSION)
 SHLIB_SUFFIX=	@SHLIB_SUFFIX@
 EXT_SUFFIX=	@EXT_SUFFIX@
 LDSHARED=	@LDSHARED@ $(PY_LDFLAGS)
-BLDSHARED=	@BLDSHARED@ $(PY_LDFLAGS)
+BLDSHARED=	@BLDSHARED@ $(PY_LDFLAGS) $(PY_CFLAGS)
 LDCXXSHARED=	@LDCXXSHARED@
 DESTSHARED=	$(BINLIBDEST)/lib-dynload
 
@@ -550,7 +550,7 @@ clinic: $(BUILDPYTHON)
 
 # Build the interpreter
 $(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)
-	$(LINKCC) $(PY_LDFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+	$(LINKCC) $(PY_LDFLAGS) $(PY_CFLAGS) $(LINKFORSHARED) -o $@ Programs/python.o $(BLDLIBRARY) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
 
 platform: $(BUILDPYTHON) pybuilddir.txt
 	$(RUNSHARED) $(PYTHON_FOR_BUILD) -c 'import sys ; from sysconfig import get_platform ; print(get_platform()+"-"+sys.version[0:3])' >platform
@@ -719,6 +719,8 @@ Modules/getbuildinfo.o: $(PARSER_OBJS) \
 	      -DHGVERSION="\"`LC_ALL=C $(HGVERSION)`\"" \
 	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
 	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \
+	      $(if $(BUILD_DATE),-DDATE='"$(BUILD_DATE)"') \
+	      $(if $(BUILD_TIME),-DTIME='"$(BUILD_TIME)"') \
 	      -o $@ $(srcdir)/Modules/getbuildinfo.c
 
 Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
@@ -747,6 +749,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
 
 Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
 	$(CC) -c $(PY_CORE_CFLAGS) \
+		$(if $(MULTIARCH),-DMULTIARCH='"$(MULTIARCH)"') \
 		-DSOABI='"$(SOABI)"' \
 		-o $@ $(srcdir)/Python/dynload_shlib.c
 
@@ -758,6 +761,7 @@ Python/dynload_hpux.o: $(srcdir)/Python/dynload_hpux.c Makefile
 Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
 	$(CC) -c $(PY_CORE_CFLAGS) \
 		-DABIFLAGS='"$(ABIFLAGS)"' \
+		-DMULTIARCH='"$(MULTIARCH)"' \
 		-o $@ $(srcdir)/Python/sysmodule.c
 
 $(IO_OBJS): $(IO_H)
@@ -1296,6 +1300,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
 $(srcdir)/Lib/$(PLATDIR):
 	mkdir $(srcdir)/Lib/$(PLATDIR)
 	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
+	if [ -n "$(MULTIARCH)" ]; then \
+	  cp -p $(srcdir)/Lib/plat-linux/*.py $(srcdir)/Lib/$(PLATDIR)/.; \
+	  rm -f $(srcdir)/Lib/$(PLATDIR)/IN.py; \
+	fi
 	export PATH; PATH="`pwd`:$$PATH"; \
 	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
 	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
@@ -1346,7 +1354,7 @@ inclinstall:
 LIBPL=		@LIBPL@
 
 # pkgconfig directory
-LIBPC=		$(LIBDIR)/pkgconfig
+LIBPC=		$(LIBDIR)/$(MULTIARCH)/pkgconfig
 
 libainstall:	all python-config
 	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \

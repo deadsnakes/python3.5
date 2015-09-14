@@ -12,7 +12,7 @@
 -from docutils.io import StringOutput
 -from docutils.utils import new_document
 +ISSUE_URI = 'http://bugs.python.org/issue%s'
-+SOURCE_URI = 'https://hg.python.org/cpython/file/3.4/%s'
++SOURCE_URI = 'https://hg.python.org/cpython/file/3.5/%s'
  
  from docutils import nodes, utils
  
@@ -32,7 +32,7 @@
 -
 -
 -ISSUE_URI = 'https://bugs.python.org/issue%s'
--SOURCE_URI = 'https://hg.python.org/cpython/file/3.4/%s'
+-SOURCE_URI = 'https://hg.python.org/cpython/file/3.5/%s'
 +from sphinx.locale import versionlabels
  
  # monkey-patch reST parser to disable alphabetic and roman enumerated lists
@@ -96,7 +96,7 @@
  class PyDecoratorMixin(object):
      def handle_signature(self, sig, signode):
          ret = super(PyDecoratorMixin, self).handle_signature(sig, signode)
-@@ -131,14 +129,12 @@
+@@ -131,39 +129,18 @@
      def needs_arglist(self):
          return False
  
@@ -111,7 +111,32 @@
  class PyDecoratorMethod(PyDecoratorMixin, PyClassmember):
      def run(self):
          self.name = 'py:method'
-@@ -172,31 +168,38 @@
+         return PyClassmember.run(self)
+ 
+ 
+-class PyCoroutineMixin(object):
+-    def handle_signature(self, sig, signode):
+-        ret = super(PyCoroutineMixin, self).handle_signature(sig, signode)
+-        signode.insert(0, addnodes.desc_annotation('coroutine ', 'coroutine '))
+-        return ret
+-
+-
+-class PyCoroutineFunction(PyCoroutineMixin, PyModulelevel):
+-    def run(self):
+-        self.name = 'py:function'
+-        return PyModulelevel.run(self)
+-
+-
+-class PyCoroutineMethod(PyCoroutineMixin, PyClassmember):
+-    def run(self):
+-        self.name = 'py:method'
+-        return PyClassmember.run(self)
+-
+-
+ # Support for documenting version of removal in deprecations
+ 
+ class DeprecatedRemoved(Directive):
+@@ -191,31 +168,38 @@
              messages = []
          if self.content:
              self.state.nested_parse(self.content, self.content_offset, node)
@@ -158,7 +183,7 @@
  class MiscNews(Directive):
      has_content = False
      required_arguments = 1
-@@ -221,7 +224,7 @@
+@@ -240,7 +224,7 @@
              text = 'The NEWS file is not available.'
              node = nodes.strong(text, text)
              return [node]
@@ -167,7 +192,7 @@
                                 content)
          content = whatsnew_re.sub(r'\1', content)
          # remove first 3 lines as they are the main heading
-@@ -250,6 +253,15 @@
+@@ -269,6 +253,15 @@
      'typesseq', 'typesseq-mutable', 'unary', 'while', 'with', 'yield'
  ]
  
@@ -183,7 +208,7 @@
  
  class PydocTopicsBuilder(Builder):
      name = 'pydoc-topics'
-@@ -277,22 +289,28 @@
+@@ -296,22 +289,28 @@
              document.append(doctree.ids[labelid])
              destination = StringOutput(encoding='utf-8')
              writer.write(document, destination)
@@ -218,7 +243,7 @@
  
  def parse_opcode_signature(env, sig, signode):
      """Transform an opcode signature into RST nodes."""
-@@ -313,13 +331,12 @@
+@@ -332,13 +331,12 @@
  pdbcmd_sig_re = re.compile(r'([a-z()!]+)\s*(.*)')
  
  # later...
@@ -233,8 +258,11 @@
  def parse_pdb_command(env, sig, signode):
      """Transform a pdb command signature into RST nodes."""
      m = pdbcmd_sig_re.match(sig)
-@@ -348,4 +365,3 @@
+@@ -366,7 +364,4 @@
+     app.add_description_unit('2to3fixer', '2to3fixer', '%s (2to3 fixer)')
      app.add_directive_to_domain('py', 'decorator', PyDecoratorFunction)
      app.add_directive_to_domain('py', 'decoratormethod', PyDecoratorMethod)
+-    app.add_directive_to_domain('py', 'coroutinefunction', PyCoroutineFunction)
+-    app.add_directive_to_domain('py', 'coroutinemethod', PyCoroutineMethod)
      app.add_directive('miscnews', MiscNews)
 -    return {'version': '1.0', 'parallel_read_safe': True}
