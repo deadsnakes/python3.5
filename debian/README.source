@@ -1,4 +1,4 @@
-README.source for python3.4
+README.source for python3.5
 ---------------------------
 The package uses the "3.0 (quilt)" source format so patches recorded in
 debian/patches/series are applied automatically. However, since some patches
