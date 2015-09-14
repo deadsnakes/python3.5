@@ -1,0 +1,3 @@
+# the packages in question are empty and transitional
+python3.4 source: dbg-package-missing-depends python3.4-tk-dbg
+python3.4 source: dbg-package-missing-depends python3.4-gdbm-dbg

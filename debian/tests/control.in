@@ -1,0 +1,34 @@
+Tests: testsuite
+Depends: build-essential, locales, @PVER@, @PVER@-dev, lib@PVER@-testsuite, lib@PVER@-tk, lib@PVER@-gdbm, @PVER@-venv
+
+Tests: testsuite-dbg
+Depends: build-essential, locales, gdb, @PVER@-dbg, lib@PVER@-testsuite, lib@PVER@-tk-dbg, lib@PVER@-gdbm-dbg, @PVER@-venv
+
+Tests: regr6-curses-newpad
+Depends: @PVER@
+
+# regr11-missing-test.support
+Test-Command: @PVER@ -c "import test.support"
+Depends: @PVER@
+
+# Not on precise
+#Tests: regr17-apt_pkg-import
+#Depends: @PVER@-minimal, python3-apport
+
+Tests: check-minimal-extensions
+Depends: @PVER@-minimal
+
+Tests: regr20-check-dynamic-ctypes
+Depends: libc-bin, lib@PVER@-stdlib, lib@PVER@-dbg
+
+Tests: regr23-venv-install-layout
+Depends: @PVER@, @PVER@-venv
+
+Tests: check-various-modules
+Depends: @PVER@, lib@PVER@-gdbm, lib@PVER@-tk
+
+Tests: check-ndbm
+Depends: libc-bin, @PVER@
+
+Tests: check-disabled-venv-site-packages
+Depends: @PVER@, @PVER@-venv

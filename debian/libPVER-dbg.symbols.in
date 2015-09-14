@@ -1,0 +1,32 @@
+libpython@VER@@DEBUG_ABIFLAGS@.so.1.0 libpython@VER@-dbg #MINVER#
+#include "libpython.symbols"
+
+ (arch=i386 lpia)_Py_force_double@Base @VER@
+ (arch=amd64 i386 lpia)_Py_get_387controlword@Base @VER@
+ (arch=amd64 i386 lpia)_Py_set_387controlword@Base @VER@
+
+ _PyDict_Dummy@Base @VER@
+ _PyObject_DebugMallocStats@Base @VER@
+ _PySet_Dummy@Base @VER@
+ _PyUnicode_CheckConsistency@Base @VER@
+ _PyUnicode_Dump@Base @VER@
+ _PyUnicode_compact_data@Base @VER@
+ _PyUnicode_data@Base @VER@
+ _PyUnicode_utf8@Base @VER@
+ _Py_AddToAllObjects@Base @VER@
+ _Py_Dealloc@Base @VER@
+ _Py_ForgetReference@Base @VER@
+ _Py_GetObjects@Base @VER@
+ _Py_GetRefTotal@Base @VER@
+ _Py_HashSecret_Initialized@Base @VER@
+ _Py_NegativeRefcount@Base @VER@
+ _Py_NewReference@Base @VER@
+ _Py_PrintReferenceAddresses@Base @VER@
+ _Py_PrintReferences@Base @VER@
+ _Py_RefTotal@Base @VER@
+ _Py_dumptree@Base @VER@
+ _Py_hashtable_print_stats@Base @VER@
+ _Py_printtree@Base @VER@
+ _Py_showtree@Base @VER@
+ _Py_tok_dump@Base @VER@
+ PyModule_Create2TraceRefs@Base @VER@

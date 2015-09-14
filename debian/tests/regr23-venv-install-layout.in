@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+@PVER@ -mvenv $ADTTMP/test-venv
+test ! -e $ADTTMP/test-venv/local
+test -d $ADTTMP/test-venv/lib/@PVER@/site-packages
+test -e $ADTTMP/test-venv/bin/pip
+

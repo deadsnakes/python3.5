@@ -1,0 +1,11 @@
+--- a/Doc/conf.py
++++ b/Doc/conf.py
+@@ -34,7 +34,7 @@
+ highlight_language = 'python3'
+ 
+ # Require Sphinx 1.2 for build.
+-needs_sphinx = '1.2'
++#needs_sphinx = '1.2'
+ 
+ 
+ # Options for HTML output

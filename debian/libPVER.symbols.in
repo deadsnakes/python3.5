@@ -1,0 +1,9 @@
+libpython@VER@@ABIFLAGS@.so.1.0 libpython@VER@ #MINVER#
+#include "libpython.symbols"
+ PyModule_Create2@Base @VER@
+
+ (arch=i386 lpia)_Py_force_double@Base @VER@
+ (arch=amd64 i386 lpia)_Py_get_387controlword@Base @VER@
+ (arch=amd64 i386 lpia)_Py_set_387controlword@Base @VER@
+
+ (optional)__gnu_lto_v1@Base @VER@

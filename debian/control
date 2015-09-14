@@ -1,0 +1,319 @@
+Source: python3.4
+Section: python
+Priority: optional
+Maintainer: Felix Krull <f_krull@gmx.de>
+XSBC-Original-Maintainer: Matthias Klose <doko@debian.org>
+Build-Depends: debhelper (>= 5.0.51~), dpkg-dev (>= 1.16.1~), quilt, autoconf, lsb-release, sharutils,
+  libreadline6-dev, libncursesw5-dev (>= 5.3),
+  zlib1g-dev, libbz2-dev, liblzma-dev,
+  libgdbm-dev, libdb-dev,
+  tk-dev, blt-dev (>= 2.4z), libssl-dev,
+  libexpat1-dev,
+  libbluetooth-dev [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64],
+  locales [!armel !avr32 !hppa !ia64 !mipsel],
+  libsqlite3-dev, libffi-dev (>= 3.0.5),
+  libgpm2 [!hurd-i386 !kfreebsd-i386 !kfreebsd-amd64],
+  mime-support, netbase, bzip2, python3,
+  net-tools, xvfb, xauth
+Build-Depends-Indep: python-sphinx
+Standards-Version: 3.9.5
+Vcs-Browser: https://bitbucket.org/fk/deadsnakes-python3.4
+Vcs-Hg: https://bitbucket.org/fk/deadsnakes-python3.4
+X-Original-Vcs-Browser: https://code.launchpad.net/~doko/python/pkg3.4-debian
+X-Original-Vcs-Bzr: http://bazaar.launchpad.net/~doko/python/pkg3.4-debian
+XS-Testsuite: autopkgtest
+
+Package: python3.4
+Architecture: any
+Multi-Arch: allowed
+Priority: optional
+Depends: python3.4-minimal (= ${binary:Version}), libpython3.4-stdlib (= ${binary:Version}), mime-support, ${shlibs:Depends}, ${misc:Depends}
+Suggests: python3.4-doc, binutils
+Description: Interactive high-level object-oriented language (version 3.4)
+ Python is a high-level, interactive, object-oriented language. Its 3.4 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+
+Package: libpython3.4-stdlib
+Architecture: any
+Multi-Arch: same
+Priority: optional
+Pre-Depends: multiarch-support
+Depends: libpython3.4-minimal (= ${binary:Version}), mime-support, ${shlibs:Depends}, ${misc:Depends}
+Description: Interactive high-level object-oriented language (standard library, version 3.4)
+ Python is a high-level, interactive, object-oriented language. Its 3.4 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains Python 3.4's standard library. It is normally not
+ used on its own, but as a dependency of python3.4.
+
+Package: python3.4-minimal
+Architecture: any
+Multi-Arch: allowed
+Priority: optional
+Pre-Depends: ${shlibs:Pre-Depends}
+Depends: libpython3.4-minimal (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Recommends: python3.4
+Suggests: binfmt-support
+Conflicts: binfmt-support (<< 1.1.2)
+Description: Minimal subset of the Python language (version 3.4)
+ This package contains the interpreter and some essential modules.  It can
+ be used in the boot process for some basic tasks.
+ See /usr/share/doc/python3.4-minimal/README.Debian for a list of the modules
+ contained in this package.
+
+Package: libpython3.4-minimal
+Architecture: any
+Multi-Arch: same
+Priority: optional
+Pre-Depends: multiarch-support
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: libpython3.4-stdlib
+Conflicts: binfmt-support (<< 1.1.2)
+Replaces: libpython3.4-stdlib (<< 3.4~b1-5), libpython3.4-stdlib (<< 3.4.1)
+Breaks: libpython3.4-stdlib (<< 3.4.1)
+Description: Minimal subset of the Python language (version 3.4)
+ This package contains some essential modules. It is normally not
+ used on its own, but as a dependency of python3.4-minimal.
+
+Package: libpython3.4
+Architecture: any
+Multi-Arch: same
+Section: libs
+Priority: optional
+Pre-Depends: multiarch-support
+Depends: libpython3.4-stdlib (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Shared Python runtime library (version 3.4)
+ Python is a high-level, interactive, object-oriented language. Its 3.4 version
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package contains the shared runtime library, normally not needed
+ for programs using the statically linked interpreter.
+
+Package: python3.4-examples
+Architecture: all
+Depends: python3.4 (>= ${source:Version}), ${misc:Depends}
+Description: Examples for the Python language (v3.4)
+ Examples, Demos and Tools for Python (v3.4). These are files included in
+ the upstream Python distribution (v3.4).
+
+Package: python3.4-dev
+Architecture: any
+Multi-Arch: allowed
+Depends: python3.4 (= ${binary:Version}), libpython3.4-dev (= ${binary:Version}), libpython3.4 (= ${binary:Version}), libexpat1-dev, ${shlibs:Depends}, ${misc:Depends}
+Recommends: libc6-dev | libc-dev
+Description: Header files and a static library for Python (v3.4)
+ Header files, a static library and development tools for building
+ Python (v3.4) modules, extending the Python interpreter or embedding
+ Python (v3.4) in applications.
+ .
+ Maintainers of Python packages should read README.maintainers.
+
+Package: libpython3.4-dev
+Section: libdevel
+Architecture: any
+Multi-Arch: same
+Pre-Depends: multiarch-support
+Depends: libpython3.4-stdlib (= ${binary:Version}), libpython3.4 (= ${binary:Version}), libexpat1-dev, ${shlibs:Depends}, ${misc:Depends}
+Recommends: libc6-dev | libc-dev
+Description: Header files and a static library for Python (v3.4)
+ Header files, a static library and development tools for building
+ Python (v3.4) modules, extending the Python interpreter or embedding
+ Python (v3.4) in applications.
+ .
+ Maintainers of Python packages should read README.maintainers.
+ .
+ This package contains development files. It is normally not
+ used on it's own, but as a dependency of python3.4-dev.
+
+Package: libpython3.4-testsuite
+Section: libdevel
+Architecture: all
+Depends: libpython3.4-stdlib (>= ${binary:Version}), ${misc:Depends}, net-tools
+Suggests: libpython3.4-gdbm, libpython3.4-tk
+Description: Testsuite for the Python standard library (v3.4)
+ The complete testsuite for the Python standard library.  Note that
+ a subset is found in the libpython3.4-stdlib package, which should
+ be enough for other packages to use (please do not build-depend
+ on this package, but file a bug report to include additional 
+ testsuite files in the libpython3.4-stdlib package).
+
+Package: idle-python3.4
+Architecture: all
+Depends: python3.4, libpython3.4-tk, ${misc:Depends}
+Enhances: python3.4
+Description: IDE for Python (v3.4) using Tkinter
+ IDLE is an Integrated Development Environment for Python (v3.4).
+ IDLE is written using Tkinter and therefore quite platform-independent.
+
+Package: python3.4-doc
+Section: doc
+Architecture: all
+Depends: libjs-jquery, libjs-underscore, ${misc:Depends}
+Suggests: python3.4
+Description: Documentation for the high-level object-oriented language Python (v3.4)
+ These is the official set of documentation for the interactive high-level
+ object-oriented language Python (v3.4). All documents are provided
+ in HTML format. The package consists of ten documents:
+ .
+   * What's New in Python3.4
+   * Tutorial
+   * Python Library Reference
+   * Macintosh Module Reference
+   * Python Language Reference
+   * Extending and Embedding Python
+   * Python/C API Reference
+   * Installing Python Modules
+   * Documenting Python
+   * Distributing Python Modules
+
+Package: python3.4-dbg
+Section: debug
+Architecture: any
+Multi-Arch: allowed
+Priority: extra
+Depends: python3.4 (= ${binary:Version}), libpython3.4-dbg (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Recommends: gdb
+Suggests: libpython3.4-gdbm-dbg, libpython3.4-tk-dbg
+Description: Debug Build of the Python Interpreter (version 3.4)
+ The package holds two things:
+ .
+ - A Python interpreter configured with --pydebug. Dynamically loaded modules
+   are searched as <foo>_d.so first. Third party extensions need a separate
+   build to be used by this interpreter.
+ - Debug information for standard python interpreter and extensions.
+ .
+ See the README.debug for more information.
+
+Package: libpython3.4-dbg
+Section: debug
+Architecture: any
+Multi-Arch: same
+Priority: extra
+Pre-Depends: multiarch-support
+Depends: libpython3.4-stdlib (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Debug Build of the Python Interpreter (version 3.4)
+ The package holds two things:
+ .
+ - Extensions for a Python interpreter configured with --pydebug.
+ - Debug information for standard python extensions.
+ .
+ See the README.debug for more information.
+
+
+Package: libpython3.4-tk
+Architecture: any
+Multi-Arch: same
+Depends: libpython3.4-stdlib (>= ${binary:Version}), ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Provides: ${python:Provides}
+Suggests: tix, libpython3.4-tk-dbg
+Description: Tkinter - Writing Tk applications with Python (version 3.4)
+ A module for writing portable GUI applications with Python (version 3.4)
+ using Tk. Also known as Tkinter.
+
+Package: libpython3.4-gdbm
+Architecture: any
+Multi-Arch: same
+Depends: libpython3.4-stdlib (>= ${binary:Version}), ${python:Depends}, ${shlibs:Depends}, ${misc:Depends}
+Provides: ${python:Provides}
+Suggests: libpython3.4-gdbm-dbg
+Description: GNU dbm database support for Python (version 3.4)
+ GNU dbm database module for Python (version 3.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+
+Package: libpython3.4-tk-dbg
+Architecture: any
+Multi-Arch: same
+Priority: extra
+Section: debug
+Depends: libpython3.4-dbg (>= ${binary:Version}), ${python:Depends}, libpython3.4-tk (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Tkinter - Writing Tk applications with Python (version 3.4 debug extension)
+ A module for writing portable GUI applications with Python (version 3.4)
+ using Tk. Also known as Tkinter.
+ .
+ This package contains the extensions built for the Python debug interpreter.
+
+Package: libpython3.4-gdbm-dbg
+Architecture: any
+Multi-Arch: same
+Priority: extra
+Section: debug
+Depends: libpython3.4-dbg (>= ${binary:Version}), ${python:Depends}, libpython3.4-gdbm (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: GNU dbm database support for Python (version 3.4 debug extension)
+ GNU dbm database module for Python (version 3.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+ .
+ This package contains the extensions built for the Python debug interpreter.
+
+
+Package: python3.4-tk
+Architecture: all
+Section: oldlibs
+Priority: extra
+Depends: libpython3.4-tk, ${misc:Depends}
+Description: Tkinter - Writing Tk applications with Python (transitional package)
+ A module for writing portable GUI applications with Python (version 3.4)
+ using Tk. Also known as Tkinter.
+ .
+ This package is a transitional package. It can safely be removed.
+
+Package: python3.4-gdbm
+Architecture: all
+Section: oldlibs
+Priority: extra
+Depends: libpython3.4-gdbm, ${misc:Depends}
+Description: GNU dbm database support for Python (transitional package)
+ GNU dbm database module for Python (version 3.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+ .
+ This package is a transitional package. It can safely be removed.
+
+Package: python3.4-tk-dbg
+Architecture: all
+Section: oldlibs
+Priority: extra
+Depends: libpython3.4-tk-dbg, ${misc:Depends}
+Description: Tkinter - Writing Tk applications with Python (transitional package)
+ A module for writing portable GUI applications with Python (version 3.4)
+ using Tk. Also known as Tkinter.
+ .
+ This package is a transitional package. It can safely be removed.
+
+Package: python3.4-gdbm-dbg
+Architecture: all
+Section: oldlibs
+Priority: extra
+Depends: libpython3.4-gdbm-dbg, ${misc:Depends}
+Description: GNU dbm database support for Python (transitional package)
+ GNU dbm database module for Python (version 3.4). Install this if you want to
+ create or read GNU dbm database files with Python.
+ .
+ This package is a transitional package. It can safely be removed.
+
+
+Package: python3.4-complete
+Architecture: all
+Priority: extra
+Depends:
+ python3.4 (>= ${binary:Version}),
+ libpython3.4 (>= ${binary:Version}),
+ libpython3.4-testsuite (>= ${binary:Version}),
+ libpython3.4-tk (>= ${binary:Version}),
+ libpython3.4-gdbm (>= ${binary:Version}),
+ libpython3.4-tk-dbg (>= ${binary:Version}),
+ libpython3.4-gdbm-dbg (>= ${binary:Version}),
+ python3.4-examples (>= ${binary:Version}),
+ python3.4-dev (>= ${binary:Version}),
+ python3.4-doc (>= ${binary:Version}),
+ python3.4-dbg (>= ${binary:Version}),
+ idle-python3.4 (>= ${binary:Version}),
+ ${misc:Depends}
+Description: Interactive high-level object-oriented language (version 3.4)
+ Version 3.4 of the high-level, interactive object oriented language,
+ includes an extensive class library with lots of goodies for
+ network programming, system administration, sounds and graphics.
+ .
+ This package depends on all individual packages that were generated from the
+ python3.4 source package.
