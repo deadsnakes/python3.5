@@ -47,13 +47,15 @@ ifeq ($(on_buildd),yes)
   ifneq (,$(filter $(DEB_HOST_ARCH), armel hppa mips mipsel mips64 mips64el s390 hurd-i386 kfreebsd-amd64 kfreebsd-i386))
     WITHOUT_CHECK := yes
   endif
-  ifneq (,$(filter $(DEB_HOST_ARCH), armel hppa mips mipsel mips64 mips64el s390 hurd-i386))
+  ifneq (,$(filter $(DEB_HOST_ARCH), armel hppa mips mipsel mips64 mips64el s390 hurd-i386 kfreebsd-amd64 kfreebsd-i386))
     WITHOUT_BENCH := yes
+    WITHOUT_STONE := yes
   endif
 endif
 ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
   WITHOUT_BENCH := yes
   WITHOUT_CHECK := yes
+  WITHOUT_STONE := yes
 endif
 
 COMMA = ,
@@ -67,7 +69,7 @@ distrelease  := $(shell lsb_release -cs)
 VER=3.5
 SVER=3.5.0
 NVER=3.6
-PVER=python3.5
+PVER=python$(VER)
 PRIORITY=$(shell echo $(VER) | tr -d '.')0
 
 VER_MAJOR=$(shell echo $(VER) | sed -e s/[.][0-9]//)
@@ -154,14 +156,26 @@ endif
 
 ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
   ifeq ($(DEB_HOST_ARCH_OS),linux)
-    ifneq (,$(findstring $(DEB_HOST_ARCH), amd64 armel armhf i386 powerpc ppc64))
-      #with_pgo := yes
+    ifneq (,$(findstring $(DEB_HOST_ARCH), amd64 armel armhf i386 powerpc ppc64 ppc64el))
+      with_pgo := yes
     endif
   endif
 endif
 
-ifneq (,$(findstring $(DEB_HOST_ARCH), amd64 armel i386))
+ifneq (,$(findstring $(DEB_HOST_ARCH), amd64 armel armhf i386 powerpc ppc64 ppc64el))
   with_lto := yes
+endif
+
+ifeq ($(distribution),Debian)
+    # FIXME: investigate, succeeds locally
+    # https://buildd.debian.org/status/fetch.php?pkg=python3.5&arch=i386&ver=3.5.0%7Ea4-3&stamp=1431890568
+    with_pgo :=
+endif
+ifeq ($(distribution),Ubuntu)
+    # FIXME
+    ifneq (,$(findstring $(DEB_HOST_ARCH), i386))
+      with_pgo :=
+    endif
 endif
 
 ifneq (,$(findstring noopt, $(DEB_BUILD_OPTIONS)))
@@ -251,6 +265,7 @@ PROFILE_EXCLUDES = test_compiler test_distutils test_platform test_subprocess \
 # FIXME: update profiled-build.diff to support --next
 #	--next=20
 PROFILE_TASK = ../Lib/test/regrtest.py \
+	-s \
 	-j 1 -unone,decimal \
 	-x $(sort $(TEST_EXCLUDES) $(PROFILE_EXCLUDES))
 
@@ -265,6 +280,7 @@ ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
   ifneq (,$(filter $(DEB_HOST_ARCH_OS), linux))
 	cd $(buildd_static) && ./python -c 'from _multiprocessing import SemLock'
   endif
+	cd $(buildd_static) && ./python -c 'import _decimal'
 endif
 
 	touch stamps/stamp-build-static
@@ -306,7 +322,7 @@ common_configure_args = \
 		--without-ensurepip \
 		--with-system-expat \
 
-ifeq ($(DEB_HOST_ARCH), avr32)
+ifneq (,$(filter $(DEB_HOST_ARCH), avr32 or1k))
   common_configure_args += --without-ffi
 else
   common_configure_args += --with-system-ffi
@@ -544,7 +560,9 @@ endif
 	touch stamps/stamp-check
 
 stamps/stamp-pystone:
-ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+ifeq ($(WITHOUT_STONE),yes)
+	@echo "pystone run disabled for this build"
+else
 	@echo "BEGIN pystone static"
 	cd $(buildd_static) && ./python ../Lib/test/pystone.py
 	cd $(buildd_static) && ./python ../Lib/test/pystone.py
@@ -695,14 +713,14 @@ install: build-arch stamps/stamp-install
 stamps/stamp-install: stamps/stamp-build generated-files stamps/stamp-control
 	dh_testdir
 	dh_testroot
-	dh_prep
+	dh_clean -k
 	dh_installdirs
 
 	: # make install into tmp and subsequently move the files into
 	: # their packages' directories.
 	install -d $(d)/usr
 ifeq ($(with_interp),static)
-	$(MAKE) -C $(buildd_static) install prefix=$(CURDIR)/$(d)/usr
+	$(MAKE) -C $(buildd_static) install DESTDIR=$(CURDIR)/$(d)
 	sed -e '/^OPT/s,-O3,-O2,' \
 	    -e 's/$(LTO_CFLAGS)//g' \
 	    -e 's,^RUNSHARED *=.*,RUNSHARED=,' \
@@ -710,7 +728,7 @@ ifeq ($(with_interp),static)
 		$(buildd_shared)/$(shell cat $(buildd_shared)/pybuilddir.txt)/_sysconfigdata.py \
 		> $(d)/$(scriptdir)/_sysconfigdata.py
 else
-	$(MAKE) -C $(buildd_shared) install prefix=$(CURDIR)/$(d)/usr
+	$(MAKE) -C $(buildd_shared) install DESTDIR=$(CURDIR)/$(d)
 endif
 	mkdir -p $(d)/usr/include/$(DEB_HOST_MULTIARCH)/$(PVER)$(ABIFLAGS)
 	mv $(d)/usr/include/$(PVER)$(ABIFLAGS)/pyconfig.h \
@@ -718,17 +736,20 @@ endif
 	rm -f $(d)/$(scriptdir)/lib-dynload/*.py
 	sed -i 's/ -O3 / -O2 /g;s/$(LTO_CFLAGS)//g;s/-fprofile-use *-fprofile-correction//g' \
 		$(d)/$(scriptdir)/_sysconfigdata.py
+	mkdir -p $(d)/$(scriptdir)/plat-$(DEB_HOST_MULTIARCH)
 	mv $(d)/$(scriptdir)/_sysconfigdata.py \
 	  $(d)/$(scriptdir)/plat-$(DEB_HOST_MULTIARCH)/_sysconfigdata_$(ABIFLAGS).py
 	cp -p debian/_sysconfigdata.py $(d)/$(scriptdir)/
 
+	: # work around issue 24226
+	sed -i 's/^\(def[^:]*:\) *\(.*\)/\1\n    \2/' \
+	  $(d)/$(scriptdir)/plat-$(DEB_HOST_MULTIARCH)/IN.py
+
 	-find $(d)/usr/lib/python$(VER) -name '*_failed*.so'
 	find $(d)/usr/lib/python$(VER) -name '*_failed*.so' | xargs -r rm -f
 
-	: # FIXME: don't ship ensurepip for now
-	#rm -rf $(d)/usr/lib/python$(VER)/ensurepip
-
 	for i in $(d)/$(scriptdir)/lib-dynload/*.so; do \
+	  case "$$i" in *$(DEB_HOST_MULTIARCH)*) continue; esac; \
 	  b=$$(basename $$i .$(SOABI).so); \
 	  d=$${b}.$(SOABI)-$(DEB_HOST_MULTIARCH).so; \
 	  mv $$i $(d)/$(scriptdir)/lib-dynload/$$d; \
@@ -973,7 +994,7 @@ endif
 	: # Move the demos and tools into $(p_exam)'s doc directory
 	dh_installdirs -p$(p_exam) \
 		usr/share/doc/python$(VER)/examples
-	DH_COMPAT=2 dh_movefiles -p$(p_ltst) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_exam) --sourcedir=$(d) \
 		$(scriptdir)/turtledemo
 
 	cp -rp Tools/* $(d_exam)/usr/share/doc/python$(VER)/examples/
@@ -1096,6 +1117,7 @@ endif
 	mv $(d)-dbg/usr/lib/libpython*.a $(d)-dbg/usr/lib/$(DEB_HOST_MULTIARCH)/
 
 	for i in $(d)-dbg/$(scriptdir)/lib-dynload/*.so; do \
+	  case "$$i" in *$(DEB_HOST_MULTIARCH)*) continue; esac; \
 	  b=$$(basename $$i .$(DEBUG_SOABI).so); \
 	  d=$${b}.$(DEBUG_SOABI)-$(DEB_HOST_MULTIARCH).so; \
 	  mv $$i $(d)-dbg/$(scriptdir)/lib-dynload/$$d; \
@@ -1141,6 +1163,7 @@ endif
 		/usr/lib/$(DEB_HOST_MULTIARCH)/libpython$(VER)$(DEBUG_ABIFLAGS).so
 	sed -e '/^Libs:/s,-lpython$(VER),-lpython$(VER)$(DEBUG_ABIFLAGS),' \
 	  -e '/^Cflags:/s,$$, -I$${includedir}/$(DEB_HOST_MULTIARCH)/python$(VER)$(DEBUG_ABIFLAGS),' \
+	  -e '/^libdir=/d;s/-L\$${libdir} *//' \
 	  $(d)-dbg/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/python-$(VER).pc \
 	  > $(d_ldbg)/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/python-$(VER)-dbg.pc
 
@@ -1269,13 +1292,13 @@ binary-indep: build-indep install stamps/stamp-control
 	cd $(buildd_static) && ./python ../debian/pyhtml2devhelp.py \
 		../$(d_doc)/usr/share/doc/$(p_base)/html index.html $(VER) \
 		> ../$(d_doc)/usr/share/doc/$(p_base)/html/$(PVER).devhelp
-	gzip -9v $(d_doc)/usr/share/doc/$(p_base)/html/$(PVER).devhelp
+	gzip -9nv $(d_doc)/usr/share/doc/$(p_base)/html/$(PVER).devhelp
 	dh_link -p$(p_doc) \
 		/usr/share/doc/$(p_base)/html /usr/share/devhelp/books/$(PVER)
 
 	for i in $(p_ltst); do \
 	  rm -rf debian/$$i/usr/share/doc/$$i; \
-	  ln -s $(p_lbase) debian/$$i/usr/share/doc/$$i; \
+	  ln -s $(p_base) debian/$$i/usr/share/doc/$$i; \
 	done
 
 	dh_installdebconf -i $(dh_args)
@@ -1326,17 +1349,19 @@ binary-arch: build-arch install
 	-find debian ! -perm -200 -print -exec chmod +w {} \;
 
 ifneq ($(with_tk),yes)
-	rm -f $(d_base)/$(scriptdir)/lib-dynload/_tkinter*.so
+	rm -f $(d_lbase)/$(scriptdir)/lib-dynload/_tkinter*.so
 else
 	dh_strip -p$(p_tk) --dbg-package=$(p_tk_dbg)
 endif
 ifneq ($(with_gdbm),yes)
-	rm -f $(d_base)/$(scriptdir)/lib-dynload/_gdbm*.so
+	rm -f $(d_lbase)/$(scriptdir)/lib-dynload/_gdbm*.so
 else
 	dh_strip -p$(p_gdbm) --dbg-package=$(p_gdbm_dbg)
 endif
 
-	dh_strip -a -N$(p_dbg) -Xdebug -Xdbg --dbg-package=$(p_dbg)
+	#find $(d_ldbg) $(d_ldev) -name '*.a' ! -type l \
+	#	| xargs -n 1 $(DEB_HOST_GNU_TYPE)-objcopy -p --remove-section=.gnu.lto_.*
+	dh_strip -a -N$(p_dbg) -N$(p_ldbg) -Xdebug -Xdbg --dbg-package=$(p_dbg)
 	cp Tools/gdb/libpython.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)$(ABIFLAGS)-gdb.py
 	ln -sf $(PVER)$(ABIFLAGS)-gdb.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)$(DEBUG_ABIFLAGS)-gdb.py
 	ln -sf $(PVER)$(ABIFLAGS)-gdb.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)-dbg-gdb.py
@@ -1368,9 +1393,9 @@ endif
 	    $(d_lib)/DEBIAN/symbols $(d_ldbg)/DEBIAN/symbols
 	dh_installdeb -a
 	dh_shlibdeps -a
-	dep=`sed -n '/^shlibs:Depends/s/.*\(libc6[^,]*\).*/\1/p' $(d_min).substvars`; \
+	dep=`sed -n '/^shlibs:Depends/s/[^=]*=\(.*\)/\1/p' $(d_min).substvars | awk -v RS=', ' -v ORS=', ' '/^libc6/ { print }'`; \
 	echo "shlibs:Pre-Depends=$$dep" >> $(d_min).substvars
-	sed -i '/^shlibs:Depends/s/libc6[^,]*[, ]*//' $(d_min).substvars
+	sed -i '/^shlibs:Depends/s/libc6[^,]*[, ]*//g' $(d_min).substvars
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a
