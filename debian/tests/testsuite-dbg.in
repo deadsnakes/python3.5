@@ -36,9 +36,8 @@ TESTEXCLUSIONS="$TESTEXCLUSIONS test_dbm"
 # test_distutils: Issue 17752, many failures in installed location
 TESTEXCLUSIONS="$TESTEXCLUSIONS test_distutils"
 
-# test_ensurepip: not yet installed, http://bugs.debian.org/732703
-# ... and then test_venv fails too
-#TESTEXCLUSIONS="$TESTEXCLUSIONS test_ensurepip test_venv "
+# test_venv: fails with an ensurepip error
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_venv "
 
 # test_gdb: not run for the optimized build
 #TESTEXCLUSIONS="$TESTEXCLUSIONS test_gdb"
@@ -47,7 +46,7 @@ TESTEXCLUSIONS="$TESTEXCLUSIONS test_distutils"
 TESTEXCLUSIONS="$TESTEXCLUSIONS test_ossaudiodev"
 
 # test_platform: Issue 17762 needs upstreaming
-TESTEXCLUSIONS="$TESTEXCLUSIONS test_platform "
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_platform "
 
 # test_pydoc: Issue 17763, interfers with packages in dist-packages
 #TESTEXCLUSIONS="$TESTEXCLUSIONS test_pydoc"
