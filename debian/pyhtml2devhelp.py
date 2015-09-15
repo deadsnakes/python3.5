@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 
 from html.parser import HTMLParser
-import formatter
 import os, sys, re
 
 class PyHTMLParser(HTMLParser):
@@ -10,8 +9,8 @@ class PyHTMLParser(HTMLParser):
                             'extending/index.html', 'c-api/index.html', 'install/index.html',
                             'distutils/index.html'))
 
-    def __init__(self, formatter, basedir, fn, indent, parents=set()):
-        HTMLParser.__init__(self, formatter)
+    def __init__(self, basedir, fn, indent, parents=set()):
+        HTMLParser.__init__(self)
         self.basedir = basedir
         self.dir, self.fn = os.path.split(fn)
         self.data = ''
@@ -109,8 +108,7 @@ class PyHTMLParser(HTMLParser):
         # TODO basedir bestimmen
         parent = os.path.join(self.basedir, self.fn)
         self.parents.add(parent)
-        parser = PyHTMLParser(formatter.NullFormatter(),
-                              self.basedir, href, self.indent + 1,
+        parser = PyHTMLParser(self.basedir, href, self.indent + 1,
                               self.parents)
         text = open(self.basedir + '/' + href, encoding='latin_1').read()
         parser.feed(text)
@@ -120,8 +118,8 @@ class PyHTMLParser(HTMLParser):
             self.parents.remove(parent)
 
 class PyIdxHTMLParser(HTMLParser):
-    def __init__(self, formatter, basedir, fn, indent):
-        HTMLParser.__init__(self, formatter)
+    def __init__(self, basedir, fn, indent):
+        HTMLParser.__init__(self)
         self.basedir = basedir
         self.dir, self.fn = os.path.split(fn)
         self.data = ''
@@ -252,7 +250,7 @@ def main():
     fn = sys.argv[2]
     version = sys.argv[3]
 
-    parser = PyHTMLParser(formatter.NullFormatter(), base, fn, indent=0)
+    parser = PyHTMLParser(base, fn, indent=0)
     print('<?xml version="1.0" encoding="iso-8859-1"?>')
     print('<book title="Python %s Documentation" name="Python %s" version="%s" link="index.html">' % (version, version, version))
     print('<chapters>')
@@ -262,7 +260,7 @@ def main():
     print('<functions>')
 
     fn = 'genindex-all.html'
-    parser = PyIdxHTMLParser(formatter.NullFormatter(), base, fn, indent=1)
+    parser = PyIdxHTMLParser(base, fn, indent=1)
     text = open(base + '/' + fn, encoding='latin_1').read()
     parser.feed(text)
     parser.close()
