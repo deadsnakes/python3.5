@@ -12,8 +12,8 @@ Test-Command: @PVER@ -c "import test.support"
 Depends: @PVER@
 
 # Not on precise
-#Tests: regr17-apt_pkg-import
-#Depends: @PVER@-minimal, python3-apport
+Tests: regr17-apt_pkg-import
+Depends: @PVER@-minimal, python3-apport
 
 Tests: check-minimal-extensions
 Depends: @PVER@-minimal
