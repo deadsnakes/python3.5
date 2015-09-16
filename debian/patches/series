@@ -1,4 +1,4 @@
-#hg-updates.diff
+# hg-updates.diff
 deb-setup.diff
 deb-locations.diff
 site-locations.diff
@@ -13,37 +13,41 @@ setup-modules.diff
 platform-lsbrelease.diff
 bdist-wininst-notfound.diff
 no-zip-on-sys.path.diff
-#profiled-build.diff FIXME for 3.4
+profiled-build.diff
 makesetup-bashism.diff
 hurd-disable-nonworking-constants.diff
 enable-fpectl.diff
-statvfs-f_flag-constants.diff
+# statvfs-f_flag-constants.diff
 
 # Ubuntu specific
 langpack-gettext.diff
-
-#link-system-expat.diff
+no-large-file-support.diff
 disable-sem-check.diff
 lib-argparse.diff
 ctypes-arm.diff
-link-timemodule.diff
+# link-timemodule.diff
 lto-link-flags.diff
 libffi-shared.diff
 multiarch.diff
 distutils-init.diff
 lib2to3-no-pickled-grammar.diff
 ext-no-libpython-link.diff
-installed-testsuite.diff
+# installed-testsuite.diff
 test-no-random-order.diff
 multiarch-extname.diff
 tempfile-minimal.diff
 
+issue21264.diff
+
 mpdecimal-version.diff
 mangle-fstack-protector.diff
 reproducible-buildinfo.diff
+
+issue24705.diff
 
 deadsnakes-assert-use-system-ffi.diff
 distutils-packaging-link.diff
 turtledemo-add-shebang.diff
 deadsnakes-ignore-sphinx-version.diff
 deadsnakes-pyspecific-3.4.2.diff
+

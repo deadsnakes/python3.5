@@ -2,7 +2,7 @@
 
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -719,6 +719,8 @@
+@@ -728,6 +728,8 @@
  	      -DHGVERSION="\"`LC_ALL=C $(HGVERSION)`\"" \
  	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
  	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \

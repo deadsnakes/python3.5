@@ -1854,11 +1854,6 @@ if test "$sol_lfs_bug" = "yes"; then
   use_lfs=no
 fi
 
-# Don't use largefile support for GNU/Hurd
-case $ac_sys_system in GNU*)
-  use_lfs=no
-esac
-
 if test "$use_lfs" = "yes"; then
 # Two defines needed to enable largefile support on various platforms
 # These may affect some typedefs
@@ -4178,13 +4173,8 @@ int main(void) {
 AC_MSG_RESULT($ac_cv_posix_semaphores_enabled)
 if test $ac_cv_posix_semaphores_enabled = no
 then
-  case $ac_sys_system in
-    Linux*) # assume yes, see https://launchpad.net/bugs/630511
-      ;;
-    *)
-      AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
-                [Define if POSIX semaphores aren't enabled on your system])
-  esac
+  AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
+            [Define if POSIX semaphores aren't enabled on your system])
 fi
 
 # Multiprocessing check for broken sem_getvalue
@@ -4219,13 +4209,8 @@ int main(void){
 AC_MSG_RESULT($ac_cv_broken_sem_getvalue)
 if test $ac_cv_broken_sem_getvalue = yes
 then
-  case $ac_sys_system in
-    Linux*) # assume yes, see https://launchpad.net/bugs/630511
-      ;;
-    *)
-      AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
-      [define to 1 if your sem_getvalue is broken.])
-  esac
+  AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
+  [define to 1 if your sem_getvalue is broken.])
 fi
 
 # determine what size digit to use for Python's longs

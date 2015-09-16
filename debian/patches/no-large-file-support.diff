@@ -1,10 +1,8 @@
 # DP: disable large file support for GNU/Hurd
 
-Index: b/configure.ac
-===================================================================
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1854,6 +1854,11 @@ if test "$sol_lfs_bug" = "yes"; then
+@@ -1854,6 +1854,11 @@
    use_lfs=no
  fi
  

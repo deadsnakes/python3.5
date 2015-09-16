@@ -222,19 +222,19 @@ class CommandLineTests(unittest.TestCase):
         os.utime(pycpath, (time.time()-60,)*2)
         mtime = os.stat(pycpath).st_mtime
         # Without force, no recompilation
-        self.assertRunOK(self.directory)
+        self.assertRunOK(PYTHONPATH=self.directory)
         mtime2 = os.stat(pycpath).st_mtime
         self.assertEqual(mtime, mtime2)
         # Now force it.
-        self.assertRunOK('-f', self.directory)
+        self.assertRunOK('-f', PYTHONPATH=self.directory)
         mtime2 = os.stat(pycpath).st_mtime
         self.assertNotEqual(mtime, mtime2)
 
     def test_no_args_respects_quiet_flag(self):
         script_helper.make_script(self.directory, 'baz', '')
-        noisy = self.assertRunOK(self.directory)
+        noisy = self.assertRunOK(PYTHONPATH=self.directory)
         self.assertIn(b'Listing ', noisy)
-        quiet = self.assertRunOK('-q', self.directory)
+        quiet = self.assertRunOK('-q', PYTHONPATH=self.directory)
         self.assertNotIn(b'Listing ', quiet)
 
     # Ensure that the default behavior of compileall's CLI is to create
