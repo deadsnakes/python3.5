@@ -31,7 +31,6 @@ test-no-random-order.diff
 multiarch-extname.diff
 tempfile-minimal.diff
 issue21264.diff
-mpdecimal-version.diff
 mangle-fstack-protector.diff
 reproducible-buildinfo.diff
 issue24705.diff
