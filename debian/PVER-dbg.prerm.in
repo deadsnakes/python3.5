@@ -17,10 +17,10 @@ remove_bytecode()
 
 case "$1" in
     remove)
-	remove_bytecode lib@PVER@-dbg
+	remove_bytecode lib@PVER@-dbg@HOST_QUAL@
         ;;
     upgrade)
-	remove_bytecode lib@PVER@-dbg
+	remove_bytecode lib@PVER@-dbg@HOST_QUAL@
         ;;
     deconfigure)
         ;;

@@ -34,6 +34,14 @@ CHANGELOG_VARS := $(shell dpkg-parsechangelog | \
 PKGSOURCE  := $(call vafilt,$(CHANGELOG_VARS),Source)
 PKGVERSION := $(call vafilt,$(CHANGELOG_VARS),Version)
 
+LAST_CHANGE := $(shell dpkg-parsechangelog -S Date)
+export BUILD_DATE := $(shell LC_ALL=C date -u +'%b %e %Y' -d '$(LAST_CHANGE)')
+export BUILD_TIME := $(shell LC_ALL=C date -u +'%H:%M:%S' -d '$(LAST_CHANGE)')
+
+SPHINXOPTS := -D today='$(shell LC_ALL=C date -u +'%B %d, %Y' -d '$(LAST_CHANGE)')'
+SPHINXOPTS += -D html_last_updated_fmt='$(shell LC_ALL=C date -u +'%B %d, %Y' -d '$(LAST_CHANGE)')'
+export SPHINXOPTS
+
 on_buildd := $(shell [ -f /CurrentlyBuilding -o "$$LOGNAME" = buildd -o "$$USER" = buildd ] && echo yes)
 
 ifneq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
@@ -134,6 +142,12 @@ ifeq (,$(filter $(distrelease),lenny etch squeeze wheezy lucid maverick natty on
 else
   ma_filter = grep -v '^Multi-Arch:'
 endif
+ifneq (,$(filter $(distrelease),sid experimental))
+  bd_gcc = gcc (>= 4:4.9.2),
+endif
+#ifeq (,$(filter $(distrelease),lenny etch squeeze wheezy lucid maverick natty oneiric precise quantal raring saucy trusty))
+#  bd_dpkgdev = dpkg-dev (>= 1.17.11),
+#endif
 
 CC=$(DEB_HOST_GNU_TYPE)-gcc
 CXX=$(DEB_HOST_GNU_TYPE)-g++
@@ -187,6 +201,11 @@ endif
 
 ifeq ($(with_lto),yes)
     LTO_CFLAGS = -g -flto -fuse-linker-plugin
+    with_fat_lto := $(shell dpkg --compare-versions $$($(CC) --version \
+			| sed -n '/^$(CC)/s,.* ,,p') ge 4.8 && echo yes)
+    ifeq ($(with_fat_lto),yes)
+      LTO_CFLAGS += -ffat-lto-objects
+    endif
     EXTRA_OPT_CFLAGS += $(LTO_CFLAGS)
 endif
 
@@ -321,6 +340,7 @@ common_configure_args = \
 		--with-computed-gotos \
 		--without-ensurepip \
 		--with-system-expat \
+		--with-system-libmpdec \
 
 ifneq (,$(filter $(DEB_HOST_ARCH), avr32 or1k))
   common_configure_args += --without-ffi
@@ -428,12 +448,11 @@ ifeq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
 	  echo "import $$m"; \
 	done > $(buildd_static)/minmods.py
 	cd $(buildd_static) && ./python ../debian/pymindeps.py minmods.py \
-	  > $(buildd_static)/mindeps.txt
+	  > mindeps.txt
 	-if [ -x /usr/bin/dot ]; then \
 	  cd $(buildd_static) && ./python ../debian/depgraph.py \
-	    < $(buildd_static)/mindeps.txt > $(buildd_static)/mindeps.dot; \
-	  dot -Tpng -o $(buildd_static)/mindeps.png \
-	    $(buildd_static)/mindeps.dot; \
+	    < mindeps.txt > mindeps.dot; \
+	  dot -Tpng -o mindeps.png mindeps.dot; \
 	else true; fi
 	cd $(buildd_static) && ./python ../debian/mincheck.py \
 		minmods.py mindeps.txt
@@ -528,7 +547,9 @@ else
 	) > $(buildd_debug)/run_tests
 	chmod 755 $(buildd_debug)/run_tests
 	@echo "BEGIN test debug"
-	-cd $(buildd_debug) && time xvfb-run -a -e xvfb-run.log ./run_tests
+	-tmphome=$$(mktemp -d); export HOME=$$tmphome; \
+	  cd $(buildd_debug) && time xvfb-run -a -e xvfb-run.log ./run_tests; \
+	  rm -rf $$tmphome
 	@echo "END test debug"
   endif
 
@@ -541,7 +562,9 @@ else
 	) > $(buildd_static)/run_tests
 	chmod 755 $(buildd_static)/run_tests
 	@echo "BEGIN test static"
-	-cd $(buildd_static) && time xvfb-run -a -e xvfb-run.log ./run_tests
+	-tmphome=$$(mktemp -d); export HOME=$$tmphome; \
+	  cd $(buildd_static) && time xvfb-run -a -e xvfb-run.log ./run_tests; \
+	  rm -rf $$tmphome
 	@echo "END test static"
 
 	( \
@@ -553,7 +576,9 @@ else
 	) > $(buildd_shared)/run_tests
 	chmod 755 $(buildd_shared)/run_tests
 	@echo "BEGIN test shared"
-	-cd $(buildd_shared) && time xvfb-run -a -e xvfb-run.log ./run_tests
+	-tmphome=$$(mktemp -d); export HOME=$$tmphome; \
+	  cd $(buildd_shared) && time xvfb-run -a -e xvfb-run.log ./run_tests; \
+	  rm -rf $$tmphome
 	@echo "END test shared"
 endif
 	cp -p $(buildd_static)/test_results debian/
@@ -659,8 +684,12 @@ generated-files:
 	    -e "s/@PRIORITY@/$(PRIORITY)/g" \
 	    -e "s/@PRIO@/$(PY_PRIO)/g" \
 	    -e "s/@MINPRIO@/$(PY_MINPRIO)/g" \
+	    -e "s/@bd_qual@/$(bd_qual)/g" \
+	    -e "s/@bd_gcc@/$(bd_gcc)/g" \
+	    -e "s/@bd_dpkgdev@/$(bd_dpkgdev)/g" \
 	    -e "s,@SCRIPTDIR@,/$(scriptdir),g" \
 	    -e "s,@INFO@,$(info_docs),g" \
+	    -e "s,@HOST_QUAL@,:$(DEB_HOST_ARCH),g" \
 	    -e "s/@ABIFLAGS@/$(ABIFLAGS)/g" \
 	    -e "s/@DEBUG_ABIFLAGS@/$(DEBUG_ABIFLAGS)/g" \
 	    -e "s/@VER_MAJOR@/$(VER_MAJOR)/g" \
@@ -693,6 +722,7 @@ clean: generated-files
 	    rm -f $$f2; \
 	  fi; \
 	done
+
 	dh_clean
 
 stamps/stamp-control: generated-files
@@ -713,7 +743,7 @@ install: build-arch stamps/stamp-install
 stamps/stamp-install: stamps/stamp-build generated-files stamps/stamp-control
 	dh_testdir
 	dh_testroot
-	dh_clean -k
+	dh_prep
 	dh_installdirs
 
 	: # make install into tmp and subsequently move the files into
@@ -773,7 +803,7 @@ endif
 
 	: # fix some file permissions
 	chmod a-x $(d)/$(scriptdir)/{runpy,fractions,lib2to3/refactor,tkinter/tix}.py
-	chmod a-x $(d)/$(scriptdir)/test/{test_pathlib,test_script_helper}.py
+	chmod a-x $(d)/$(scriptdir)/test/test_pathlib.py
 
 #	: # move manpages to new names
 #	if [ -d $(d)/usr/man/man1 ]; then \
@@ -905,7 +935,9 @@ endif
 	sed 's/@subdir@/$(PVER)$(ABIFLAGS)/;s/@header@/pyconfig.h/' \
 		debian/multiarch.h.in > $(d_ldev)/usr/include/$(PVER)$(ABIFLAGS)/pyconfig.h
 
-	sed -i '/^Cflags:/s,$$, -I$${includedir}/$(DEB_HOST_MULTIARCH)/python$(VER)$(ABIFLAGS),' \
+	sed -i \
+	    -e '/^Cflags:/s,$$, -I$${includedir}/$(DEB_HOST_MULTIARCH)/python$(VER)$(ABIFLAGS),' \
+	    -e '/^libdir=/d;s/-L\$${libdir} *//' \
 		$(d_ldev)/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/python-$(VER).pc
 
 	dh_link -p$(p_ldev) \
@@ -1363,6 +1395,7 @@ endif
 	#	| xargs -n 1 $(DEB_HOST_GNU_TYPE)-objcopy -p --remove-section=.gnu.lto_.*
 	dh_strip -a -N$(p_dbg) -N$(p_ldbg) -Xdebug -Xdbg --dbg-package=$(p_dbg)
 	cp Tools/gdb/libpython.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)$(ABIFLAGS)-gdb.py
+	ln -sf $(PVER)$(ABIFLAGS)-gdb.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)-gdb.py
 	ln -sf $(PVER)$(ABIFLAGS)-gdb.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)$(DEBUG_ABIFLAGS)-gdb.py
 	ln -sf $(PVER)$(ABIFLAGS)-gdb.py $(d_dbg)/usr/lib/debug/usr/bin/$(PVER)-dbg-gdb.py
 	ln -sf ../bin/$(PVER)$(ABIFLAGS)-gdb.py \

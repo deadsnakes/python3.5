@@ -3,7 +3,7 @@
 set -e
 
 if [ "$1" = "purge" ]; then
-    pc=$(dpkg-query -f '${db:Status-Abbrev} ${binary:Package}\n' -W pkgname \
+    pc=$(dpkg-query -f '${db:Status-Abbrev} ${binary:Package}\n' -W lib@PVER@-minimal \
 	| grep -v '^.n' | wc -l)
     if [ "$pc" -lt 1 ]; then
 	find /usr/lib/@PVER@ -depth -type d -name __pycache__ \

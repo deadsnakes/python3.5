@@ -16,7 +16,7 @@ remove_bytecode()
 
 case "$1" in
     remove|upgrade)
-	remove_bytecode lib@PVER@-stdlib
+	remove_bytecode lib@PVER@-stdlib@HOST_QUAL@
         ;;
     deconfigure)
         ;;
