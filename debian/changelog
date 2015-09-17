@@ -1,3 +1,9 @@
+python3.5 (3.5.0-2+vivid1) vivid; urgency=medium
+
+  * Imported from Trusty package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 17 Sep 2015 18:32:47 +0200
+
 python3.5 (3.5.0-2+trusty1) trusty; urgency=medium
 
   * Imported from Precise package.
