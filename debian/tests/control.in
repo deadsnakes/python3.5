@@ -33,5 +33,5 @@ Depends: libc-bin, @PVER@
 Tests: check-disabled-venv-site-packages
 Depends: @PVER@-venv
 
-Test: check-venv-package
+Tests: check-venv-package
 Depends: @PVER@-venv
