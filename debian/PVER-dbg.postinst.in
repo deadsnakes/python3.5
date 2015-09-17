@@ -3,7 +3,7 @@
 set -e
 
 if [ "$1" = configure ]; then
-    files=$(dpkg -L lib@PVER@-dbg | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p')
+    files=$(dpkg -L lib@PVER@-dbg@HOST_QUAL@ | sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p')
     if [ -n "$files" ]; then
 	@PVER@ -E -S /usr/lib/@PVER@/py_compile.py $files
 	if grep -sq '^byte-compile[^#]*optimize' /etc/python/debian_config; then

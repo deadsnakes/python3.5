@@ -1,10 +1,8 @@
 # DP: Ignore errors in the profile task.
 
-Index: b/Makefile.pre.in
-===================================================================
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -494,7 +494,16 @@ build_all_generate_profile:
+@@ -494,7 +494,16 @@
  
  run_profile_task:
  	: # FIXME: can't run for a cross build

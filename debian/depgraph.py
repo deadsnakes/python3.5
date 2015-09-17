@@ -186,7 +186,7 @@ class pydepgraphdot:
         sf = float(n[2])/0xff
         vf = float(n[3])/0xff
         r,g,b = colorsys.hsv_to_rgb(hf, 0.3+0.6*sf, 0.8+0.2*vf)
-        return '#%02x%02x%02x' % (r*256,g*256,b*256)
+        return '#%02x%02x%02x' % (int(r*256),int(g*256),int(b*256))
 
 
 def main():

@@ -39,6 +39,8 @@
 #  else
 #   error unknown multiarch location for @header@
 #  endif
+# elif defined(__or1k__)
+#  include <or1k-linux-gnu/@subdir@/@header@>
 # elif defined(__powerpc__) && defined(__SPE__)
 #  include <powerpc-linux-gnuspe/@subdir@/@header@>
 # elif defined(__powerpc64__)

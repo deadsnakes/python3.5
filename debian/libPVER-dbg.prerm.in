@@ -4,7 +4,7 @@ set -e
 
 case "$1" in
     remove)
-	dpkg -L lib@PVER@-dbg \
+	dpkg -L lib@PVER@-dbg@HOST_QUAL@ \
 	    | awk '/\.py$/ {print $0"c\n" $0"o"}' \
 	    | xargs -r rm -f >&2
         ;;

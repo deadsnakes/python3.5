@@ -40,7 +40,7 @@ if [ "$1" = configure ]; then
     else
 	filt='fgrep -v sitecustomize.py'
     fi
-    files=$(dpkg -L lib@PVER@-minimal \
+    files=$(dpkg -L lib@PVER@-minimal@HOST_QUAL@ \
 		| sed -n '/^\/usr\/lib\/@PVER@\/.*\.py$/p' | $filt)
     if [ -n "$files" ]; then
 	@PVER@ -E -S /usr/lib/@PVER@/py_compile.py $files
