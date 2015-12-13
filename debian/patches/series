@@ -13,7 +13,6 @@ setup-modules.diff
 platform-lsbrelease.diff
 bdist-wininst-notfound.diff
 no-zip-on-sys.path.diff
-profiled-build.diff
 makesetup-bashism.diff
 hurd-disable-nonworking-constants.diff
 enable-fpectl.diff
