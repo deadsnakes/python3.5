@@ -204,8 +204,8 @@ Command-line options
 
 .. cmdoption:: -c, --catch
 
-   Control-C during the test run waits for the current test to end and then
-   reports all the results so far. A second control-C raises the normal
+   :kbd:`Control-C` during the test run waits for the current test to end and then
+   reports all the results so far. A second :kbd:`Control-C` raises the normal
    :exc:`KeyboardInterrupt` exception.
 
    See `Signal Handling`_ for the functions that provide this functionality.
@@ -278,8 +278,8 @@ The :option:`-s`, :option:`-p`, and :option:`-t` options can be passed in
 as positional arguments in that order. The following two command lines
 are equivalent::
 
-   python -m unittest discover -s project_directory -p '*_test.py'
-   python -m unittest discover project_directory '*_test.py'
+   python -m unittest discover -s project_directory -p "*_test.py"
+   python -m unittest discover project_directory "*_test.py"
 
 As well as being a path it is possible to pass a package name, for example
 ``myproject.subpackage.test``, as the start directory. The package name you
@@ -471,7 +471,7 @@ Skipping tests and expected failures
 .. versionadded:: 3.1
 
 Unittest supports skipping individual test methods and even whole classes of
-tests.  In addition, it supports marking a test as a "expected failure," a test
+tests.  In addition, it supports marking a test as an "expected failure," a test
 that is broken and will fail, but shouldn't be counted as a failure on a
 :class:`TestResult`.
 

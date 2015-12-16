@@ -974,7 +974,7 @@ Since idlelib implements the IDLE shell and editor and is not intended for
 import by other programs, it gets improvements with every release. See
 :file:`Lib/idlelib/NEWS.txt` for a cumulative list of changes since 3.3.0,
 as well as changes made in future 3.4.x releases. This file is also available
-from the IDLE Help -> About Idle dialog.
+from the IDLE :menuselection:`Help --> About IDLE` dialog.
 
 
 importlib
@@ -2076,7 +2076,7 @@ using ``-Wd``).
 Deprecations in the Python API
 ------------------------------
 
-* As mentioned in :ref:`whatsnew-pep-451`, a number of :mod:`importilb`
+* As mentioned in :ref:`whatsnew-pep-451`, a number of :mod:`importlib`
   methods and functions are deprecated: :meth:`importlib.find_loader` is
   replaced by :func:`importlib.util.find_spec`;
   :meth:`importlib.machinery.PathFinder.find_module` is replaced by

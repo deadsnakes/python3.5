@@ -9,6 +9,13 @@ Streams (high-level API)
 Stream functions
 ================
 
+.. note::
+
+   The top-level functions in this module are meant convenience wrappers
+   only; there's really nothing special there, and if they don't do
+   exactly what you want, feel free to copy their code.
+
+
 .. coroutinefunction:: open_connection(host=None, port=None, \*, loop=None, limit=None, \*\*kwds)
 
    A wrapper for :meth:`~BaseEventLoop.create_connection()` returning a (reader,
@@ -25,10 +32,6 @@ Stream functions
    Additional optional keyword arguments are *loop* (to set the event loop
    instance to use) and *limit* (to set the buffer limit passed to the
    :class:`StreamReader`).
-
-   (If you want to customize the :class:`StreamReader` and/or
-   :class:`StreamReaderProtocol` classes, just copy the code -- there's really
-   nothing special here except some convenience.)
 
    This function is a :ref:`coroutine <coroutine>`.
 
@@ -228,8 +231,8 @@ StreamReaderProtocol
 
     (This is a helper class instead of making :class:`StreamReader` itself a
     :class:`Protocol` subclass, because the :class:`StreamReader` has other
-    potential uses, and to prevent the user of the :class:`StreamReader` to
-    accidentally call inappropriate methods of the protocol.)
+    potential uses, and to prevent the user of the :class:`StreamReader` from
+    accidentally calling inappropriate methods of the protocol.)
 
 
 IncompleteReadError
@@ -312,7 +315,7 @@ TCP echo server using the :func:`asyncio.start_server` function::
     coro = asyncio.start_server(handle_echo, '127.0.0.1', 8888, loop=loop)
     server = loop.run_until_complete(coro)
 
-    # Serve requests until CTRL+c is pressed
+    # Serve requests until Ctrl+C is pressed
     print('Serving on {}'.format(server.sockets[0].getsockname()))
     try:
         loop.run_forever()

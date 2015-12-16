@@ -552,7 +552,7 @@ the *new_callable* argument to :func:`patch`.
         keyword arguments (or an empty dictionary).
 
             >>> mock = Mock(return_value=None)
-            >>> print mock.call_args
+            >>> print(mock.call_args)
             None
             >>> mock()
             >>> mock.call_args
@@ -747,7 +747,7 @@ apply to method calls on the mock object.
         >>> with patch('__main__.Foo.foo', new_callable=PropertyMock) as mock_foo:
         ...     mock_foo.return_value = 'mockity-mock'
         ...     this_foo = Foo()
-        ...     print this_foo.foo
+        ...     print(this_foo.foo)
         ...     this_foo.foo = 6
         ...
         mockity-mock
@@ -1131,11 +1131,11 @@ you wanted a :class:`NonCallableMock` to be used:
       ...
     TypeError: 'NonCallableMock' object is not callable
 
-Another use case might be to replace an object with a :class:`io.StringIO` instance:
+Another use case might be to replace an object with an :class:`io.StringIO` instance:
 
     >>> from io import StringIO
     >>> def foo():
-    ...     print 'Something'
+    ...     print('Something')
     ...
     >>> @patch('sys.stdout', new_callable=StringIO)
     ... def test(mock_stdout):
@@ -1249,7 +1249,7 @@ ends.
 
     >>> import os
     >>> with patch.dict('os.environ', {'newkey': 'newvalue'}):
-    ...     print os.environ['newkey']
+    ...     print(os.environ['newkey'])
     ...
     newvalue
     >>> assert 'newkey' not in os.environ
@@ -1462,9 +1462,9 @@ inform the patchers of the different prefix by setting ``patch.TEST_PREFIX``:
     >>> @patch('__main__.value', 'not three')
     ... class Thing:
     ...     def foo_one(self):
-    ...         print value
+    ...         print(value)
     ...     def foo_two(self):
-    ...         print value
+    ...         print(value)
     ...
     >>>
     >>> Thing().foo_one()

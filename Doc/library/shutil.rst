@@ -207,8 +207,8 @@ Directory and files operations
    and metadata of the linked files are copied to the new tree.
 
    When *symlinks* is false, if the file pointed by the symlink doesn't
-   exist, a exception will be added in the list of errors raised in
-   a :exc:`Error` exception at the end of the copy process.
+   exist, an exception will be added in the list of errors raised in
+   an :exc:`Error` exception at the end of the copy process.
    You can set the optional *ignore_dangling_symlinks* flag to true if you
    want to silence this exception. Notice that this option has no effect
    on platforms that don't support :func:`os.symlink`.
@@ -497,7 +497,7 @@ provided.  They rely on the :mod:`zipfile` and :mod:`tarfile` modules.
 .. function:: get_archive_formats()
 
    Return a list of supported formats for archiving.
-   Each element of the returned sequence is a tuple ``(name, description)``
+   Each element of the returned sequence is a tuple ``(name, description)``.
 
    By default :mod:`shutil` provides these formats:
 
