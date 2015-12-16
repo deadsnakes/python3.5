@@ -1,4 +1,3 @@
-#!/usr/bin/python3.4
 """turtledemo.two_canvases
 
 Use TurtleScreen and RawTurtle to draw on two

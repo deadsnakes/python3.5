@@ -32,10 +32,7 @@ tk.mainloop()
 
 import sys
 
-try:
-    import _tkinter
-except ImportError as msg:
-    raise ImportError(str(msg) + ', please install the python3-tk package')
+import _tkinter # If this fails your Python may not be configured for Tk
 TclError = _tkinter.TclError
 from tkinter.constants import *
 import re

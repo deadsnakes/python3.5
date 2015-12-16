@@ -14,38 +14,18 @@ class install_egg_info(Command):
     description = "Install package's PKG-INFO metadata as an .egg-info file"
     user_options = [
         ('install-dir=', 'd', "directory to install to"),
-        ('install-layout', None, "custom installation layout"),
     ]
 
     def initialize_options(self):
         self.install_dir = None
-        self.install_layout = None
-        self.prefix_option = None
 
     def finalize_options(self):
         self.set_undefined_options('install_lib',('install_dir','install_dir'))
-        self.set_undefined_options('install',('install_layout','install_layout'))
-        self.set_undefined_options('install',('prefix_option','prefix_option'))
-        if self.install_layout:
-            if not self.install_layout.lower() in ['deb', 'unix']:
-                raise DistutilsOptionError(
-                    "unknown value for --install-layout")
-            no_pyver = (self.install_layout.lower() == 'deb')
-        elif self.prefix_option:
-            no_pyver = False
-        else:
-            no_pyver = True
-        if no_pyver:
-            basename = "%s-%s.egg-info" % (
-                to_filename(safe_name(self.distribution.get_name())),
-                to_filename(safe_version(self.distribution.get_version()))
-                )
-        else:
-            basename = "%s-%s-py%s.egg-info" % (
-                to_filename(safe_name(self.distribution.get_name())),
-                to_filename(safe_version(self.distribution.get_version())),
-                sys.version[:3]
-                )
+        basename = "%s-%s-py%s.egg-info" % (
+            to_filename(safe_name(self.distribution.get_name())),
+            to_filename(safe_version(self.distribution.get_version())),
+            sys.version[:3]
+        )
         self.target = os.path.join(self.install_dir, basename)
         self.outputs = [self.target]
 
