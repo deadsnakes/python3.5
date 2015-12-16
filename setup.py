@@ -254,8 +254,10 @@ class PyBuildExt(build_ext):
         # unfortunately, distutils doesn't let us provide separate C and C++
         # compilers
         if compiler is not None:
-            (ccshared,cflags) = sysconfig.get_config_vars('CCSHARED','CFLAGS')
-            args['compiler_so'] = compiler + ' ' + ccshared + ' ' + cflags
+            (ccshared, cppflags, cflags) = \
+                sysconfig.get_config_vars('CCSHARED', 'CPPFLAGS', 'CFLAGS')
+            cppflags = ' '.join([f for f in cppflags.split() if not f.startswith('-I')])
+            args['compiler_so'] = compiler + ' ' + ccshared + ' ' + cppflags + ' ' + cflags
         self.compiler.set_executables(**args)
 
         build_ext.build_extensions(self)
@@ -465,12 +467,7 @@ class PyBuildExt(build_ext):
             os.unlink(tmpfile)
 
     def detect_modules(self):
-        # Ensure that /usr/local is always used, but the local build
-        # directories (i.e. '.' and 'Include') must be first.  See issue
-        # 10520.
-        if not cross_compiling:
-            add_dir_to_list(self.compiler.library_dirs, '/usr/local/lib')
-            add_dir_to_list(self.compiler.include_dirs, '/usr/local/include')
+        # On Debian /usr/local is always used, so we don't include it twice
         # only change this for cross builds for 3.3, issues on Mageia
         if cross_compiling:
             self.add_gcc_paths()
@@ -1343,6 +1340,9 @@ class PyBuildExt(build_ext):
         else:
             missing.append('_curses_panel')
 
+        #fpectl fpectlmodule.c ...
+        exts.append( Extension('fpectl', ['fpectlmodule.c']) )
+
         # Andrew Kuchling's zlib module.  Note that some versions of zlib
         # 1.1.3 have security problems.  See CERT Advisory CA-2002-07:
         # http://www.cert.org/advisories/CA-2002-07.html
@@ -1974,7 +1974,7 @@ class PyBuildExt(build_ext):
                         break
         ffi_lib = None
         if ffi_inc is not None:
-            for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):
+            for lib_name in ('ffi', 'ffi_convenience', 'ffi_pic', 'ffi'):
                 if (self.compiler.find_library_file(lib_dirs, lib_name)):
                     ffi_lib = lib_name
                     break
@@ -1983,6 +1983,10 @@ class PyBuildExt(build_ext):
             ext.include_dirs.extend(ffi_inc)
             ext.libraries.append(ffi_lib)
             self.use_system_libffi = True
+
+        if not self.use_system_libffi:
+            print("Error: not using system libffi", file=sys.stderr)
+            sys.exit(1)
 
     def _decimal_ext(self):
         extra_compile_args = []

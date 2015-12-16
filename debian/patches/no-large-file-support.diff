@@ -2,7 +2,7 @@
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1854,6 +1854,11 @@
+@@ -1897,6 +1897,11 @@
    use_lfs=no
  fi
  

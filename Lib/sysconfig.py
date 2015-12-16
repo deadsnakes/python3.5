@@ -260,7 +260,12 @@ def _parse_makefile(filename, vars=None):
     while len(variables) > 0:
         for name in tuple(variables):
             value = notdone[name]
-            m = _findvar1_rx.search(value) or _findvar2_rx.search(value)
+            m1 = _findvar1_rx.search(value)
+            m2 = _findvar2_rx.search(value)
+            if m1 and m2:
+                m = m1 if m1.start() < m2.start() else m2
+            else:
+                m = m1 if m1 else m2
             if m is not None:
                 n = m.group(1)
                 found = True
@@ -332,6 +337,8 @@ def get_makefile_filename():
         config_dir_name = 'config-%s%s' % (_PY_VERSION_SHORT, sys.abiflags)
     else:
         config_dir_name = 'config'
+    if hasattr(sys.implementation, '_multiarch'):
+        config_dir_name += '-%s' % sys.implementation._multiarch
     return os.path.join(get_path('stdlib'), config_dir_name, 'Makefile')
 
 def _generate_posix_vars():
@@ -537,6 +544,12 @@ def get_config_vars(*args):
         # init function to enable using 'get_config_var' in
         # the init-function.
         _CONFIG_VARS['userbase'] = _getuserbase()
+
+        multiarch = get_config_var('MULTIARCH')
+        if multiarch:
+            _CONFIG_VARS['multiarchsubdir'] = '/' + multiarch
+        else:
+            _CONFIG_VARS['multiarchsubdir'] = ''
 
         # Always convert srcdir to an absolute path
         srcdir = _CONFIG_VARS.get('srcdir', _PROJECT_BASE)
