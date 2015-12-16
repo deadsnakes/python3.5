@@ -295,6 +295,7 @@ class _SSLProtocolTransport(transports._FlowControlMixin,
 
     def __init__(self, loop, ssl_protocol, app_protocol):
         self._loop = loop
+        # SSLProtocol instance
         self._ssl_protocol = ssl_protocol
         self._app_protocol = app_protocol
         self._closed = False
@@ -302,6 +303,9 @@ class _SSLProtocolTransport(transports._FlowControlMixin,
     def get_extra_info(self, name, default=None):
         """Get optional transport information."""
         return self._ssl_protocol._get_extra_info(name, default)
+
+    def is_closing(self):
+        return self._closed
 
     def close(self):
         """Close the transport.
@@ -348,7 +352,7 @@ class _SSLProtocolTransport(transports._FlowControlMixin,
         high-water limit.  Neither value can be negative.
 
         The defaults are implementation-specific.  If only the
-        high-water limit is given, the low-water limit defaults to a
+        high-water limit is given, the low-water limit defaults to an
         implementation-specific value less than or equal to the
         high-water limit.  Setting high to zero forces low to zero as
         well, and causes pause_writing() to be called whenever the
@@ -425,10 +429,12 @@ class SSLProtocol(protocols.Protocol):
         self._app_protocol = app_protocol
         self._app_transport = _SSLProtocolTransport(self._loop,
                                                     self, self._app_protocol)
+        # _SSLPipe instance (None until the connection is made)
         self._sslpipe = None
         self._session_established = False
         self._in_handshake = False
         self._in_shutdown = False
+        # transport, ex: SelectorSocketTransport
         self._transport = None
 
     def _wakeup_waiter(self, exc=None):
@@ -591,6 +597,7 @@ class SSLProtocol(protocols.Protocol):
         self._extra.update(peercert=peercert,
                            cipher=sslobj.cipher(),
                            compression=sslobj.compression(),
+                           ssl_object=sslobj,
                            )
         self._app_protocol.connection_made(self._app_transport)
         self._wakeup_waiter()

@@ -14,14 +14,14 @@ This page lists common traps and explains how to avoid them.
 Debug mode of asyncio
 ---------------------
 
-The implementation of :mod:`asyncio` module has been written for performances.
-To development with asyncio, it's required to enable the debug checks to ease
-the development of asynchronous code.
+The implementation of :mod:`asyncio` has been written for performance.
+In order to ease the development of asynchronous code, you may wish to
+enable *debug mode*.
 
-Setup an application to enable all debug checks:
+To enable all debug checks for an application:
 
 * Enable the asyncio debug mode globally by setting the environment variable
-  :envvar:`PYTHONASYNCIODEBUG` to ``1``
+  :envvar:`PYTHONASYNCIODEBUG` to ``1``, or by calling :meth:`BaseEventLoop.set_debug`.
 * Set the log level of the :ref:`asyncio logger <asyncio-logger>` to
   :py:data:`logging.DEBUG`. For example, call
   ``logging.basicConfig(level=logging.DEBUG)`` at startup.
@@ -96,10 +96,9 @@ the same thread. But when the task uses ``yield from``, the task is suspended
 and the event loop executes the next task.
 
 To schedule a callback from a different thread, the
-:meth:`BaseEventLoop.call_soon_threadsafe` method should be used. Example to
-schedule a coroutine from a different thread::
+:meth:`BaseEventLoop.call_soon_threadsafe` method should be used. Example::
 
-    loop.call_soon_threadsafe(asyncio.ensure_future, coro_func())
+    loop.call_soon_threadsafe(callback, *args)
 
 Most asyncio objects are not thread safe. You should only worry if you access
 objects outside the event loop. For example, to cancel a future, don't call
@@ -109,6 +108,13 @@ directly its :meth:`Future.cancel` method, but::
 
 To handle signals and to execute subprocesses, the event loop must be run in
 the main thread.
+
+To schedule a coroutine object from a different thread, the
+:func:`run_coroutine_threadsafe` function should be used. It returns a
+:class:`concurrent.futures.Future` to access the result::
+
+     future = asyncio.run_coroutine_threadsafe(coro_func(), loop)
+     result = future.result(timeout)  # Wait for the result with a timeout
 
 The :meth:`BaseEventLoop.run_in_executor` method can be used with a thread pool
 executor to execute a callback in different thread to not block the thread of

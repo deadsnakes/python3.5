@@ -641,7 +641,7 @@ always available.
    :term:`struct sequence`  :data:`sys.version_info` may be used for a more
    human-friendly encoding of the same information.
 
-   More details of ``hexversion`` can be found at :ref:`apiabiversion`
+   More details of ``hexversion`` can be found at :ref:`apiabiversion`.
 
 
 .. data:: implementation
@@ -974,6 +974,13 @@ always available.
    limit higher when they have a program that requires deep recursion and a platform
    that supports a higher limit.  This should be done with care, because a too-high
    limit can lead to a crash.
+
+   If the new limit is too low at the current recursion depth, a
+   :exc:`RecursionError` exception is raised.
+
+   .. versionchanged:: 3.5.1
+      A :exc:`RecursionError` exception is now raised if the new limit is too
+      low at the current recursion depth.
 
 
 .. function:: setswitchinterval(interval)

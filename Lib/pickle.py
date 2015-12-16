@@ -358,7 +358,7 @@ class _Pickler:
 
         The *file* argument must have a write() method that accepts a
         single bytes argument. It can thus be a file object opened for
-        binary writing, a io.BytesIO instance, or any other custom
+        binary writing, an io.BytesIO instance, or any other custom
         object that meets this interface.
 
         If *fix_imports* is True and *protocol* is less than 3, pickle
@@ -984,7 +984,7 @@ class _Unpickler:
         The argument *file* must have two methods, a read() method that
         takes an integer argument, and a readline() method that requires
         no arguments.  Both methods should return bytes.  Thus *file*
-        can be a binary file object opened for reading, a io.BytesIO
+        can be a binary file object opened for reading, an io.BytesIO
         object, or any other custom object that meets this interface.
 
         The file-like object must have two methods, a read() method
@@ -1204,6 +1204,14 @@ class _Unpickler:
                                   "of %d bytes" % maxsize)
         self.append(str(self.read(len), 'utf-8', 'surrogatepass'))
     dispatch[BINUNICODE8[0]] = load_binunicode8
+
+    def load_binbytes8(self):
+        len, = unpack('<Q', self.read(8))
+        if len > maxsize:
+            raise UnpicklingError("BINBYTES8 exceeds system's maximum size "
+                                  "of %d bytes" % maxsize)
+        self.append(self.read(len))
+    dispatch[BINBYTES8[0]] = load_binbytes8
 
     def load_short_binstring(self):
         len = self.read(1)[0]

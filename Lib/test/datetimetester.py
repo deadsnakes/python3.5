@@ -3,6 +3,7 @@
 See http://www.zope.org/Members/fdrake/DateTimeWiki/TestCases
 """
 
+import copy
 import decimal
 import sys
 import pickle
@@ -192,6 +193,29 @@ class TestTZInfo(unittest.TestCase):
                 self.assertEqual(derived.utcoffset(None), offset)
                 self.assertEqual(derived.tzname(None), oname)
 
+    def test_issue23600(self):
+        DSTDIFF = DSTOFFSET = timedelta(hours=1)
+
+        class UKSummerTime(tzinfo):
+            """Simple time zone which pretends to always be in summer time, since
+                that's what shows the failure.
+            """
+
+            def utcoffset(self, dt):
+                return DSTOFFSET
+
+            def dst(self, dt):
+                return DSTDIFF
+
+            def tzname(self, dt):
+                return 'UKSummerTime'
+
+        tz = UKSummerTime()
+        u = datetime(2014, 4, 26, 12, 1, tzinfo=tz)
+        t = tz.fromutc(u)
+        self.assertEqual(t - t.utcoffset(), u)
+
+
 class TestTimeZone(unittest.TestCase):
 
     def setUp(self):
@@ -211,7 +235,6 @@ class TestTimeZone(unittest.TestCase):
             # test round-trip
             tzrep = repr(tz)
             self.assertEqual(tz, eval(tzrep))
-
 
     def test_class_members(self):
         limit = timedelta(hours=23, minutes=59)
@@ -298,6 +321,33 @@ class TestTimeZone(unittest.TestCase):
                              t.replace(tzinfo=tz).utcoffset())
             self.assertEqual(tz.dst(t),
                              t.replace(tzinfo=tz).dst())
+
+    def test_pickle(self):
+        for tz in self.ACDT, self.EST, timezone.min, timezone.max:
+            for pickler, unpickler, proto in pickle_choices:
+                tz_copy = unpickler.loads(pickler.dumps(tz, proto))
+                self.assertEqual(tz_copy, tz)
+        tz = timezone.utc
+        for pickler, unpickler, proto in pickle_choices:
+            tz_copy = unpickler.loads(pickler.dumps(tz, proto))
+            self.assertIs(tz_copy, tz)
+
+    def test_copy(self):
+        for tz in self.ACDT, self.EST, timezone.min, timezone.max:
+            tz_copy = copy.copy(tz)
+            self.assertEqual(tz_copy, tz)
+        tz = timezone.utc
+        tz_copy = copy.copy(tz)
+        self.assertIs(tz_copy, tz)
+
+    def test_deepcopy(self):
+        for tz in self.ACDT, self.EST, timezone.min, timezone.max:
+            tz_copy = copy.deepcopy(tz)
+            self.assertEqual(tz_copy, tz)
+        tz = timezone.utc
+        tz_copy = copy.deepcopy(tz)
+        self.assertIs(tz_copy, tz)
+
 
 #############################################################################
 # Base class for testing a particular aspect of timedelta, time, date and
@@ -663,11 +713,15 @@ class TestTimeDelta(HarmlessMixedComparison, unittest.TestCase):
         eq(td(milliseconds=0.4/1000), td(0))    # rounds to 0
         eq(td(milliseconds=-0.4/1000), td(0))    # rounds to 0
         eq(td(milliseconds=0.5/1000), td(microseconds=0))
-        eq(td(milliseconds=-0.5/1000), td(microseconds=0))
+        eq(td(milliseconds=-0.5/1000), td(microseconds=-0))
         eq(td(milliseconds=0.6/1000), td(microseconds=1))
         eq(td(milliseconds=-0.6/1000), td(microseconds=-1))
+        eq(td(milliseconds=1.5/1000), td(microseconds=2))
+        eq(td(milliseconds=-1.5/1000), td(microseconds=-2))
         eq(td(seconds=0.5/10**6), td(microseconds=0))
-        eq(td(seconds=-0.5/10**6), td(microseconds=0))
+        eq(td(seconds=-0.5/10**6), td(microseconds=-0))
+        eq(td(seconds=1/2**7), td(microseconds=7812))
+        eq(td(seconds=-1/2**7), td(microseconds=-7812))
 
         # Rounding due to contributions from more than one field.
         us_per_hour = 3600e6
@@ -1851,6 +1905,7 @@ class TestDateTime(TestDate):
             zero = fts(0)
             self.assertEqual(zero.second, 0)
             self.assertEqual(zero.microsecond, 0)
+            one = fts(1e-6)
             try:
                 minus_one = fts(-1e-6)
             except OSError:
@@ -1861,22 +1916,28 @@ class TestDateTime(TestDate):
                 self.assertEqual(minus_one.microsecond, 999999)
 
                 t = fts(-1e-8)
-                self.assertEqual(t, minus_one)
+                self.assertEqual(t, zero)
                 t = fts(-9e-7)
                 self.assertEqual(t, minus_one)
                 t = fts(-1e-7)
-                self.assertEqual(t, minus_one)
+                self.assertEqual(t, zero)
+                t = fts(-1/2**7)
+                self.assertEqual(t.second, 59)
+                self.assertEqual(t.microsecond, 992188)
 
             t = fts(1e-7)
             self.assertEqual(t, zero)
             t = fts(9e-7)
-            self.assertEqual(t, zero)
+            self.assertEqual(t, one)
             t = fts(0.99999949)
             self.assertEqual(t.second, 0)
             self.assertEqual(t.microsecond, 999999)
             t = fts(0.9999999)
+            self.assertEqual(t.second, 1)
+            self.assertEqual(t.microsecond, 0)
+            t = fts(1/2**7)
             self.assertEqual(t.second, 0)
-            self.assertEqual(t.microsecond, 999999)
+            self.assertEqual(t.microsecond, 7812)
 
     def test_insane_fromtimestamp(self):
         # It's possible that some platform maps time_t to double,

@@ -82,8 +82,21 @@ the :mod:`glob` module.)
 
    Return the longest path prefix (taken character-by-character) that is a
    prefix of all paths in  *list*.  If *list* is empty, return the empty string
-   (``''``).  Note that this may return invalid paths because it works a
-   character at a time.  To obtain a valid path, see :func:`commonpath`.
+   (``''``).
+
+   .. note::
+
+      This function may return invalid paths because it works a
+      character at a time.  To obtain a valid path, see
+      :func:`commonpath`.
+
+      ::
+
+        >>> os.path.commonprefix(['/usr/lib', '/usr/local/lib'])
+        '/usr/l'
+
+        >>> os.path.commonpath(['/usr/lib', '/usr/local/lib'])
+        '/usr'
 
 
 .. function:: dirname(path)
@@ -276,7 +289,7 @@ the :mod:`glob` module.)
 
    Return ``True`` if both pathname arguments refer to the same file or directory.
    This is determined by the device number and i-node number and raises an
-   exception if a :func:`os.stat` call on either pathname fails.
+   exception if an :func:`os.stat` call on either pathname fails.
 
    Availability: Unix, Windows.
 

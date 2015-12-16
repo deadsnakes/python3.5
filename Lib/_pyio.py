@@ -8,12 +8,13 @@ import codecs
 import errno
 import array
 import stat
+import sys
 # Import _thread instead of threading to reduce startup cost
 try:
     from _thread import allocate_lock as Lock
 except ImportError:
     from _dummy_thread import allocate_lock as Lock
-if os.name == 'win32':
+if sys.platform in {'win32', 'cygwin'}:
     from msvcrt import setmode as _setmode
 else:
     _setmode = None
@@ -2511,7 +2512,7 @@ class StringIO(TextIOWrapper):
 
     def __repr__(self):
         # TextIOWrapper tells the encoding in its repr. In StringIO,
-        # that's a implementation detail.
+        # that's an implementation detail.
         return object.__repr__(self)
 
     @property
