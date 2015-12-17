@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+CTYPES=/usr/lib/@PVER@/lib-dynload/_ctypes.@EXTSUFFIX@
+CTYPES_DEBUG=/usr/lib/@PVER@/lib-dynload/_ctypes.@DEBUG_EXTSUFFIX@
+
+LIBFFI=libffi.so.6
+
+# regular
+test -e $CTYPES && echo "$CTYPES exists"
+ldd $CTYPES | grep -q $LIBFFI
+
+# debug
+test -e $CTYPES_DEBUG && echo "$CTYPES_DEBUG exists"
+ldd $CTYPES_DEBUG | grep -q $LIBFFI

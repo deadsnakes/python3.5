@@ -1,0 +1,19 @@
+README.source for python@VER@
+---------------------------
+The package uses the "3.0 (quilt)" source format so patches recorded in
+debian/patches/series are applied automatically. However, since some patches
+might modify `configure.in` without also patching `configure` (which is
+generated from `configure.in`, so that would be pointless), `debian/rules`
+provides a `patch` target that regenerates `configure`. The build process will
+perfom this step automatically if required, however.
+
+This package uses pristine-tar [1] and a custom-written support script [2] to
+allow reconstruction of the original source tarballs from the repository. To
+reconstruct an original tarball from the repository:
+
+$ deadsnakes-pristine-tar checkout <tarball name>
+
+This will re-create the tarball and place it in the parent directory.
+
+[1] http://joeyh.name/code/pristine-tar/
+[2] https://bitbucket.org/fk/deadsnakes-pristine-tar/src/tip/deadsnakes-pristine-tar

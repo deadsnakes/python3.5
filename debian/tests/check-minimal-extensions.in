@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+apt-get purge -yy lib@PVER@-stdlib 2>&1 || true
+
+on_error() {
+    echo $*
+    ls /usr/lib/@PVER@/lib-dynload
+    false
+}
+
+MIN_EXTS="_ssl _hashlib _opcode"
+for mod in $MIN_EXTS; do
+  @PVER@ -c "import $mod"
+  test -e "/usr/lib/@PVER@/lib-dynload/${mod}.@EXTSUFFIX@" || on_error missing $mod
+done
+
+MIN_BUILTINS=""
+for mod in $MIN_BUILTINS; do
+  @PVER@ -c "import $mod"
+  test ! -e "/usr/lib/@PVER@/lib-dynload/${mod}.@EXTSUFFIX@" || on_error builtin $mod as extension
+done
+
+test $(ls -1 /usr/lib/@PVER@/lib-dynload | wc -l) -eq $(echo $MIN_EXTS | wc -w) || on_error unexpected number of extensions

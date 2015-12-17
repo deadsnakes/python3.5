@@ -1,0 +1,13 @@
+# DP: Build getbuildinfo.o with DATE/TIME values when defined
+
+--- a/Makefile.pre.in
++++ b/Makefile.pre.in
+@@ -734,6 +734,8 @@
+ 	      -DHGVERSION="\"`LC_ALL=C $(HGVERSION)`\"" \
+ 	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
+ 	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \
++	      $(if $(BUILD_DATE),-DDATE='"$(BUILD_DATE)"') \
++	      $(if $(BUILD_TIME),-DTIME='"$(BUILD_TIME)"') \
+ 	      -o $@ $(srcdir)/Modules/getbuildinfo.c
+ 
+ Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile

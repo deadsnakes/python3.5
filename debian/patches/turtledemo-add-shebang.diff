@@ -1,0 +1,7 @@
+--- a/Lib/turtledemo/two_canvases.py
++++ b/Lib/turtledemo/two_canvases.py
+@@ -1,3 +1,4 @@
++#!/usr/bin/python3.4
+ """turtledemo.two_canvases
+ 
+ Use TurtleScreen and RawTurtle to draw on two

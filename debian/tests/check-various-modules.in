@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+MODS="ctypes ssl readline curses dbm.gnu tkinter"
+for mod in $MODS; do
+  @PVER@ -c "import $mod"
+done
+
+@PVER@ -c "from _multiprocessing import SemLock"
