@@ -2,5 +2,5 @@
 set -e
 
 files=`dpkg -L @PVER@-venv`
-echo $files | grep -q /usr/bin/pyvenv@VER@
+echo $files | grep -q /usr/bin/pyvenv-@VER@
 echo $files | grep -q /usr/lib/@PVER@/ensurepip/

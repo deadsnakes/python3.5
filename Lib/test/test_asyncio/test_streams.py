@@ -2,8 +2,10 @@
 
 import gc
 import os
+import queue
 import socket
 import sys
+import threading
 import unittest
 from unittest import mock
 try:
@@ -631,6 +633,89 @@ os.close(fd)
         reader = mock.Mock()
         protocol = asyncio.StreamReaderProtocol(reader)
         self.assertIs(protocol._loop, self.loop)
+
+    def test_drain_raises(self):
+        # See http://bugs.python.org/issue25441
+
+        # This test should not use asyncio for the mock server; the
+        # whole point of the test is to test for a bug in drain()
+        # where it never gives up the event loop but the socket is
+        # closed on the  server side.
+
+        q = queue.Queue()
+
+        def server():
+            # Runs in a separate thread.
+            sock = socket.socket()
+            sock.bind(('localhost', 0))
+            sock.listen(1)
+            addr = sock.getsockname()
+            q.put(addr)
+            clt, _ = sock.accept()
+            clt.close()
+
+        @asyncio.coroutine
+        def client(host, port):
+            reader, writer = yield from asyncio.open_connection(host, port, loop=self.loop)
+            while True:
+                writer.write(b"foo\n")
+                yield from writer.drain()
+
+        # Start the server thread and wait for it to be listening.
+        thread = threading.Thread(target=server)
+        thread.setDaemon(True)
+        thread.start()
+        addr = q.get()
+
+        # Should not be stuck in an infinite loop.
+        with self.assertRaises((ConnectionResetError, BrokenPipeError)):
+            self.loop.run_until_complete(client(*addr))
+
+        # Clean up the thread.  (Only on success; on failure, it may
+        # be stuck in accept().)
+        thread.join()
+
+    def test___repr__(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        self.assertEqual("<StreamReader>", repr(stream))
+
+    def test___repr__nondefault_limit(self):
+        stream = asyncio.StreamReader(loop=self.loop, limit=123)
+        self.assertEqual("<StreamReader l=123>", repr(stream))
+
+    def test___repr__eof(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream.feed_eof()
+        self.assertEqual("<StreamReader eof>", repr(stream))
+
+    def test___repr__data(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream.feed_data(b'data')
+        self.assertEqual("<StreamReader 4 bytes>", repr(stream))
+
+    def test___repr__exception(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        exc = RuntimeError()
+        stream.set_exception(exc)
+        self.assertEqual("<StreamReader e=RuntimeError()>", repr(stream))
+
+    def test___repr__waiter(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream._waiter = asyncio.Future(loop=self.loop)
+        self.assertRegex(
+            repr(stream),
+            "<StreamReader w=<Future pending[\S ]*>>")
+        stream._waiter.set_result(None)
+        self.loop.run_until_complete(stream._waiter)
+        stream._waiter = None
+        self.assertEqual("<StreamReader>", repr(stream))
+
+    def test___repr__transport(self):
+        stream = asyncio.StreamReader(loop=self.loop)
+        stream._transport = mock.Mock()
+        stream._transport.__repr__ = mock.Mock()
+        stream._transport.__repr__.return_value = "<Transport>"
+        self.assertEqual("<StreamReader t=<Transport>>", repr(stream))
 
 
 if __name__ == '__main__':

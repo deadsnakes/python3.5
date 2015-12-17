@@ -1320,7 +1320,7 @@ Basic customization
      object's   :meth:`__hash__` must interoperate on builds of different bit
      sizes, be sure to check the width on all supported builds.  An easy way
      to do this is with
-     ``python -c "import sys; print(sys.hash_info.width)"``
+     ``python -c "import sys; print(sys.hash_info.width)"``.
 
    If a class does not define an :meth:`__eq__` method it should not define a
    :meth:`__hash__` operation either; if it defines :meth:`__eq__` but not
@@ -1341,7 +1341,7 @@ Basic customization
    :meth:`__hash__` method of a class is ``None``, instances of the class will
    raise an appropriate :exc:`TypeError` when a program attempts to retrieve
    their hash value, and will also be correctly identified as unhashable when
-   checking ``isinstance(obj, collections.Hashable``).
+   checking ``isinstance(obj, collections.Hashable)``.
 
    If a class that overrides :meth:`__eq__` needs to retain the implementation
    of :meth:`__hash__` from a parent class, the interpreter must be told this
@@ -2358,7 +2358,7 @@ An *asynchronous iterable* is able to call asynchronous code in its
 ``__aiter__`` implementation, and an *asynchronous iterator* can call
 asynchronous code in its ``__anext__`` method.
 
-Asynchronous iterators can be used in a :keyword:`async for` statement.
+Asynchronous iterators can be used in an :keyword:`async for` statement.
 
 .. method:: object.__aiter__(self)
 
@@ -2393,7 +2393,7 @@ Asynchronous Context Managers
 An *asynchronous context manager* is a *context manager* that is able to
 suspend execution in its ``__aenter__`` and ``__aexit__`` methods.
 
-Asynchronous context managers can be used in a :keyword:`async with` statement.
+Asynchronous context managers can be used in an :keyword:`async with` statement.
 
 .. method:: object.__aenter__(self)
 

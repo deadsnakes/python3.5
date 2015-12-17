@@ -150,7 +150,7 @@
  import errno as _errno
  from random import Random as _Random
  import weakref as _weakref
-@@ -784,7 +923,7 @@
+@@ -793,7 +932,7 @@
  
      @classmethod
      def _cleanup(cls, name, warn_message):
@@ -159,7 +159,7 @@
          _warnings.warn(warn_message, ResourceWarning)
  
  
-@@ -799,4 +938,4 @@
+@@ -808,4 +947,4 @@
  
      def cleanup(self):
          if self._finalizer.detach():

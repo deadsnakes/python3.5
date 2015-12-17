@@ -722,6 +722,11 @@ resize_compact(PyObject *unicode, Py_ssize_t length)
     }
     new_size = (struct_size + (length + 1) * char_size);
 
+    if (_PyUnicode_HAS_UTF8_MEMORY(unicode)) {
+        PyObject_DEL(_PyUnicode_UTF8(unicode));
+        _PyUnicode_UTF8(unicode) = NULL;
+        _PyUnicode_UTF8_LENGTH(unicode) = 0;
+    }
     _Py_DEC_REFTOTAL;
     _Py_ForgetReference(unicode);
 
@@ -1701,7 +1706,7 @@ PyUnicode_Resize(PyObject **p_unicode, Py_ssize_t length)
     return unicode_resize(p_unicode, length);
 }
 
-/* Copy a ASCII or latin1 char* string into a Python Unicode string.
+/* Copy an ASCII or latin1 char* string into a Python Unicode string.
 
    WARNING: The function doesn't copy the terminating null character and
    doesn't check the maximum character (may write a latin1 character in an
@@ -3614,6 +3619,7 @@ PyUnicode_FSConverter(PyObject* arg, void* addr)
     void *data;
     if (arg == NULL) {
         Py_DECREF(*(PyObject**)addr);
+        *(PyObject**)addr = NULL;
         return 1;
     }
     if (PyBytes_Check(arg)) {
@@ -4330,31 +4336,31 @@ PyUnicode_DecodeUTF7Stateful(const char *s,
             }
             else { /* now leaving a base-64 section */
                 inShift = 0;
-                s++;
-                if (surrogate) {
-                    if (_PyUnicodeWriter_WriteCharInline(&writer, surrogate) < 0)
-                        goto onError;
-                    surrogate = 0;
-                }
                 if (base64bits > 0) { /* left-over bits */
                     if (base64bits >= 6) {
                         /* We've seen at least one base-64 character */
+                        s++;
                         errmsg = "partial character in shift sequence";
                         goto utf7Error;
                     }
                     else {
                         /* Some bits remain; they should be zero */
                         if (base64buffer != 0) {
+                            s++;
                             errmsg = "non-zero padding bits in shift sequence";
                             goto utf7Error;
                         }
                     }
                 }
-                if (ch != '-') {
+                if (surrogate && DECODE_DIRECT(ch)) {
+                    if (_PyUnicodeWriter_WriteCharInline(&writer, surrogate) < 0)
+                        goto onError;
+                }
+                surrogate = 0;
+                if (ch == '-') {
                     /* '-' is absorbed; other terminating
                        characters are preserved */
-                    if (_PyUnicodeWriter_WriteCharInline(&writer, ch) < 0)
-                        goto onError;
+                    s++;
                 }
             }
         }
@@ -4368,6 +4374,7 @@ PyUnicode_DecodeUTF7Stateful(const char *s,
             }
             else { /* begin base64-encoded section */
                 inShift = 1;
+                surrogate = 0;
                 shiftOutStart = writer.pos;
                 base64bits = 0;
                 base64buffer = 0;
@@ -4399,6 +4406,7 @@ utf7Error:
 
     if (inShift && !consumed) { /* in shift sequence, no more to follow */
         /* if we're in an inconsistent state, that's an error */
+        inShift = 0;
         if (surrogate ||
                 (base64bits >= 6) ||
                 (base64bits > 0 && base64buffer != 0)) {
@@ -7189,7 +7197,7 @@ error:
 }
 
 /*
- * Encode a Unicode string to a Windows code page into a byte string using a
+ * Encode a Unicode string to a Windows code page into a byte string using an
  * error handler.
  *
  * Returns consumed characters if succeed, or raise an OSError and returns
@@ -13291,6 +13299,7 @@ _PyUnicodeWriter_PrepareInternal(_PyUnicodeWriter *writer,
 
         if (maxchar > writer->maxchar || writer->readonly) {
             /* resize + widen */
+            maxchar = Py_MAX(maxchar, writer->maxchar);
             newbuffer = PyUnicode_New(newlen, maxchar);
             if (newbuffer == NULL)
                 return -1;

@@ -1102,6 +1102,7 @@
  _PyDict_Contains@Base @VER@
  _PyDict_DebugMallocStats@Base @VER@
  _PyDict_DelItemId@Base @VER@
+ _PyDict_DelItem_KnownHash@Base 3.5.1
  _PyDict_FromKeys@Base @VER@
  _PyDict_GetItemId@Base @VER@
  _PyDict_GetItemIdWithError@Base @VER@
@@ -1314,6 +1315,7 @@
  _PyTime_AsSecondsDouble@Base @VER@
  _PyTime_AsTimespec@Base @VER@
  _PyTime_AsTimeval@Base @VER@
+ _PyTime_AsTimevalTime_t@Base 3.5.1
  _PyTime_AsTimeval_noraise@Base @VER@
  _PyTime_FromMillisecondsObject@Base @VER@
  _PyTime_FromNanoseconds@Base @VER@

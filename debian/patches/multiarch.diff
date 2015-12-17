@@ -45,7 +45,7 @@
  
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -756,6 +756,7 @@
+@@ -762,6 +762,7 @@
  
  Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
@@ -53,7 +53,7 @@
  		-DSOABI='"$(SOABI)"' \
  		-o $@ $(srcdir)/Python/dynload_shlib.c
  
-@@ -767,6 +768,7 @@
+@@ -773,6 +774,7 @@
  Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
  		-DABIFLAGS='"$(ABIFLAGS)"' \
@@ -61,7 +61,7 @@
  		-o $@ $(srcdir)/Python/sysmodule.c
  
  $(IO_OBJS): $(IO_H)
-@@ -1305,6 +1307,10 @@
+@@ -1311,6 +1313,10 @@
  $(srcdir)/Lib/$(PLATDIR):
  	mkdir $(srcdir)/Lib/$(PLATDIR)
  	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
@@ -72,7 +72,7 @@
  	export PATH; PATH="`pwd`:$$PATH"; \
  	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
  	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
-@@ -1355,7 +1361,7 @@
+@@ -1361,7 +1367,7 @@
  LIBPL=		@LIBPL@
  
  # pkgconfig directory
@@ -83,7 +83,7 @@
  	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \
 --- a/Python/sysmodule.c
 +++ b/Python/sysmodule.c
-@@ -1673,6 +1673,15 @@
+@@ -1696,6 +1696,15 @@
      if (res < 0)
          goto error;
  
@@ -115,7 +115,7 @@
  AC_SUBST(PLATDIR)
  AC_SUBST(PLATFORM_TRIPLET)
  
-@@ -4346,7 +4351,7 @@
+@@ -4389,7 +4394,7 @@
  
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)

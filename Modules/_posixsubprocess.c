@@ -109,10 +109,11 @@ _sanity_check_python_fd_sequence(PyObject *fd_sequence)
     for (seq_idx = 0; seq_idx < seq_len; ++seq_idx) {
         PyObject* py_fd = PySequence_Fast_GET_ITEM(fd_sequence, seq_idx);
         long iter_fd = PyLong_AsLong(py_fd);
-        if (iter_fd < 0 || iter_fd < prev_fd || iter_fd > INT_MAX) {
+        if (iter_fd < 0 || iter_fd <= prev_fd || iter_fd > INT_MAX) {
             /* Negative, overflow, not a Long, unsorted, too big for a fd. */
             return 1;
         }
+        prev_fd = iter_fd;
     }
     return 0;
 }
@@ -549,7 +550,9 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
     int need_to_reenable_gc = 0;
     char *const *exec_array, *const *argv = NULL, *const *envp = NULL;
     Py_ssize_t arg_num;
+#ifdef WITH_THREAD
     int import_lock_held = 0;
+#endif
 
     if (!PyArg_ParseTuple(
             args, "OOpOOOiiiiiiiiiiO:fork_exec",
@@ -644,8 +647,10 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
         preexec_fn_args_tuple = PyTuple_New(0);
         if (!preexec_fn_args_tuple)
             goto cleanup;
+#ifdef WITH_THREAD
         _PyImport_AcquireLock();
         import_lock_held = 1;
+#endif
     }
 
     if (cwd_obj != Py_None) {
@@ -688,12 +693,14 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
         /* Capture the errno exception before errno can be clobbered. */
         PyErr_SetFromErrno(PyExc_OSError);
     }
-    if (preexec_fn != Py_None &&
-        _PyImport_ReleaseLock() < 0 && !PyErr_Occurred()) {
+#ifdef WITH_THREAD
+    if (preexec_fn != Py_None
+        && _PyImport_ReleaseLock() < 0 && !PyErr_Occurred()) {
         PyErr_SetString(PyExc_RuntimeError,
                         "not holding the import lock");
     }
     import_lock_held = 0;
+#endif
 
     /* Parent process */
     if (envp)
@@ -716,8 +723,10 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
     return PyLong_FromPid(pid);
 
 cleanup:
+#ifdef WITH_THREAD
     if (import_lock_held)
         _PyImport_ReleaseLock();
+#endif
     if (envp)
         _Py_FreeCharPArray(envp);
     if (argv)

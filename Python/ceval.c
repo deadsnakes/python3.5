@@ -1214,7 +1214,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
 #ifdef Py_DEBUG
     /* PyEval_EvalFrameEx() must not be called with an exception set,
        because it may clear it (directly or indirectly) and so the
-       caller looses its exception */
+       caller loses its exception */
     assert(!PyErr_Occurred());
 #endif
 
@@ -2363,6 +2363,10 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
                 /* Slow-path if globals or builtins is not a dict */
                 v = PyObject_GetItem(f->f_globals, name);
                 if (v == NULL) {
+                    if (!PyErr_ExceptionMatches(PyExc_KeyError))
+                        goto error;
+                    PyErr_Clear();
+
                     v = PyObject_GetItem(f->f_builtins, name);
                     if (v == NULL) {
                         if (PyErr_ExceptionMatches(PyExc_KeyError))

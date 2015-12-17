@@ -11,6 +11,12 @@
         <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
         <Platform Condition="'$(Platform)' == ''">x86</Platform>
         <InstallScope Condition="'$(InstallScope)' != 'perMachine'">perUser</InstallScope>
+    </PropertyGroup>
+
+    <Import Project="wix.props" />
+    <Import Project="..\..\PCBuild\tcltk.props" />
+
+    <PropertyGroup>
         <!--
         This URI is used to generate the various GUIDs used by the installer.
         Installers built with the same URI will upgrade each other or block
@@ -21,17 +27,15 @@
         that intend to bundle Python should rebuild these modules with their
         own URI to avoid conflicting with the official releases.
         
-        The official releases are built with http://www.python.org/.
+        The official releases use "http://www.python.org/$(ArchName)"
         
         This is not the same as the DownloadUrl property used in the bundle
         projects.
         -->
-        <ReleaseUri Condition="'$(ReleaseUri)' == ''">$(ComputerName)</ReleaseUri>
+        <ReleaseUri Condition="'$(ReleaseUri)' == ''">$(ComputerName)/$(ArchName)/</ReleaseUri>
         <ReleaseUri Condition="!$(ReleaseUri.EndsWith(`/`))">$(ReleaseUri)/</ReleaseUri>
     </PropertyGroup>
 
-    <Import Project="wix.props" />
-    <Import Project="..\..\PCBuild\tcltk.props" />
     
     <ItemGroup>
         <Compile Include="$(MSBuildThisFileDirectory)common.wxs" />
@@ -49,7 +53,7 @@
         <OutputPath Condition="!HasTrailingSlash($(OutputPath))">$(OutputPath)\</OutputPath>
         <OutDir>$(OutputPath)</OutDir>
         <ReuseCabinetCache>true</ReuseCabinetCache>
-        <CRTRedist Condition="'$(CRTRedist)' == ''">$(ExternalsDir)\redist</CRTRedist>
+        <CRTRedist Condition="'$(CRTRedist)' == ''">$(ExternalsDir)\windows-installer\redist</CRTRedist>
         <CRTRedist Condition="!Exists($(CRTRedist))"></CRTRedist>
         <DocFilename>python$(MajorVersionNumber)$(MinorVersionNumber)$(MicroVersionNumber)$(ReleaseLevelName).chm</DocFilename>
 
@@ -76,16 +80,12 @@
             NextMajorVersionNumber=$(MajorVersionNumber).$([msbuild]::Add($(MinorVersionNumber), 1)).0.0;
             Bitness=$(Bitness);
             PyDebugExt=$(PyDebugExt);
+            PyArchExt=$(PyArchExt);
+            PyTestExt=$(PyTestExt);
             OptionalFeatureName=$(OutputName);
         </DefineConstants>
         <DefineConstants Condition="'$(CRTRedist)' != ''">
             $(DefineConstants);CRTRedist=$(CRTRedist);
-        </DefineConstants>
-        <DefineConstants Condition="$(UseTestMarker) != 'true'">
-            $(DefineConstants);TestPrefix=;FileExtension=py;
-        </DefineConstants>
-        <DefineConstants Condition="$(UseTestMarker) == 'true'">
-            $(DefineConstants);TestPrefix=x;FileExtension=px;
         </DefineConstants>
         <DefineConstants Condition="$(Platform) != 'x64'">
             $(DefineConstants);Suffix32=-32;
@@ -106,7 +106,10 @@
         </LinkerBindInputPaths>
     </ItemDefinitionGroup>
     <ItemGroup>
-        <LinkerBindInputPaths Include="$(BuildPath);$(PySourcePath)Doc\build\htmlhelp">
+        <LinkerBindInputPaths Include="$(PGOBuildPath);$(BuildPath)">
+            <BindName></BindName>
+        </LinkerBindInputPaths>
+        <LinkerBindInputPaths Include="$(PySourcePath)Doc\build\htmlhelp">
             <BindName></BindName>
         </LinkerBindInputPaths>
         <LinkerBindInputPaths Include="$(PySourcePath)">
@@ -150,7 +153,7 @@
     <Target Name="_GenerateGuids" AfterTargets="PrepareForBuild">
         <PropertyGroup>
             <_Uuids>@(_Uuid->'("%(Identity)", "$(MajorVersionNumber).$(MinorVersionNumber)/%(Uri)")',',')</_Uuids>
-            <_GenerateCommand>import uuid; print('\n'.join('{}={}'.format(i, uuid.uuid5(uuid.UUID('c8d9733e-a70c-43ff-ab0c-e26456f11083'), '$(ReleaseUri)' + j)) for i,j in [$(_Uuids.Replace(`"`,`'`))]))</_GenerateCommand>
+            <_GenerateCommand>import uuid; print('\n'.join('{}={}'.format(i, uuid.uuid5(uuid.UUID('c8d9733e-a70c-43ff-ab0c-e26456f11083'), '$(ReleaseUri.Replace(`{arch}`, `$(ArchName)`))' + j)) for i,j in [$(_Uuids.Replace(`"`,`'`))]))</_GenerateCommand>
         </PropertyGroup>
         
         <Exec Command='"$(PythonExe)" -c "$(_GenerateCommand)" &gt; "$(IntermediateOutputPath)$(OutputName)guids.txt"'
