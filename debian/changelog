@@ -1,3 +1,9 @@
+python3.5 (3.5.1-1+trusty1) trusty; urgency=medium
+
+  * Imported from Precise package.
+
+ -- Felix Krull <f_krull@gmx.de>  Thu, 17 Dec 2015 19:22:08 +0100
+
 python3.5 (3.5.1-1+precise1) precise; urgency=medium
 
   * Import new upstream release Python 3.5.1.
