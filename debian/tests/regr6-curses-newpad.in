@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+
+cat > $ADTTMP/curses-newpad-test.py <<EOF
+import curses
+screen = curses.initscr()
+pad = curses.newpad(10, 10)
+pad.addstr("test")
+size = screen.getmaxyx()
+pad.refresh(0, 0, 0, 0, size[0] - 1, size[1] - 1)
+EOF
+
+@PVER@ $ADTTMP/curses-newpad-test.py > /dev/null

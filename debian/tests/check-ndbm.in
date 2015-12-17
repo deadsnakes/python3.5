@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+DBM=/usr/lib/@PVER@/lib-dynload/_dbm.@EXTSUFFIX@
+test -e $DBM && echo "$DBM exists"
+ldd $DBM | grep -q libdb
+@PVER@ -c "import dbm.ndbm"

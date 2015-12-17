@@ -1,0 +1,55 @@
+# DP: Modules/posixmodule.c: Add flags for statvfs.f_flag to constant list.
+
+From: Peter Jones <pjones@redhat.com>
+Date: Wed, 6 Jan 2010 15:22:38 -0500
+Subject: [PATCH] Add flags for statvfs.f_flag to constant list.
+
+ Modules/posixmodule.c |   37 +++++++++++++++++++++++++++++++++++++
+ 1 files changed, 37 insertions(+), 0 deletions(-)
+
+--- a/Modules/posixmodule.c
++++ b/Modules/posixmodule.c
+@@ -12739,6 +12739,43 @@
+     if (PyModule_AddIntMacro(m, F_TEST)) return -1;
+ #endif
+ 
++	/* These came from statvfs.h */
++#ifdef ST_RDONLY
++	if (PyModule_AddIntMacro(m, ST_RDONLY)) return -1;
++#endif /* ST_RDONLY */
++#ifdef ST_NOSUID
++	if (PyModule_AddIntMacro(m, ST_NOSUID)) return -1;
++#endif /* ST_NOSUID */
++
++	/* GNU extensions */
++#ifdef ST_NODEV
++	if (PyModule_AddIntMacro(m, ST_NODEV)) return -1;
++#endif /* ST_NODEV */
++#ifdef ST_NOEXEC
++	if (PyModule_AddIntMacro(m, ST_NOEXEC)) return -1;
++#endif /* ST_NOEXEC */
++#ifdef ST_SYNCHRONOUS
++	if (PyModule_AddIntMacro(m, ST_SYNCHRONOUS)) return -1;
++#endif /* ST_SYNCHRONOUS */
++#ifdef ST_MANDLOCK
++	if (PyModule_AddIntMacro(m, ST_MANDLOCK)) return -1;
++#endif /* ST_MANDLOCK */
++#ifdef ST_WRITE
++	if (PyModule_AddIntMacro(m, ST_WRITE)) return -1;
++#endif /* ST_WRITE */
++#ifdef ST_APPEND
++	if (PyModule_AddIntMacro(m, ST_APPEND)) return -1;
++#endif /* ST_APPEND */
++#ifdef ST_NOATIME
++	if (PyModule_AddIntMacro(m, ST_NOATIME)) return -1;
++#endif /* ST_NOATIME */
++#ifdef ST_NODIRATIME
++	if (PyModule_AddIntMacro(m, ST_NODIRATIME)) return -1;
++#endif /* ST_NODIRATIME */
++#ifdef ST_RELATIME
++	if (PyModule_AddIntMacro(m, ST_RELATIME)) return -1;
++#endif /* ST_RELATIME */
++
+ #ifdef HAVE_SPAWNV
+     if (PyModule_AddIntConstant(m, "P_WAIT", _P_WAIT)) return -1;
+     if (PyModule_AddIntConstant(m, "P_NOWAIT", _P_NOWAIT)) return -1;

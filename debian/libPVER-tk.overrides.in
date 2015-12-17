@@ -1,0 +1,2 @@
+# lintian omission, multiarch string is encoded in the filename
+lib@PVER@-tk binary: arch-dependent-file-not-in-arch-specific-directory

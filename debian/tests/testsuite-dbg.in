@@ -1,0 +1,81 @@
+#!/bin/sh
+
+set -e
+
+#if [ "$(whoami)" = root ]; then
+#  # stop apport
+#  stop apport 2> /dev/null || true
+#fi
+
+debian_dir=$(dirname $(dirname $0))
+
+export LOCPATH=$(pwd)/locales
+sh $debian_dir/locale-gen
+
+export LANG=C
+
+TESTPYTHON="@PVER@@DEBUG_ABIFLAGS@ -W default -bb -E -R -m test"
+TESTOPTS="-j 1 -w -uall,-network,-urlfetch,-gui"
+TESTEXCLUSIONS="-x"
+
+# test_cmd_line_script: FIXME, https://launchpad.net/bugs/1264554
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_cmd_line_script"
+
+# test_code_module: Issue 17756, reason unknown
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_code_module"
+
+# test_compileall: FIXME, https://launchpad.net/bugs/1264554
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_compileall"
+
+# test_curses: Don't run for now, issue with new curses?
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_curses"
+
+# test_dbm: Fails from time to time ...
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_dbm"
+
+# test_distutils: Issue 17752, many failures in installed location
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_distutils"
+
+# test_venv: fails with an ensurepip error
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_venv "
+
+# test_gdb: not run for the optimized build
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_gdb"
+
+# test_ossaudiodev: no /dev/dsp?
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_ossaudiodev"
+
+# test_platform: Issue 17762 needs upstreaming
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_platform "
+
+# test_pydoc: Issue 17763, interfers with packages in dist-packages
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_pydoc"
+
+# test_site: FIXME, https://launchpad.net/bugs/1264554
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_site "
+
+# test_tools: not relevant for installed version
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_tools"
+
+# test_zipfile: Issue 17753, requires write access to test and email.test
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_zipfile"
+
+# test_zipimport_support: FIXME, https://launchpad.net/bugs/1264554
+TESTEXCLUSIONS="$TESTEXCLUSIONS test_zipimport_support"
+
+# test_subprocess: Issue 17757, two failing tests
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_subprocess"
+
+# test_uuid: fails, but not on the buildd. need to investigate
+#TESTEXCLUSIONS="$TESTEXCLUSIONS test_uuid"
+
+script=$debian_dir/script.py
+if [ -f "$script" ]; then
+  cmd="@PVER@ $script \"testsuite-dbg.log\" \"$TESTPYTHON $TESTOPTS $TESTEXCLUSIONS\""
+else
+  cmd="$TESTPYTHON $TESTOPTS $TESTEXCLUSIONS"
+fi
+
+echo "Running the python testsuite with the debug enabled interpreter:"
+echo "$cmd"
+eval $cmd
