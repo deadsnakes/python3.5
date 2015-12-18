@@ -1,5 +1,7 @@
 import contextlib
+import copy
 import inspect
+import pickle
 import sys
 import types
 import unittest
@@ -1318,11 +1320,41 @@ class CoroutineTest(unittest.TestCase):
             run_async(foo())
         self.assertEqual(CNT, 0)
 
+    def test_copy(self):
+        async def func(): pass
+        coro = func()
+        with self.assertRaises(TypeError):
+            copy.copy(coro)
+
+        aw = coro.__await__()
+        try:
+            with self.assertRaises(TypeError):
+                copy.copy(aw)
+        finally:
+            aw.close()
+
+    def test_pickle(self):
+        async def func(): pass
+        coro = func()
+        for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+            with self.assertRaises((TypeError, pickle.PicklingError)):
+                pickle.dumps(coro, proto)
+
+        aw = coro.__await__()
+        try:
+            for proto in range(pickle.HIGHEST_PROTOCOL + 1):
+                with self.assertRaises((TypeError, pickle.PicklingError)):
+                    pickle.dumps(aw, proto)
+        finally:
+            aw.close()
+
 
 class CoroAsyncIOCompatTest(unittest.TestCase):
 
     def test_asyncio_1(self):
-        import asyncio
+        # asyncio cannot be imported when Python is compiled without thread
+        # support
+        asyncio = support.import_module('asyncio')
 
         class MyException(Exception):
             pass

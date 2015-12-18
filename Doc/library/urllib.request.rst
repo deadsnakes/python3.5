@@ -202,7 +202,7 @@ The following classes are provided:
    ``"Python-urllib/2.6"`` (on Python 2.6).
 
    An example of using ``Content-Type`` header with *data* argument would be
-   sending a dictionary like ``{"Content-Type":" application/x-www-form-urlencoded;charset=utf-8"}``
+   sending a dictionary like ``{"Content-Type":" application/x-www-form-urlencoded;charset=utf-8"}``.
 
    The final two arguments are only of interest for correct handling
    of third-party HTTP cookies:
@@ -1168,7 +1168,7 @@ The code for the sample CGI used in the above example is::
    #!/usr/bin/env python
    import sys
    data = sys.stdin.read()
-   print('Content-type: text-plain\n\nGot Data: "%s"' % data)
+   print('Content-type: text/plain\n\nGot Data: "%s"' % data)
 
 Here is an example of doing a ``PUT`` request using :class:`Request`::
 
@@ -1383,7 +1383,7 @@ some point in the future.
     .. method:: retrieve(url, filename=None, reporthook=None, data=None)
 
        Retrieves the contents of *url* and places it in *filename*.  The return value
-       is a tuple consisting of a local filename and either a
+       is a tuple consisting of a local filename and either an
        :class:`email.message.Message` object containing the response headers (for remote
        URLs) or ``None`` (for local URLs).  The caller must then open and read the
        contents of *filename*.  If *filename* is not given and the URL refers to a

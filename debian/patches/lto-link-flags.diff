@@ -1,6 +1,6 @@
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -133,7 +133,7 @@
+@@ -138,7 +138,7 @@
  SHLIB_SUFFIX=	@SHLIB_SUFFIX@
  EXT_SUFFIX=	@EXT_SUFFIX@
  LDSHARED=	@LDSHARED@ $(PY_LDFLAGS)
@@ -9,7 +9,7 @@
  LDCXXSHARED=	@LDCXXSHARED@
  DESTSHARED=	$(BINLIBDEST)/lib-dynload
  
-@@ -559,7 +559,7 @@
+@@ -565,7 +565,7 @@
  
  # Build the interpreter
  $(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)

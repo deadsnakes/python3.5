@@ -548,7 +548,7 @@ compiler_enter_scope(struct compiler *c, identifier name,
         return 0;
     }
     if (u->u_ste->ste_needs_class_closure) {
-        /* Cook up a implicit __class__ cell. */
+        /* Cook up an implicit __class__ cell. */
         _Py_IDENTIFIER(__class__);
         PyObject *tuple, *name, *zero;
         int res;
@@ -985,7 +985,7 @@ PyCompile_OpcodeStackEffect(int opcode, int oparg)
         case BUILD_MAP_UNPACK_WITH_CALL:
             return 1 - (oparg & 0xFF);
         case BUILD_MAP:
-            return 1;
+            return 1 - 2*oparg;
         case LOAD_ATTR:
             return 0;
         case COMPARE_OP:

@@ -255,7 +255,7 @@ class StreamWriter:
     def __init__(self, transport, protocol, reader, loop):
         self._transport = transport
         self._protocol = protocol
-        # drain() expects that the reader has a exception() method
+        # drain() expects that the reader has an exception() method
         assert reader is None or isinstance(reader, StreamReader)
         self._reader = reader
         self._loop = loop
@@ -301,6 +301,15 @@ class StreamWriter:
             exc = self._reader.exception()
             if exc is not None:
                 raise exc
+        if self._transport is not None:
+            if self._transport.is_closing():
+                # Yield to the event loop so connection_lost() may be
+                # called.  Without this, _drain_helper() would return
+                # immediately, and code that calls
+                #     write(...); yield from drain()
+                # in a loop would never call connection_lost(), so it
+                # would not see an error when the socket is closed.
+                yield
         yield from self._protocol._drain_helper()
 
 
@@ -324,7 +333,7 @@ class StreamReader:
     def __repr__(self):
         info = ['StreamReader']
         if self._buffer:
-            info.append('%d bytes' % len(info))
+            info.append('%d bytes' % len(self._buffer))
         if self._eof:
             info.append('eof')
         if self._limit != _DEFAULT_LIMIT:

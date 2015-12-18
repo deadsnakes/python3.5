@@ -12,7 +12,6 @@ setup-modules.diff
 platform-lsbrelease.diff
 bdist-wininst-notfound.diff
 no-zip-on-sys.path.diff
-profiled-build.diff
 makesetup-bashism.diff
 hurd-disable-nonworking-constants.diff
 enable-fpectl.diff
@@ -30,7 +29,6 @@ ext-no-libpython-link.diff
 test-no-random-order.diff
 multiarch-extname.diff
 tempfile-minimal.diff
-issue21264.diff
 mangle-fstack-protector.diff
 reproducible-buildinfo.diff
 issue24705.diff

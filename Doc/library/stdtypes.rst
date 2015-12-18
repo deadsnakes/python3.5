@@ -854,8 +854,8 @@ operations have the same priority as the corresponding numeric operations.
 | ``s + t``                | the concatenation of *s* and   | (6)(7)   |
 |                          | *t*                            |          |
 +--------------------------+--------------------------------+----------+
-| ``s * n`` or             | *n* shallow copies of *s*      | (2)(7)   |
-| ``n * s``                | concatenated                   |          |
+| ``s * n`` or             | equivalent to adding *s* to    | (2)(7)   |
+| ``n * s``                | itself *n* times               |          |
 +--------------------------+--------------------------------+----------+
 | ``s[i]``                 | *i*\ th item of *s*, origin 0  | \(3)     |
 +--------------------------+--------------------------------+----------+
@@ -897,9 +897,9 @@ Notes:
 
 (2)
    Values of *n* less than ``0`` are treated as ``0`` (which yields an empty
-   sequence of the same type as *s*).  Note also that the copies are shallow;
-   nested structures are not copied.  This often haunts new Python programmers;
-   consider::
+   sequence of the same type as *s*).  Note that items in the sequence *s*
+   are not copied; they are referenced multiple times.  This often haunts
+   new Python programmers; consider::
 
       >>> lists = [[]] * 3
       >>> lists
@@ -909,7 +909,7 @@ Notes:
       [[3], [3], [3]]
 
    What has happened is that ``[[]]`` is a one-element list containing an empty
-   list, so all three elements of ``[[]] * 3`` are (pointers to) this single empty
+   list, so all three elements of ``[[]] * 3`` are references to this single empty
    list.  Modifying any of the elements of ``lists`` modifies this single list.
    You can create a list of different lists this way::
 
@@ -919,6 +919,9 @@ Notes:
       >>> lists[2].append(7)
       >>> lists
       [[3], [5], [7]]
+
+   Further explanation is available in the FAQ entry
+   :ref:`faq-multidimensional-list`.
 
 (3)
    If *i* or *j* is negative, the index is relative to the end of the string:
@@ -948,7 +951,7 @@ Notes:
    runtime cost, you must switch to one of the alternatives below:
 
    * if concatenating :class:`str` objects, you can build a list and use
-     :meth:`str.join` at the end or else write to a :class:`io.StringIO`
+     :meth:`str.join` at the end or else write to an :class:`io.StringIO`
      instance and retrieve its value when complete
 
    * if concatenating :class:`bytes` objects, you can similarly use
@@ -1060,9 +1063,13 @@ accepts integers that meet the value restriction ``0 <= x <= 255``).
 | ``s.copy()``                 | creates a shallow copy of ``s``| \(5)                |
 |                              | (same as ``s[:]``)             |                     |
 +------------------------------+--------------------------------+---------------------+
-| ``s.extend(t)``              | extends *s* with the           |                     |
-|                              | contents of *t* (same as       |                     |
+| ``s.extend(t)`` or           | extends *s* with the           |                     |
+| ``s += t``                   | contents of *t* (for the       |                     |
+|                              | most part the same as          |                     |
 |                              | ``s[len(s):len(s)] = t``)      |                     |
++------------------------------+--------------------------------+---------------------+
+| ``s *= n``                   | updates *s* with its contents  | \(6)                |
+|                              | repeated *n* times             |                     |
 +------------------------------+--------------------------------+---------------------+
 | ``s.insert(i, x)``           | inserts *x* into *s* at the    |                     |
 |                              | index given by *i*             |                     |
@@ -1103,6 +1110,12 @@ Notes:
 
    .. versionadded:: 3.3
       :meth:`clear` and :meth:`!copy` methods.
+
+(6)
+   The value *n* is an integer, or an object implementing
+   :meth:`~object.__index__`.  Zero and negative values of *n* clear
+   the sequence.  Items in the sequence are not copied; they are referenced
+   multiple times, as explained for ``s * n`` under :ref:`typesseq-common`.
 
 
 .. _typesseq-list:

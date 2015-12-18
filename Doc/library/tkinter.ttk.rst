@@ -110,8 +110,9 @@ All the :mod:`ttk` Widgets accepts the following options:
    | class     | Specifies the window class. The class is used when querying  |
    |           | the option database for the window's other options, to       |
    |           | determine the default bindtags for the window, and to select |
-   |           | the widget's default layout and style. This is a read-only   |
-   |           | which may only be specified when the window is created       |
+   |           | the widget's default layout and style. This option is        |
+   |           | read-only, and may only be specified when the window is      |
+   |           | created.                                                     |
    +-----------+--------------------------------------------------------------+
    | cursor    | Specifies the mouse cursor to be used for the widget. If set |
    |           | to the empty string (the default), the cursor is inherited   |
@@ -554,9 +555,9 @@ ttk.Notebook
       This will extend the bindings for the toplevel window containing the
       notebook as follows:
 
-      * Control-Tab: selects the tab following the currently selected one.
-      * Shift-Control-Tab: selects the tab preceding the currently selected one.
-      * Alt-K: where K is the mnemonic (underlined) character of any tab, will
+      * :kbd:`Control-Tab`: selects the tab following the currently selected one.
+      * :kbd:`Shift-Control-Tab`: selects the tab preceding the currently selected one.
+      * :kbd:`Alt-K`: where *K* is the mnemonic (underlined) character of any tab, will
         select that tab.
 
       Multiple notebooks in a single toplevel may be enabled for traversal,

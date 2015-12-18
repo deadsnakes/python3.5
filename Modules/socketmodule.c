@@ -719,8 +719,10 @@ sock_call_ex(PySocketSockObject *s,
     int deadline_initialized = 0;
     int res;
 
+#ifdef WITH_THREAD
     /* sock_call() must be called with the GIL held. */
     assert(PyGILState_Check());
+#endif
 
     /* outer loop to retry select() when select() is interrupted by a signal
        or to retry select()+sock_func() on false positive (see above) */
@@ -5513,9 +5515,7 @@ socket_getaddrinfo(PyObject *self, PyObject *args, PyObject* kwargs)
     if (hobj == Py_None) {
         hptr = NULL;
     } else if (PyUnicode_Check(hobj)) {
-        _Py_IDENTIFIER(encode);
-
-        idna = _PyObject_CallMethodId(hobj, &PyId_encode, "s", "idna");
+        idna = PyUnicode_AsEncodedString(hobj, "idna", NULL);
         if (!idna)
             return NULL;
         assert(PyBytes_Check(idna));

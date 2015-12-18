@@ -28,15 +28,17 @@ import winreg
 from itertools import count
 
 def _find_vcvarsall(plat_spec):
-    with winreg.OpenKeyEx(
-        winreg.HKEY_LOCAL_MACHINE,
-        r"Software\Microsoft\VisualStudio\SxS\VC7",
-        access=winreg.KEY_READ | winreg.KEY_WOW64_32KEY
-    ) as key:
-        if not key:
-            log.debug("Visual C++ is not registered")
-            return None, None
+    try:
+        key = winreg.OpenKeyEx(
+            winreg.HKEY_LOCAL_MACHINE,
+            r"Software\Microsoft\VisualStudio\SxS\VC7",
+            access=winreg.KEY_READ | winreg.KEY_WOW64_32KEY
+        )
+    except OSError:
+        log.debug("Visual C++ is not registered")
+        return None, None
 
+    with key:
         best_version = 0
         best_dir = None
         for i in count():
@@ -100,7 +102,7 @@ def _get_vc_env(plat_spec):
         (line.partition('=') for line in out.splitlines())
         if key and value
     }
-    
+
     if vcruntime:
         env['py_vcruntime_redist'] = vcruntime
     return env
@@ -236,7 +238,7 @@ class MSVCCompiler(CCompiler) :
             '/nologo', '/Ox', '/W3', '/GL', '/DNDEBUG'
         ]
         self.compile_options.append('/MD' if self._vcruntime_redist else '/MT')
-        
+
         self.compile_options_debug = [
             '/nologo', '/Od', '/MDd', '/Zi', '/W3', '/D_DEBUG'
         ]

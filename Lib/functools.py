@@ -536,7 +536,7 @@ def _lru_cache_wrapper(user_function, maxsize, typed, _CacheInfo):
 
     wrapper.cache_info = cache_info
     wrapper.cache_clear = cache_clear
-    return update_wrapper(wrapper, user_function)
+    return wrapper
 
 try:
     from _functools import _lru_cache_wrapper
@@ -567,7 +567,7 @@ def _c3_merge(sequences):
                     break      # reject the current head, it appears later
             else:
                 break
-        if not candidate:
+        if candidate is None:
             raise RuntimeError("Inconsistent hierarchy")
         result.append(candidate)
         # remove the chosen candidate

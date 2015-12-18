@@ -1173,11 +1173,9 @@ ast_for_arg(struct compiling *c, const node *n)
             return NULL;
     }
 
-    ret = arg(name, annotation, c->c_arena);
+    ret = arg(name, annotation, LINENO(n), n->n_col_offset, c->c_arena);
     if (!ret)
         return NULL;
-    ret->lineno = LINENO(n);
-    ret->col_offset = n->n_col_offset;
     return ret;
 }
 
@@ -1233,11 +1231,10 @@ handle_keywordonly_args(struct compiling *c, const node *n, int start,
                     goto error;
                 if (forbidden_name(c, argname, ch, 0))
                     goto error;
-                arg = arg(argname, annotation, c->c_arena);
+                arg = arg(argname, annotation, LINENO(ch), ch->n_col_offset,
+                          c->c_arena);
                 if (!arg)
                     goto error;
-                arg->lineno = LINENO(ch);
-                arg->col_offset = ch->n_col_offset;
                 asdl_seq_SET(kwonlyargs, j++, arg);
                 i += 2; /* the name and the comma */
                 break;
@@ -2101,6 +2098,7 @@ ast_for_atom(struct compiling *c, const node *n)
          *                    (comp_for | (',' (test ':' test | '**' test))* [','])) |
          *                   ((test | '*' test)
          *                    (comp_for | (',' (test | '*' test))* [','])) ) */
+        expr_ty res;
         ch = CHILD(n, 1);
         if (TYPE(ch) == RBRACE) {
             /* It's an empty dict. */
@@ -2112,12 +2110,12 @@ ast_for_atom(struct compiling *c, const node *n)
                     (NCH(ch) > 1 &&
                      TYPE(CHILD(ch, 1)) == COMMA)) {
                 /* It's a set display. */
-                return ast_for_setdisplay(c, ch);
+                res = ast_for_setdisplay(c, ch);
             }
             else if (NCH(ch) > 1 &&
                     TYPE(CHILD(ch, 1)) == comp_for) {
                 /* It's a set comprehension. */
-                return ast_for_setcomp(c, ch);
+                res = ast_for_setcomp(c, ch);
             }
             else if (NCH(ch) > 3 - is_dict &&
                     TYPE(CHILD(ch, 3 - is_dict)) == comp_for) {
@@ -2127,12 +2125,17 @@ ast_for_atom(struct compiling *c, const node *n)
                             "dict comprehension");
                     return NULL;
                 }
-                return ast_for_dictcomp(c, ch);
+                res = ast_for_dictcomp(c, ch);
             }
             else {
                 /* It's a dictionary display. */
-                return ast_for_dictdisplay(c, ch);
+                res = ast_for_dictdisplay(c, ch);
             }
+            if (res) {
+                res->lineno = LINENO(n);
+                res->col_offset = n->n_col_offset;
+            }
+            return res;
         }
     }
     default:
