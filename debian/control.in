@@ -19,8 +19,8 @@ Build-Depends: debhelper (>= 5.0.51~), @bd_dpkgdev@
   net-tools, xvfb, xauth
 Build-Depends-Indep: python-sphinx
 Standards-Version: 3.9.6
-Vcs-Browser: https://bitbucket.org/fk/deadsnakes-@PVER@
-Vcs-Hg: https://bitbucket.org/fk/deadsnakes-@PVER@
+Vcs-Browser: https://bitbucket.org/fkpackaging/deadsnakes-@PVER@
+Vcs-Git: https://bitbucket.org/fkpackaging/deadsnakes-@PVER@
 X-Original-Vcs-Browser: https://code.launchpad.net/~doko/python/pkg@VER@-debian
 X-Original-Vcs-Bzr: http://bazaar.launchpad.net/~doko/python/pkg@VER@-debian
 XS-Testsuite: autopkgtest
