@@ -2,7 +2,7 @@
 
 --- a/Lib/distutils/unixccompiler.py
 +++ b/Lib/distutils/unixccompiler.py
-@@ -164,6 +164,13 @@
+@@ -166,6 +166,13 @@
          runtime_library_dirs = [dir for dir in runtime_library_dirs
                                  if not dir in system_libdirs]
  

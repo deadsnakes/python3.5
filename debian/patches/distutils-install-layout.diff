@@ -176,7 +176,7 @@
  def getsitepackages(prefixes=None):
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -243,9 +243,10 @@
+@@ -248,9 +248,10 @@
              self.assertEqual(dirs[1], wanted)
          elif os.sep == '/':
              # OS X non-framwework builds, Linux, FreeBSD, etc

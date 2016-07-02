@@ -4,7 +4,7 @@
 
 --- a/Lib/locale.py
 +++ b/Lib/locale.py
-@@ -1336,8 +1336,8 @@
+@@ -1335,8 +1335,8 @@
      'ug_cn':                                'ug_CN.UTF-8',
      'uk':                                   'uk_UA.KOI8-U',
      'uk_ua':                                'uk_UA.KOI8-U',

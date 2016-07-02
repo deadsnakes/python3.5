@@ -22,7 +22,7 @@
  def linux_distribution(distname='', version='', id='',
  
                         supported_dists=_supported_dists,
-@@ -330,6 +334,25 @@
+@@ -329,6 +333,25 @@
          args given as parameters.
  
      """
@@ -50,7 +50,7 @@
      except OSError:
 --- a/Lib/test/test_platform.py
 +++ b/Lib/test/test_platform.py
-@@ -304,28 +304,6 @@
+@@ -320,28 +320,6 @@
                      returncode = ret >> 8
                  self.assertEqual(returncode, len(data))
  

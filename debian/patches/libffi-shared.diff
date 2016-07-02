@@ -1,6 +1,6 @@
 --- a/setup.py
 +++ b/setup.py
-@@ -1974,7 +1974,7 @@
+@@ -2007,7 +2007,7 @@
                          break
          ffi_lib = None
          if ffi_inc is not None:
