@@ -41,7 +41,6 @@ tempfile-minimal.diff
 mangle-fstack-protector.diff
 reproducible-buildinfo.diff
 
-issue24705.diff
 
 deadsnakes-assert-use-system-ffi.diff
 distutils-packaging-link.diff
