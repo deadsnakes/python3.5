@@ -1065,6 +1065,8 @@
  Py_hexdigits@Base @VER@
  Py_meta_grammar@Base @VER@
  Py_pgen@Base @VER@
+ _PyAIterWrapper_New@Base 3.5.2
+ _PyAIterWrapper_Type@Base 3.5.2
  _PyAccu_Accumulate@Base @VER@
  _PyAccu_Destroy@Base @VER@
  _PyAccu_Finish@Base @VER@
@@ -1085,6 +1087,7 @@
  _PyBytes_Resize@Base @VER@
  _PyCFunction_DebugMallocStats@Base @VER@
  _PyCode_CheckLineNumber@Base @VER@
+ _PyCode_ConstantKey@Base 3.5.2
  _PyCodecInfo_GetIncrementalDecoder@Base @VER@
  _PyCodecInfo_GetIncrementalEncoder@Base @VER@
  _PyCodec_DecodeText@Base @VER@
@@ -1155,6 +1158,7 @@
  _PyGen_FetchStopIterationValue@Base @VER@
  _PyGen_Finalize@Base @VER@
  _PyGen_Send@Base @VER@
+ _PyGen_yf@Base 3.5.2
  _PyHash_Fini@Base @VER@
  _PyIOBase_check_closed@Base @VER@
  _PyIOBase_check_readable@Base @VER@
@@ -1308,6 +1312,7 @@
  _PyThreadState_GetFrame@Base @VER@
  _PyThreadState_Init@Base @VER@
  _PyThreadState_Prealloc@Base @VER@
+ _PyThreadState_UncheckedGet@Base 3.5.2
  _PyThread_CurrentFrames@Base @VER@
  _PyTime_AsMicroseconds@Base @VER@
  _PyTime_AsMilliseconds@Base @VER@
