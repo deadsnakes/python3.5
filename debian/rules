@@ -875,7 +875,7 @@ endif
 			  && echo $(scriptdir)/lib-dynload/$$i.*.so; \
 		  done
 
-	dh_movefiles -p$(p_lmin) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_lmin) --sourcedir=$(d) \
 		$(foreach i,$(MIN_MODS),$(scriptdir)/$(i).py) \
 		$(foreach i,$(MIN_PACKAGES),$(scriptdir)/$(i)) \
 		$(foreach i,$(MIN_ENCODINGS),$(scriptdir)/$(i)) \
@@ -892,7 +892,7 @@ endif
 	dh_installdirs -p$(p_min) \
 		usr/bin \
 		usr/share/man/man1
-	dh_movefiles -p$(p_min) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_min) --sourcedir=$(d) \
 		usr/bin/python$(VER) \
 		usr/bin/python$(VER)$(ABIFLAGS) \
 		usr/share/man/man1/python$(VER).1 \
@@ -925,7 +925,7 @@ endif
 		usr/include \
 		usr/share/man/man1
 
-	dh_movefiles -p$(p_ldev) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_ldev) --sourcedir=$(d) \
 		usr/bin/$(DEB_HOST_MULTIARCH)-$(PVER)*-config \
 		usr/lib/python$(VER)/config-$(VER)$(ABIFLAGS)-$(DEB_HOST_MULTIARCH) \
 		usr/include \
@@ -961,7 +961,7 @@ endif
 		debian/test_results $(buildd_static)/pybench.log \
 	    $(d_dev)/usr/share/doc/python$(VER)/
 
-	dh_movefiles -p$(p_dev) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_dev) --sourcedir=$(d) \
 		usr/bin/python$(VER)*-config
 
 	: # in $(p_ldev), prefix python-config with triplets
@@ -990,7 +990,7 @@ ifeq ($(with_tk),yes)
 	dh_installdirs -p$(p_tk) \
 		$(scriptdir) \
 		usr/lib/python$(VER)/lib-dynload
-	dh_movefiles -p$(p_tk) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_tk) --sourcedir=$(d) \
 		usr/lib/python$(VER)/lib-dynload/_tkinter*.so
 endif
 
@@ -998,16 +998,16 @@ ifeq ($(with_gdbm),yes)
 	: # Move GDBM files into $(p_gdbm)
 	dh_installdirs -p$(p_gdbm) \
 		usr/lib/python$(VER)/lib-dynload
-	dh_movefiles -p$(p_gdbm) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_gdbm) --sourcedir=$(d) \
 		usr/lib/python$(VER)/lib-dynload/_gdbm*.so
 endif
 
 	: # The test framework into $(p_lbase)
-	dh_movefiles -p$(p_lbase) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_lbase) --sourcedir=$(d) \
 		$(scriptdir)/test/{regrtest.py,support,__init__.py,pystone.py}
 
 	: # The complete testsuite into $(p_lbase)
-	dh_movefiles -p$(p_ltst) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_ltst) --sourcedir=$(d) \
 		$(scriptdir)/test \
 		$(scriptdir)/ctypes/test \
 		$(scriptdir)/distutils/tests \
@@ -1027,7 +1027,7 @@ endif
 	: # Move the demos and tools into $(p_exam)'s doc directory
 	dh_installdirs -p$(p_exam) \
 		usr/share/doc/python$(VER)/examples
-	dh_movefiles -p$(p_exam) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_exam) --sourcedir=$(d) \
 		$(scriptdir)/turtledemo
 
 	cp -rp Tools/* $(d_exam)/usr/share/doc/python$(VER)/examples/
@@ -1041,7 +1041,7 @@ endif
 	dh_installdirs -p$(p_idle) \
 		usr/bin \
 		usr/share/man/man1
-	dh_movefiles -p$(p_idle) --sourcedir=$(d) \
+	DH_COMPAT=2 dh_movefiles -p$(p_idle) --sourcedir=$(d) \
 		usr/bin/idle-python$(VER)
 	cp -p debian/idle-$(PVER).1 $(d_idle)/usr/share/man/man1/
 
