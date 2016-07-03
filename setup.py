@@ -1370,6 +1370,9 @@ class PyBuildExt(build_ext):
         else:
             missing.append('_curses_panel')
 
+        #fpectl fpectlmodule.c ...
+        exts.append( Extension('fpectl', ['fpectlmodule.c']) )
+
         # Andrew Kuchling's zlib module.  Note that some versions of zlib
         # 1.1.3 have security problems.  See CERT Advisory CA-2002-07:
         # http://www.cert.org/advisories/CA-2002-07.html
