@@ -599,17 +599,13 @@ class PyBuildExt(build_ext):
 
         # array objects
         exts.append( Extension('array', ['arraymodule.c']) )
-
-        shared_math = 'Modules/_math.o'
         # complex math library functions
-        exts.append( Extension('cmath', ['cmathmodule.c'],
-                               extra_objects=[shared_math],
-                               depends=['_math.h', shared_math],
+        exts.append( Extension('cmath', ['cmathmodule.c', '_math.c'],
+                               depends=['_math.h'],
                                libraries=math_libs) )
         # math library functions, e.g. sin()
-        exts.append( Extension('math',  ['mathmodule.c'],
-                               extra_objects=[shared_math],
-                               depends=['_math.h', shared_math],
+        exts.append( Extension('math',  ['mathmodule.c', '_math.c'],
+                               depends=['_math.h'],
                                libraries=math_libs) )
 
         # time libraries: librt may be needed for clock_gettime()
