@@ -102,6 +102,9 @@ def get_python_inc(plat_specific=0, prefix=None):
                 incdir = os.path.join(get_config_var('srcdir'), 'Include')
             return os.path.normpath(incdir)
         python_dir = 'python' + get_python_version() + build_flags
+        if not python_build and plat_specific:
+            import sysconfig
+            return sysconfig.get_path('platinclude')
         return os.path.join(prefix, "include", python_dir)
     elif os.name == "nt":
         return os.path.join(prefix, "include")
@@ -260,6 +263,8 @@ def get_makefile_filename():
         return os.path.join(_sys_home or project_base, "Makefile")
     lib_dir = get_python_lib(plat_specific=0, standard_lib=1)
     config_file = 'config-{}{}'.format(get_python_version(), build_flags)
+    if hasattr(sys.implementation, '_multiarch'):
+        config_file += '-%s' % sys.implementation._multiarch
     return os.path.join(lib_dir, config_file, 'Makefile')
 
 
