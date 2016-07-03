@@ -4382,8 +4382,13 @@ int main(void) {
 AC_MSG_RESULT($ac_cv_posix_semaphores_enabled)
 if test $ac_cv_posix_semaphores_enabled = no
 then
-  AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
-            [Define if POSIX semaphores aren't enabled on your system])
+  case $ac_sys_system in
+    Linux*) # assume yes, see https://launchpad.net/bugs/630511
+      ;;
+    *)
+      AC_DEFINE(POSIX_SEMAPHORES_NOT_ENABLED, 1,
+                [Define if POSIX semaphores aren't enabled on your system])
+  esac
 fi
 
 # Multiprocessing check for broken sem_getvalue
@@ -4418,8 +4423,13 @@ int main(void){
 AC_MSG_RESULT($ac_cv_broken_sem_getvalue)
 if test $ac_cv_broken_sem_getvalue = yes
 then
-  AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
-  [define to 1 if your sem_getvalue is broken.])
+  case $ac_sys_system in
+    Linux*) # assume yes, see https://launchpad.net/bugs/630511
+      ;;
+    *)
+      AC_DEFINE(HAVE_BROKEN_SEM_GETVALUE, 1,
+      [define to 1 if your sem_getvalue is broken.])
+  esac
 fi
 
 # determine what size digit to use for Python's longs
