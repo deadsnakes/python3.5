@@ -326,7 +326,7 @@ exception).  Error messages are written to stderr.
 These are subject to difference depending on local installation
 conventions; ${prefix} and ${exec_prefix} are installation-dependent
 and should be interpreted as for GNU software; they may be the same.
-The default for both is \fI/usr/local\fP.
+On Debian GNU/{Hurd,Linux} the default for both is \fI/usr\fP.
 .IP \fI${exec_prefix}/bin/python\fP
 Recommended location of the interpreter.
 .PP
