@@ -3,12 +3,12 @@ python3.5 (3.5.2-1~precise1) precise; urgency=medium
   * debian/watch.in, debian/watch: switch to .tar.xz.
   * debian/watch.in, debian/watch: verify signature on upstream tarballs.
   * debian/control: update VCS info.
-  * debian/rules: remove outdated DH_COMPAT.
   * debian/README.source: remove outdated note about deadsnakes-pristine-tar.
   * Fix VCS info.
   * Imported Upstream version 3.5.2
-  * debian/rules: update SVER.
-  * debian/patches: remove upstreamed patch issue24705.diff.
+    - debian/patches: remove upstreamed patch issue24705.diff.
+    - Revert patch for Python issue #24421 because it broke the build.
+    - debian/libpython.symbols.in: add new symbols.
 
  -- Felix Krull <f_krull@gmx.de>  Sat, 02 Jul 2016 03:15:59 +0200
 
