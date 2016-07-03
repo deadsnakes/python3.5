@@ -1,8 +1,17 @@
-# DP: Use _sysconfigdata.py in distutils to initialize distutils
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: distutils-init
 
+# DP: Use _sysconfigdata.py in distutils to initialize distutils
+---
+ Lib/distutils/sysconfig.py | 35 ++++-------------------------------
+ 1 file changed, 4 insertions(+), 31 deletions(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index d6d01b0..707f4f6 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -438,38 +438,11 @@
+@@ -438,38 +438,11 @@ _config_vars = None
  
  def _init_posix():
      """Initialize the module as appropriate for POSIX systems."""

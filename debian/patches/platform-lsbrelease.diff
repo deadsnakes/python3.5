@@ -1,8 +1,18 @@
-# DP: Use /etc/lsb-release to identify the platform.
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:10 +0200
+Subject: platform-lsbrelease
 
+# DP: Use /etc/lsb-release to identify the platform.
+---
+ Lib/platform.py           | 25 ++++++++++++++++++++++++-
+ Lib/test/test_platform.py | 22 ----------------------
+ 2 files changed, 24 insertions(+), 23 deletions(-)
+
+diff --git a/Lib/platform.py b/Lib/platform.py
+index d58494c..d84ce3c 100755
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
-@@ -268,7 +268,7 @@
+@@ -268,7 +268,7 @@ _release_version = re.compile(r'([^0-9]+)'
  _supported_dists = (
      'SuSE', 'debian', 'fedora', 'redhat', 'centos',
      'mandrake', 'mandriva', 'rocks', 'slackware', 'yellowdog', 'gentoo',
@@ -11,7 +21,7 @@
  
  def _parse_release_file(firstline):
  
-@@ -297,6 +297,10 @@
+@@ -297,6 +297,10 @@ def _parse_release_file(firstline):
              id = l[1]
      return '', version, id
  
@@ -22,7 +32,7 @@
  def linux_distribution(distname='', version='', id='',
  
                         supported_dists=_supported_dists,
-@@ -329,6 +333,25 @@
+@@ -329,6 +333,25 @@ def _linux_distribution(distname, version, id, supported_dists,
          args given as parameters.
  
      """
@@ -48,9 +58,11 @@
      try:
          etc = os.listdir(_UNIXCONFDIR)
      except OSError:
+diff --git a/Lib/test/test_platform.py b/Lib/test/test_platform.py
+index ed18773..a123958 100644
 --- a/Lib/test/test_platform.py
 +++ b/Lib/test/test_platform.py
-@@ -320,28 +320,6 @@
+@@ -320,28 +320,6 @@ class PlatformTest(unittest.TestCase):
                      returncode = ret >> 8
                  self.assertEqual(returncode, len(data))
  

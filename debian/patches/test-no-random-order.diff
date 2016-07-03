@@ -1,8 +1,17 @@
-# DP: Don't run the test suite in random order.
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: test-no-random-order
 
+# DP: Don't run the test suite in random order.
+---
+ Tools/scripts/run_tests.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Tools/scripts/run_tests.py b/Tools/scripts/run_tests.py
+index b582e13..3a8a50b 100644
 --- a/Tools/scripts/run_tests.py
 +++ b/Tools/scripts/run_tests.py
-@@ -37,7 +37,6 @@
+@@ -37,7 +37,6 @@ def main(regrtest_args):
      args.extend(['-W', 'error::BytesWarning'])
  
      args.extend(['-m', 'test',    # Run the test suite

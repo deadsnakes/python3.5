@@ -1,8 +1,17 @@
-# DP: argparse.py: Make the gettext import conditional
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: lib-argparse
 
+# DP: argparse.py: Make the gettext import conditional
+---
+ Lib/argparse.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/argparse.py b/Lib/argparse.py
+index 9a06719..13bfea4 100644
 --- a/Lib/argparse.py
 +++ b/Lib/argparse.py
-@@ -90,7 +90,16 @@
+@@ -90,7 +90,16 @@ import re as _re
  import sys as _sys
  import textwrap as _textwrap
  

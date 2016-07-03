@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: lto-link-flags
+
+---
+ Makefile.pre.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 87528a0..5c985f0 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -138,7 +138,7 @@
+@@ -138,7 +138,7 @@ CONFINCLUDEPY=	$(CONFINCLUDEDIR)/python$(LDVERSION)
  SHLIB_SUFFIX=	@SHLIB_SUFFIX@
  EXT_SUFFIX=	@EXT_SUFFIX@
  LDSHARED=	@LDSHARED@ $(PY_LDFLAGS)
@@ -9,7 +19,7 @@
  LDCXXSHARED=	@LDCXXSHARED@
  DESTSHARED=	$(BINLIBDEST)/lib-dynload
  
-@@ -568,7 +568,7 @@
+@@ -568,7 +568,7 @@ clinic: $(BUILDPYTHON)
  
  # Build the interpreter
  $(BUILDPYTHON):	Programs/python.o $(LIBRARY) $(LDLIBRARY) $(PY3LIBRARY)

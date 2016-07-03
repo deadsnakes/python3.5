@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: deadsnakes-ignore-sphinx-version
+
+---
+ Doc/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Doc/conf.py b/Doc/conf.py
+index d6f20ba..0afc8b6 100644
 --- a/Doc/conf.py
 +++ b/Doc/conf.py
-@@ -34,7 +34,7 @@
+@@ -34,7 +34,7 @@ today_fmt = '%B %d, %Y'
  highlight_language = 'python3'
  
  # Require Sphinx 1.2 for build.

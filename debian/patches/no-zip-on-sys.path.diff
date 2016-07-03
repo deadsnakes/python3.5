@@ -1,8 +1,17 @@
-# DP: Do not add /usr/lib/pythonXY.zip on sys.path.
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: no-zip-on-sys.path
 
+# DP: Do not add /usr/lib/pythonXY.zip on sys.path.
+---
+ Modules/getpath.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/Modules/getpath.c b/Modules/getpath.c
+index 18deb60..0039ac5 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
-@@ -470,7 +470,9 @@
+@@ -470,7 +470,9 @@ calculate_path(void)
      wchar_t *path = NULL;
      wchar_t *prog = Py_GetProgramName();
      wchar_t argv0_path[MAXPATHLEN+1];
@@ -12,7 +21,7 @@
      int pfound, efound; /* 1 if found; -1 if found build directory */
      wchar_t *buf;
      size_t bufsz;
-@@ -675,6 +677,7 @@
+@@ -675,6 +677,7 @@ calculate_path(void)
      else
          reduce(prefix);
  
@@ -20,7 +29,7 @@
      wcsncpy(zip_path, prefix, MAXPATHLEN);
      zip_path[MAXPATHLEN] = L'\0';
      if (pfound > 0) { /* Use the reduced prefix returned by Py_GetPrefix() */
-@@ -687,6 +690,7 @@
+@@ -687,6 +690,7 @@ calculate_path(void)
      bufsz = wcslen(zip_path);   /* Replace "00" with version */
      zip_path[bufsz - 6] = VERSION[0];
      zip_path[bufsz - 5] = VERSION[2];
@@ -28,7 +37,7 @@
  
      efound = search_for_exec_prefix(argv0_path, home,
                                      _exec_prefix, lib_python);
-@@ -732,7 +736,9 @@
+@@ -732,7 +736,9 @@ calculate_path(void)
          defpath = delim + 1;
      }
  
@@ -38,7 +47,7 @@
      bufsz += wcslen(exec_prefix) + 1;
  
      buf = PyMem_New(wchar_t, bufsz);
-@@ -749,9 +755,11 @@
+@@ -749,9 +755,11 @@ calculate_path(void)
      else
          buf[0] = '\0';
  

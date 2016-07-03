@@ -1,8 +1,17 @@
-# DP: Avoid shutil import when it is not available.
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: tempfile-minimal
 
+# DP: Avoid shutil import when it is not available.
+---
+ Lib/tempfile.py | 145 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 142 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/tempfile.py b/Lib/tempfile.py
+index ad687b9..0b02cce 100644
 --- a/Lib/tempfile.py
 +++ b/Lib/tempfile.py
-@@ -40,7 +40,146 @@
+@@ -40,7 +40,146 @@ import functools as _functools
  import warnings as _warnings
  import io as _io
  import os as _os
@@ -150,7 +159,7 @@
  import errno as _errno
  from random import Random as _Random
  import weakref as _weakref
-@@ -794,7 +933,7 @@
+@@ -794,7 +933,7 @@ class TemporaryDirectory(object):
  
      @classmethod
      def _cleanup(cls, name, warn_message):
@@ -159,7 +168,7 @@
          _warnings.warn(warn_message, ResourceWarning)
  
  
-@@ -809,4 +948,4 @@
+@@ -809,4 +948,4 @@ class TemporaryDirectory(object):
  
      def cleanup(self):
          if self._finalizer.detach():

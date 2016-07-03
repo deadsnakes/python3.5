@@ -1,6 +1,16 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: libffi-shared
+
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index dd7b212..991369d 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -2007,7 +2007,7 @@
+@@ -2007,7 +2007,7 @@ class PyBuildExt(build_ext):
                          break
          ffi_lib = None
          if ffi_inc is not None:
