@@ -470,7 +470,9 @@ calculate_path(void)
     wchar_t *path = NULL;
     wchar_t *prog = Py_GetProgramName();
     wchar_t argv0_path[MAXPATHLEN+1];
+#ifdef WITH_ZIP_PATH
     wchar_t zip_path[MAXPATHLEN+1];
+#endif
     int pfound, efound; /* 1 if found; -1 if found build directory */
     wchar_t *buf;
     size_t bufsz;
@@ -675,6 +677,7 @@ calculate_path(void)
     else
         reduce(prefix);
 
+#ifdef WITH_ZIP_PATH
     wcsncpy(zip_path, prefix, MAXPATHLEN);
     zip_path[MAXPATHLEN] = L'\0';
     if (pfound > 0) { /* Use the reduced prefix returned by Py_GetPrefix() */
@@ -687,6 +690,7 @@ calculate_path(void)
     bufsz = wcslen(zip_path);   /* Replace "00" with version */
     zip_path[bufsz - 6] = VERSION[0];
     zip_path[bufsz - 5] = VERSION[2];
+#endif
 
     efound = search_for_exec_prefix(argv0_path, home,
                                     _exec_prefix, lib_python);
@@ -732,7 +736,9 @@ calculate_path(void)
         defpath = delim + 1;
     }
 
+#ifdef WITH_ZIP_PATH
     bufsz += wcslen(zip_path) + 1;
+#endif
     bufsz += wcslen(exec_prefix) + 1;
 
     buf = PyMem_New(wchar_t, bufsz);
@@ -749,9 +755,11 @@ calculate_path(void)
     else
         buf[0] = '\0';
 
+#ifdef WITH_ZIP_PATH
     /* Next is the default zip path */
     wcscat(buf, zip_path);
     wcscat(buf, delimiter);
+#endif
 
     /* Next goes merge of compile-time $PYTHONPATH with
      * dynamically located prefix.
