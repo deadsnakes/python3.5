@@ -745,6 +745,8 @@ Modules/getbuildinfo.o: $(PARSER_OBJS) \
 	      -DHGVERSION="\"`LC_ALL=C $(HGVERSION)`\"" \
 	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
 	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \
+	      $(if $(BUILD_DATE),-DDATE='"$(BUILD_DATE)"') \
+	      $(if $(BUILD_TIME),-DTIME='"$(BUILD_TIME)"') \
 	      -o $@ $(srcdir)/Modules/getbuildinfo.c
 
 Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
