@@ -749,6 +749,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
 
 Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
 	$(CC) -c $(PY_CORE_CFLAGS) \
+		$(if $(MULTIARCH),-DMULTIARCH='"$(MULTIARCH)"') \
 		-DSOABI='"$(SOABI)"' \
 		-o $@ $(srcdir)/Python/dynload_shlib.c
 
@@ -760,6 +761,7 @@ Python/dynload_hpux.o: $(srcdir)/Python/dynload_hpux.c Makefile
 Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
 	$(CC) -c $(PY_CORE_CFLAGS) \
 		-DABIFLAGS='"$(ABIFLAGS)"' \
+		-DMULTIARCH='"$(MULTIARCH)"' \
 		-o $@ $(srcdir)/Python/sysmodule.c
 
 $(IO_OBJS): $(IO_H)
@@ -1326,6 +1328,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
 $(srcdir)/Lib/$(PLATDIR):
 	mkdir $(srcdir)/Lib/$(PLATDIR)
 	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
+	if [ -n "$(MULTIARCH)" ]; then \
+	  cp -p $(srcdir)/Lib/plat-linux/*.py $(srcdir)/Lib/$(PLATDIR)/.; \
+	  rm -f $(srcdir)/Lib/$(PLATDIR)/IN.py; \
+	fi
 	export PATH; PATH="`pwd`:$$PATH"; \
 	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
 	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
@@ -1376,7 +1382,7 @@ inclinstall:
 LIBPL=		@LIBPL@
 
 # pkgconfig directory
-LIBPC=		$(LIBDIR)/pkgconfig
+LIBPC=		$(LIBDIR)/$(MULTIARCH)/pkgconfig
 
 libainstall:	@DEF_MAKE_RULE@ python-config
 	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \

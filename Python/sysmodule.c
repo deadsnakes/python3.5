@@ -1733,6 +1733,15 @@ make_impl_info(PyObject *version_info)
     if (res < 0)
         goto error;
 
+    /* For Debian multiarch support. */
+    value = PyUnicode_FromString(MULTIARCH);
+    if (value == NULL)
+        goto error;
+    res = PyDict_SetItemString(impl_info, "_multiarch", value);
+    Py_DECREF(value);
+    if (res < 0)
+        goto error;
+
     /* dict ready */
 
     ns = _PyNamespace_New(impl_info);

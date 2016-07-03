@@ -874,7 +874,12 @@ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
     AC_MSG_ERROR([internal configure error for the platform triplet, please file a bug report])
   fi
 fi
-PLATDIR=plat-$MACHDEP
+
+if test x$PLATFORM_TRIPLET = x; then
+  PLATDIR=plat-$MACHDEP
+else
+  PLATDIR=plat-$PLATFORM_TRIPLET
+fi
 AC_SUBST(PLATDIR)
 AC_SUBST(PLATFORM_TRIPLET)
 
@@ -4550,7 +4555,7 @@ AC_MSG_RESULT($LDVERSION)
 
 dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
 AC_SUBST(PY_ENABLE_SHARED)
-LIBPL='$(prefix)'"/lib/python${VERSION}/config-${LDVERSION}"
+LIBPL='${prefix}'"/lib/python${VERSION}/config-${LDVERSION}-${MULTIARCH}"
 AC_SUBST(LIBPL)
 
 # Check whether right shifting a negative integer extends the sign bit
