@@ -90,7 +90,16 @@ import re as _re
 import sys as _sys
 import textwrap as _textwrap
 
-from gettext import gettext as _, ngettext
+try:
+    from gettext import gettext as _, ngettext
+except ImportError:
+    def _(message):
+        return message
+    def ngettext(singular,plural,n):
+        if n == 1:
+            return singular
+        else:
+            return plural
 
 
 SUPPRESS = '==SUPPRESS=='
