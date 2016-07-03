@@ -28,6 +28,10 @@ to a file named "<name>.html".
 
 Module docs for core modules are assumed to be in
 
+    /usr/share/doc/pythonX.Y/html/library
+
+if the pythonX.Y-doc package is installed or in
+
     http://docs.python.org/X.Y/library/
 
 This can be overridden by setting the PYTHONDOCS environment variable
