@@ -288,6 +288,13 @@ def addusersitepackages(known_paths):
 
     if ENABLE_USER_SITE and os.path.isdir(user_site):
         addsitedir(user_site, known_paths)
+    if ENABLE_USER_SITE:
+        for dist_libdir in ("lib", "local/lib"):
+            user_site = os.path.join(USER_BASE, dist_libdir,
+                                     "python" + sys.version[:3],
+                                     "dist-packages")
+            if os.path.isdir(user_site):
+                addsitedir(user_site, known_paths)
     return known_paths
 
 def getsitepackages(prefixes=None):
