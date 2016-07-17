@@ -5,6 +5,7 @@ python3.5 (3.5.2-1~precise1) precise; urgency=medium
   * debian/control: update VCS info.
   * debian/README.source: remove outdated note about deadsnakes-pristine-tar.
   * Fix VCS info.
+  * Fix Python 3.3.5/3.4.4/3.5.1 tests for Expat 2.2.0.
   * Imported Upstream version 3.5.2
     - debian/patches: remove upstreamed patch issue24705.diff.
     - Revert patch for Python issue #24421 because it broke the build.
