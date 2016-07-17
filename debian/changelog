@@ -1,3 +1,18 @@
+python3.5 (3.5.2-1~precise1) precise; urgency=medium
+
+  * debian/watch.in, debian/watch: switch to .tar.xz.
+  * debian/watch.in, debian/watch: verify signature on upstream tarballs.
+  * debian/control: update VCS info.
+  * debian/README.source: remove outdated note about deadsnakes-pristine-tar.
+  * Fix VCS info.
+  * Fix Python 3.3.5/3.4.4/3.5.1 tests for Expat 2.2.0.
+  * Imported Upstream version 3.5.2
+    - debian/patches: remove upstreamed patch issue24705.diff.
+    - Revert patch for Python issue #24421 because it broke the build.
+    - debian/libpython.symbols.in: add new symbols.
+
+ -- Felix Krull <f_krull@gmx.de>  Sun, 17 Jul 2016 19:15:16 +0200
+
 python3.5 (3.5.1-1+trusty1) trusty; urgency=medium
 
   * Imported from Precise package.

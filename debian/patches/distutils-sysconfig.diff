@@ -1,10 +1,19 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:10 +0200
+Subject: distutils-sysconfig
+
 # DP: Get CONFIGURE_CFLAGS, CONFIGURE_CPPFLAGS, CONFIGURE_LDFLAGS from
 # DP: the python build, when CFLAGS, CPPFLAGS, LDSHARED) are not set
 # DP: in the environment.
+---
+ Lib/distutils/sysconfig.py | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index e8e7a16..2be7e47 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -180,9 +180,11 @@
+@@ -180,9 +180,11 @@ def customize_compiler(compiler):
                  _osx_support.customize_compiler(_config_vars)
                  _config_vars['CUSTOMIZED_OSX_COMPILER'] = 'True'
  
@@ -18,7 +27,7 @@
  
          if 'CC' in os.environ:
              newcc = os.environ['CC']
-@@ -203,13 +205,22 @@
+@@ -203,13 +205,22 @@ def customize_compiler(compiler):
              cpp = cc + " -E"           # not always
          if 'LDFLAGS' in os.environ:
              ldshared = ldshared + ' ' + os.environ['LDFLAGS']

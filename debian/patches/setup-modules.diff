@@ -1,8 +1,17 @@
-# DP: Modules/Setup.dist: patches to build some extensions statically
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:10 +0200
+Subject: setup-modules
 
+# DP: Modules/Setup.dist: patches to build some extensions statically
+---
+ Modules/Setup.dist | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/Modules/Setup.dist b/Modules/Setup.dist
+index 06ba6ad..5e2c1d0 100644
 --- a/Modules/Setup.dist
 +++ b/Modules/Setup.dist
-@@ -175,7 +175,7 @@
+@@ -175,7 +175,7 @@ _symtable symtablemodule.c
  #_weakref _weakref.c	# basic weak reference support
  #_testcapi _testcapimodule.c    # Python C API test module
  #_random _randommodule.c	# Random number generator
@@ -11,7 +20,7 @@
  #_pickle _pickle.c	# pickle accelerator
  #_datetime _datetimemodule.c	# datetime accelerator
  #_bisect _bisectmodule.c	# Bisection algorithms
-@@ -204,10 +204,7 @@
+@@ -204,10 +204,7 @@ _symtable symtablemodule.c
  
  # Socket module helper for SSL support; you must comment out the other
  # socket line above, and possibly edit the SSL variable:
@@ -23,7 +32,7 @@
  
  # The crypt module is now disabled by default because it breaks builds
  # on many systems (where -lcrypt is needed), e.g. Linux (I believe).
-@@ -249,6 +246,7 @@
+@@ -249,6 +246,7 @@ _symtable symtablemodule.c
  #_sha256 sha256module.c
  #_sha512 sha512module.c
  
@@ -31,7 +40,7 @@
  
  # The _tkinter module.
  #
-@@ -337,6 +335,7 @@
+@@ -337,6 +335,7 @@ _symtable symtablemodule.c
  # Fred Drake's interface to the Python parser
  #parser parsermodule.c
  
@@ -39,7 +48,7 @@
  
  # Lee Busby's SIGFPE modules.
  # The library to link fpectl with is platform specific.
-@@ -371,7 +370,7 @@
+@@ -371,7 +370,7 @@ _symtable symtablemodule.c
  #
  # More information on Expat can be found at www.libexpat.org.
  #

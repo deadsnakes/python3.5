@@ -1,8 +1,17 @@
-# DP: Fix bashism in makesetup shell script
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: makesetup-bashism
 
+# DP: Fix bashism in makesetup shell script
+---
+ Modules/makesetup | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Modules/makesetup b/Modules/makesetup
+index 90db42e..c98bc8a 100755
 --- a/Modules/makesetup
 +++ b/Modules/makesetup
-@@ -277,7 +277,7 @@
+@@ -277,7 +277,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |
  	-)	;;
  	*)	sedf="@sed.in.$$"
  		trap 'rm -f $sedf' 0 1 2 3

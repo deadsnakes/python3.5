@@ -1,6 +1,43 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: multiarch
+
+---
+ Lib/distutils/sysconfig.py | 5 +++++
+ Lib/sysconfig.py           | 8 ++++++++
+ Makefile.pre.in            | 8 +++++++-
+ Python/sysmodule.c         | 9 +++++++++
+ configure.ac               | 9 +++++++--
+ 5 files changed, 36 insertions(+), 3 deletions(-)
+
+diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
+index 2be7e47..d6d01b0 100644
+--- a/Lib/distutils/sysconfig.py
++++ b/Lib/distutils/sysconfig.py
+@@ -102,6 +102,9 @@ def get_python_inc(plat_specific=0, prefix=None):
+                 incdir = os.path.join(get_config_var('srcdir'), 'Include')
+             return os.path.normpath(incdir)
+         python_dir = 'python' + get_python_version() + build_flags
++        if not python_build and plat_specific:
++            import sysconfig
++            return sysconfig.get_path('platinclude')
+         return os.path.join(prefix, "include", python_dir)
+     elif os.name == "nt":
+         return os.path.join(prefix, "include")
+@@ -260,6 +263,8 @@ def get_makefile_filename():
+         return os.path.join(_sys_home or project_base, "Makefile")
+     lib_dir = get_python_lib(plat_specific=0, standard_lib=1)
+     config_file = 'config-{}{}'.format(get_python_version(), build_flags)
++    if hasattr(sys.implementation, '_multiarch'):
++        config_file += '-%s' % sys.implementation._multiarch
+     return os.path.join(lib_dir, config_file, 'Makefile')
+ 
+ 
+diff --git a/Lib/sysconfig.py b/Lib/sysconfig.py
+index 9c34be0..771c2be 100644
 --- a/Lib/sysconfig.py
 +++ b/Lib/sysconfig.py
-@@ -332,6 +332,8 @@
+@@ -337,6 +337,8 @@ def get_makefile_filename():
          config_dir_name = 'config-%s%s' % (_PY_VERSION_SHORT, sys.abiflags)
      else:
          config_dir_name = 'config'
@@ -9,7 +46,7 @@
      return os.path.join(get_path('stdlib'), config_dir_name, 'Makefile')
  
  def _generate_posix_vars():
-@@ -538,6 +540,12 @@
+@@ -543,6 +545,12 @@ def get_config_vars(*args):
          # the init-function.
          _CONFIG_VARS['userbase'] = _getuserbase()
  
@@ -22,30 +59,11 @@
          # Always convert srcdir to an absolute path
          srcdir = _CONFIG_VARS.get('srcdir', _PROJECT_BASE)
          if os.name == 'posix':
---- a/Lib/distutils/sysconfig.py
-+++ b/Lib/distutils/sysconfig.py
-@@ -102,6 +102,9 @@
-                 incdir = os.path.join(get_config_var('srcdir'), 'Include')
-             return os.path.normpath(incdir)
-         python_dir = 'python' + get_python_version() + build_flags
-+        if not python_build and plat_specific:
-+            import sysconfig
-+            return sysconfig.get_path('platinclude')
-         return os.path.join(prefix, "include", python_dir)
-     elif os.name == "nt":
-         return os.path.join(prefix, "include")
-@@ -260,6 +263,8 @@
-         return os.path.join(_sys_home or project_base, "Makefile")
-     lib_dir = get_python_lib(plat_specific=0, standard_lib=1)
-     config_file = 'config-{}{}'.format(get_python_version(), build_flags)
-+    if hasattr(sys.implementation, '_multiarch'):
-+        config_file += '-%s' % sys.implementation._multiarch
-     return os.path.join(lib_dir, config_file, 'Makefile')
- 
- 
+diff --git a/Makefile.pre.in b/Makefile.pre.in
+index 5c985f0..7582947 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -762,6 +762,7 @@
+@@ -773,6 +773,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
  
  Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
@@ -53,7 +71,7 @@
  		-DSOABI='"$(SOABI)"' \
  		-o $@ $(srcdir)/Python/dynload_shlib.c
  
-@@ -773,6 +774,7 @@
+@@ -784,6 +785,7 @@ Python/dynload_hpux.o: $(srcdir)/Python/dynload_hpux.c Makefile
  Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
  		-DABIFLAGS='"$(ABIFLAGS)"' \
@@ -61,7 +79,7 @@
  		-o $@ $(srcdir)/Python/sysmodule.c
  
  $(IO_OBJS): $(IO_H)
-@@ -1311,6 +1313,10 @@
+@@ -1337,6 +1339,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
  $(srcdir)/Lib/$(PLATDIR):
  	mkdir $(srcdir)/Lib/$(PLATDIR)
  	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
@@ -72,7 +90,7 @@
  	export PATH; PATH="`pwd`:$$PATH"; \
  	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
  	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
-@@ -1361,7 +1367,7 @@
+@@ -1387,7 +1393,7 @@ inclinstall:
  LIBPL=		@LIBPL@
  
  # pkgconfig directory
@@ -81,9 +99,11 @@
  
  libainstall:	all python-config
  	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \
+diff --git a/Python/sysmodule.c b/Python/sysmodule.c
+index 8d7e05a..8c5a58f 100644
 --- a/Python/sysmodule.c
 +++ b/Python/sysmodule.c
-@@ -1696,6 +1696,15 @@
+@@ -1696,6 +1696,15 @@ make_impl_info(PyObject *version_info)
      if (res < 0)
          goto error;
  
@@ -99,12 +119,14 @@
      /* dict ready */
  
      ns = _PyNamespace_New(impl_info);
+diff --git a/configure.ac b/configure.ac
+index 7891d2a..896bee2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -854,7 +854,12 @@
+@@ -872,7 +872,12 @@ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
      AC_MSG_ERROR([internal configure error for the platform triplet, please file a bug report])
    fi
- fi 
+ fi
 -PLATDIR=plat-$MACHDEP
 +
 +if test x$PLATFORM_TRIPLET = x; then
@@ -115,7 +137,7 @@
  AC_SUBST(PLATDIR)
  AC_SUBST(PLATFORM_TRIPLET)
  
-@@ -4389,7 +4394,7 @@
+@@ -4471,7 +4476,7 @@ AC_MSG_RESULT($LDVERSION)
  
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)

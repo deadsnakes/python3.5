@@ -1,3 +1,13 @@
+From: Felix Krull <f_krull@gmx.de>
+Date: Sun, 3 Jul 2016 14:45:11 +0200
+Subject: turtledemo-add-shebang
+
+---
+ Lib/turtledemo/two_canvases.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/turtledemo/two_canvases.py b/Lib/turtledemo/two_canvases.py
+index d579876..426a2db 100755
 --- a/Lib/turtledemo/two_canvases.py
 +++ b/Lib/turtledemo/two_canvases.py
 @@ -1,3 +1,4 @@
