@@ -8,10 +8,10 @@ Subject: makesetup-bashism
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Modules/makesetup b/Modules/makesetup
-index 90db42e..c98bc8a 100755
+index e204a05..8d92a05 100755
 --- a/Modules/makesetup
 +++ b/Modules/makesetup
-@@ -277,7 +277,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |
+@@ -279,7 +279,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |
  	-)	;;
  	*)	sedf="@sed.in.$$"
  		trap 'rm -f $sedf' 0 1 2 3
@@ -19,4 +19,4 @@ index 90db42e..c98bc8a 100755
 +		printf "1i\\" >$sedf
  		str="# Generated automatically from $makepre by makesetup."
  		echo "$str" >>$sedf
- 		echo "s%_MODOBJS_%$OBJS%" >>$sedf
+ 		echo "s%_MODNAMES_%$NAMES%" >>$sedf

@@ -8,10 +8,10 @@ Subject: no-large-file-support
  1 file changed, 5 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index 1922834..6f98087 100644
+index b729504..3386c43 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1979,6 +1979,11 @@ if test "$sol_lfs_bug" = "yes"; then
+@@ -2048,6 +2048,11 @@ if test "$sol_lfs_bug" = "yes"; then
    use_lfs=no
  fi
  

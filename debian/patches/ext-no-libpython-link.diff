@@ -8,10 +8,10 @@ Subject: ext-no-libpython-link
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Lib/distutils/command/build_ext.py b/Lib/distutils/command/build_ext.py
-index f03a4e3..49c9995 100644
+index 7c278ef..e1d45e8 100644
 --- a/Lib/distutils/command/build_ext.py
 +++ b/Lib/distutils/command/build_ext.py
-@@ -229,7 +229,7 @@ class build_ext(Command):
+@@ -230,7 +230,7 @@ class build_ext(Command):
          # For building extensions with a shared Python library,
          # Python's library directory must be appended to library_dirs
          # See Issues: #1600860, #4366
@@ -20,7 +20,7 @@ index f03a4e3..49c9995 100644
              if not sysconfig.python_build:
                  # building third party extensions
                  self.library_dirs.append(sysconfig.get_config_var('LIBDIR'))
-@@ -745,7 +745,7 @@ class build_ext(Command):
+@@ -746,7 +746,7 @@ class build_ext(Command):
              return ext.libraries
          else:
              from distutils import sysconfig

@@ -8,7 +8,7 @@ Subject: no-zip-on-sys.path
  1 file changed, 8 insertions(+)
 
 diff --git a/Modules/getpath.c b/Modules/getpath.c
-index 18deb60..0039ac5 100644
+index c438b8e..a731de7 100644
 --- a/Modules/getpath.c
 +++ b/Modules/getpath.c
 @@ -470,7 +470,9 @@ calculate_path(void)

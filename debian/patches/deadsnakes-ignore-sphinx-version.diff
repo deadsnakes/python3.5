@@ -7,7 +7,7 @@ Subject: deadsnakes-ignore-sphinx-version
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Doc/conf.py b/Doc/conf.py
-index d6f20ba..0afc8b6 100644
+index b1bb620..be4206e 100644
 --- a/Doc/conf.py
 +++ b/Doc/conf.py
 @@ -34,7 +34,7 @@ today_fmt = '%B %d, %Y'

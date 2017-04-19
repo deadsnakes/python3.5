@@ -60,10 +60,10 @@ index 9c34be0..771c2be 100644
          srcdir = _CONFIG_VARS.get('srcdir', _PROJECT_BASE)
          if os.name == 'posix':
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 5c985f0..7582947 100644
+index 5df5497..5d97f51 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -773,6 +773,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
+@@ -770,6 +770,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
  
  Python/dynload_shlib.o: $(srcdir)/Python/dynload_shlib.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
@@ -71,7 +71,7 @@ index 5c985f0..7582947 100644
  		-DSOABI='"$(SOABI)"' \
  		-o $@ $(srcdir)/Python/dynload_shlib.c
  
-@@ -784,6 +785,7 @@ Python/dynload_hpux.o: $(srcdir)/Python/dynload_hpux.c Makefile
+@@ -781,6 +782,7 @@ Python/dynload_hpux.o: $(srcdir)/Python/dynload_hpux.c Makefile
  Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
  	$(CC) -c $(PY_CORE_CFLAGS) \
  		-DABIFLAGS='"$(ABIFLAGS)"' \
@@ -79,7 +79,7 @@ index 5c985f0..7582947 100644
  		-o $@ $(srcdir)/Python/sysmodule.c
  
  $(IO_OBJS): $(IO_H)
-@@ -1337,6 +1339,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
+@@ -1324,6 +1326,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
  $(srcdir)/Lib/$(PLATDIR):
  	mkdir $(srcdir)/Lib/$(PLATDIR)
  	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
@@ -90,7 +90,7 @@ index 5c985f0..7582947 100644
  	export PATH; PATH="`pwd`:$$PATH"; \
  	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
  	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
-@@ -1387,7 +1393,7 @@ inclinstall:
+@@ -1374,7 +1380,7 @@ inclinstall:
  LIBPL=		@LIBPL@
  
  # pkgconfig directory
@@ -100,10 +100,10 @@ index 5c985f0..7582947 100644
  libainstall:	all python-config
  	@for i in $(LIBDIR) $(LIBPL) $(LIBPC); \
 diff --git a/Python/sysmodule.c b/Python/sysmodule.c
-index 8d7e05a..8c5a58f 100644
+index 1dc7d7c..358d2c2 100644
 --- a/Python/sysmodule.c
 +++ b/Python/sysmodule.c
-@@ -1696,6 +1696,15 @@ make_impl_info(PyObject *version_info)
+@@ -1733,6 +1733,15 @@ make_impl_info(PyObject *version_info)
      if (res < 0)
          goto error;
  
@@ -120,10 +120,10 @@ index 8d7e05a..8c5a58f 100644
  
      ns = _PyNamespace_New(impl_info);
 diff --git a/configure.ac b/configure.ac
-index 7891d2a..896bee2 100644
+index f8f76a8..09e0782 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -872,7 +872,12 @@ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
+@@ -883,7 +883,12 @@ if test x$PLATFORM_TRIPLET != x && test x$MULTIARCH != x; then
      AC_MSG_ERROR([internal configure error for the platform triplet, please file a bug report])
    fi
  fi
@@ -137,7 +137,7 @@ index 7891d2a..896bee2 100644
  AC_SUBST(PLATDIR)
  AC_SUBST(PLATFORM_TRIPLET)
  
-@@ -4471,7 +4476,7 @@ AC_MSG_RESULT($LDVERSION)
+@@ -4539,7 +4544,7 @@ AC_MSG_RESULT($LDVERSION)
  
  dnl define LIBPL after ABIFLAGS and LDVERSION is defined.
  AC_SUBST(PY_ENABLE_SHARED)

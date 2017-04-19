@@ -9,7 +9,7 @@ Subject: deb-locations
  2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 3ca08c9..4f94d6c 100755
+index 0d0d0ab..2362845 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -28,6 +28,10 @@ to a file named "<name>.html".
@@ -20,11 +20,11 @@ index 3ca08c9..4f94d6c 100755
 +
 +if the pythonX.Y-doc package is installed or in
 +
-     http://docs.python.org/X.Y/library/
+     https://docs.python.org/X.Y/library/
  
  This can be overridden by setting the PYTHONDOCS environment variable
 diff --git a/Misc/python.man b/Misc/python.man
-index 3d530d7..f7c36fb 100644
+index 28f19b6..37d4f6a 100644
 --- a/Misc/python.man
 +++ b/Misc/python.man
 @@ -326,7 +326,7 @@ exception).  Error messages are written to stderr.

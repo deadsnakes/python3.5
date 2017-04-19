@@ -7,11 +7,11 @@ Subject: libffi-shared
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/setup.py b/setup.py
-index dd7b212..991369d 100644
+index 088ab00..55c2e9e 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -2007,7 +2007,7 @@ class PyBuildExt(build_ext):
-                         break
+@@ -2008,7 +2008,7 @@ class PyBuildExt(build_ext):
+                           'ffi_wrapper_h'.format(ffi_h))
          ffi_lib = None
          if ffi_inc is not None:
 -            for lib_name in ('ffi_convenience', 'ffi_pic', 'ffi'):

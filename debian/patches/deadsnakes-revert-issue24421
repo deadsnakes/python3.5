@@ -10,10 +10,10 @@ the cmath module build.
  2 files changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 7002262..e691a99 100644
+index c3bbe61..31da9cd 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -589,15 +589,11 @@ pybuilddir.txt: $(BUILDPYTHON)
+@@ -590,15 +590,11 @@ pybuilddir.txt: $(BUILDPYTHON)
  		exit 1 ; \
  	fi
  
@@ -31,10 +31,10 @@ index 7002262..e691a99 100644
  	    *\ -s*|s*) quiet="-q";; \
  	    *) quiet="";; \
 diff --git a/setup.py b/setup.py
-index 18bb8f4..6228ba6 100644
+index 72fccf2..ed1a576 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -599,17 +599,13 @@ class PyBuildExt(build_ext):
+@@ -598,17 +598,13 @@ class PyBuildExt(build_ext):
  
          # array objects
          exts.append( Extension('array', ['arraymodule.c']) )

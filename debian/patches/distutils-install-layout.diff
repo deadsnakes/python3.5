@@ -214,17 +214,17 @@ index 9313330..b74d7ae 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 4f94d6c..d1cf471 100755
+index 2362845..b8e2edc 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -404,6 +404,7 @@ class Doc:
+@@ -405,6 +405,7 @@ class Doc:
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and
 +              not file.startswith(os.path.join(basedir, 'dist-packages')) and
                not file.startswith(os.path.join(basedir, 'site-packages')))) and
              object.__name__ not in ('xml.etree', 'test.pydoc_mod')):
-             if docloc.startswith("http://"):
+             if docloc.startswith(("http://", "https://")):
 diff --git a/Lib/site.py b/Lib/site.py
 index 4113ca8..44a6123 100644
 --- a/Lib/site.py
