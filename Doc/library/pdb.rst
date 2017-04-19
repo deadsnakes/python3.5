@@ -158,7 +158,7 @@ access further features, you have to do this yourself:
    By default, Pdb sets a handler for the SIGINT signal (which is sent when the
    user presses :kbd:`Ctrl-C` on the console) when you give a ``continue`` command.
    This allows you to break into the debugger again by pressing :kbd:`Ctrl-C`.  If you
-   want Pdb not to touch the SIGINT handler, set *nosigint* tot true.
+   want Pdb not to touch the SIGINT handler, set *nosigint* to true.
 
    Example call to enable tracing with *skip*::
 
@@ -328,7 +328,7 @@ by the local file.
    return, jump, quit and their abbreviations) terminates the command list (as if
    that command was immediately followed by end). This is because any time you
    resume execution (even with a simple next or step), you may encounter another
-   breakpoint--which could have its own command list, leading to ambiguities about
+   breakpoint—which could have its own command list, leading to ambiguities about
    which list to execute.
 
    If you use the 'silent' command in the command list, the usual message about
@@ -449,7 +449,7 @@ by the local file.
 
 .. pdbcommand:: interact
 
-   Start an interative interpreter (using the :mod:`code` module) whose global
+   Start an interactive interpreter (using the :mod:`code` module) whose global
    namespace contains all the (global and local) names found in the current
    scope.
 

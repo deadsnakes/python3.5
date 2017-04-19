@@ -652,6 +652,7 @@ static void
 element_dealloc(ElementObject* self)
 {
     PyObject_GC_UnTrack(self);
+    Py_TRASHCAN_SAFE_BEGIN(self)
 
     if (self->weakreflist != NULL)
         PyObject_ClearWeakRefs((PyObject *) self);
@@ -662,6 +663,7 @@ element_dealloc(ElementObject* self)
 
     RELEASE(sizeof(ElementObject), "destroy element");
     Py_TYPE(self)->tp_free((PyObject *)self);
+    Py_TRASHCAN_SAFE_END(self)
 }
 
 /* -------------------------------------------------------------------- */
@@ -1582,10 +1584,23 @@ _elementtree_Element_remove_impl(ElementObject *self, PyObject *subelement)
 static PyObject*
 element_repr(ElementObject* self)
 {
-    if (self->tag)
-        return PyUnicode_FromFormat("<Element %R at %p>", self->tag, self);
-    else
+    int status;
+
+    if (self->tag == NULL)
         return PyUnicode_FromFormat("<Element at %p>", self);
+
+    status = Py_ReprEnter((PyObject *)self);
+    if (status == 0) {
+        PyObject *res;
+        res = PyUnicode_FromFormat("<Element %R at %p>", self->tag, self);
+        Py_ReprLeave((PyObject *)self);
+        return res;
+    }
+    if (status > 0)
+        PyErr_Format(PyExc_RuntimeError,
+                     "reentrant call inside %s.__repr__",
+                     Py_TYPE(self)->tp_name);
+    return NULL;
 }
 
 /*[clinic input]
@@ -3673,11 +3688,11 @@ xmlparser_getattro(XMLParserObject* self, PyObject* nameobj)
 {
     if (PyUnicode_Check(nameobj)) {
         PyObject* res;
-        if (PyUnicode_CompareWithASCIIString(nameobj, "entity") == 0)
+        if (_PyUnicode_EqualToASCIIString(nameobj, "entity"))
             res = self->entity;
-        else if (PyUnicode_CompareWithASCIIString(nameobj, "target") == 0)
+        else if (_PyUnicode_EqualToASCIIString(nameobj, "target"))
             res = self->target;
-        else if (PyUnicode_CompareWithASCIIString(nameobj, "version") == 0) {
+        else if (_PyUnicode_EqualToASCIIString(nameobj, "version")) {
             return PyUnicode_FromFormat(
                 "Expat %d.%d.%d", XML_MAJOR_VERSION,
                 XML_MINOR_VERSION, XML_MICRO_VERSION);

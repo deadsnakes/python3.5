@@ -244,7 +244,7 @@ the *new_callable* argument to :func:`patch`.
 
       .. versionadded:: 3.5
 
-    * *wraps*: Item for the mock object to wrap. If *wraps* is not None then
+    * *wraps*: Item for the mock object to wrap. If *wraps* is not ``None`` then
       calling the Mock will pass the call through to the wrapped object
       (returning the real result). Attribute access on the mock will return a
       Mock object that wraps the corresponding attribute of the wrapped
@@ -324,7 +324,7 @@ the *new_callable* argument to :func:`patch`.
             >>> calls = [call(4), call(2), call(3)]
             >>> mock.assert_has_calls(calls, any_order=True)
 
-    .. method:: assert_not_called(*args, **kwargs)
+    .. method:: assert_not_called()
 
         Assert the mock was never called.
 

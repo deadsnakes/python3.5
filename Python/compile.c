@@ -1390,7 +1390,7 @@ get_ref_type(struct compiler *c, PyObject *name)
 {
     int scope;
     if (c->u->u_scope_type == COMPILER_SCOPE_CLASS &&
-        !PyUnicode_CompareWithASCIIString(name, "__class__"))
+        _PyUnicode_EqualToASCIIString(name, "__class__"))
         return CELL;
     scope = PyST_GetScope(c->u->u_ste, name);
     if (scope == 0) {
@@ -1494,6 +1494,9 @@ static int
 compiler_visit_kwonlydefaults(struct compiler *c, asdl_seq *kwonlyargs,
                               asdl_seq *kw_defaults)
 {
+    /* Return the number of defaults + 1.
+       Returns 0 on error.
+     */
     int i, default_count = 0;
     for (i = 0; i < asdl_seq_LEN(kwonlyargs); i++) {
         arg_ty arg = asdl_seq_GET(kwonlyargs, i);
@@ -1501,16 +1504,16 @@ compiler_visit_kwonlydefaults(struct compiler *c, asdl_seq *kwonlyargs,
         if (default_) {
             PyObject *mangled = _Py_Mangle(c->u->u_private, arg->arg);
             if (!mangled)
-                return -1;
+                return 0;
             ADDOP_O(c, LOAD_CONST, mangled, consts);
             Py_DECREF(mangled);
             if (!compiler_visit_expr(c, default_)) {
-                return -1;
+                return 0;
             }
             default_count++;
         }
     }
-    return default_count;
+    return default_count + 1;
 }
 
 static int
@@ -1554,17 +1557,17 @@ compiler_visit_annotations(struct compiler *c, arguments_ty args,
                            expr_ty returns)
 {
     /* Push arg annotations and a list of the argument names. Return the #
-       of items pushed. The expressions are evaluated out-of-order wrt the
+       of items pushed + 1. The expressions are evaluated out-of-order wrt the
        source code.
 
-       More than 2^16-1 annotations is a SyntaxError. Returns -1 on error.
+       More than 2^16-1 annotations is a SyntaxError. Returns 0 on error.
        */
     static identifier return_str;
     PyObject *names;
     Py_ssize_t len;
     names = PyList_New(0);
     if (!names)
-        return -1;
+        return 0;
 
     if (!compiler_visit_argannotations(c, args->args, names))
         goto error;
@@ -1614,11 +1617,11 @@ compiler_visit_annotations(struct compiler *c, arguments_ty args,
     Py_DECREF(names);
 
     /* We just checked that len <= 65535, see above */
-    return Py_SAFE_DOWNCAST(len, Py_ssize_t, int);
+    return Py_SAFE_DOWNCAST(len + 1, Py_ssize_t, int);
 
 error:
     Py_DECREF(names);
-    return -1;
+    return 0;
 }
 
 static int
@@ -1667,13 +1670,14 @@ compiler_function(struct compiler *c, stmt_ty s, int is_async)
     if (args->kwonlyargs) {
         int res = compiler_visit_kwonlydefaults(c, args->kwonlyargs,
                                                 args->kw_defaults);
-        if (res < 0)
+        if (res == 0)
             return 0;
-        kw_default_count = res;
+        kw_default_count = res - 1;
     }
     num_annotations = compiler_visit_annotations(c, args, returns);
-    if (num_annotations < 0)
+    if (num_annotations == 0)
         return 0;
+    num_annotations--;
     assert((num_annotations & 0xFFFF) == num_annotations);
 
     if (!compiler_enter_scope(c, name,
@@ -1889,8 +1893,8 @@ compiler_lambda(struct compiler *c, expr_ty e)
     if (args->kwonlyargs) {
         int res = compiler_visit_kwonlydefaults(c, args->kwonlyargs,
                                                 args->kw_defaults);
-        if (res < 0) return 0;
-        kw_default_count = res;
+        if (res == 0) return 0;
+        kw_default_count = res - 1;
     }
     if (!compiler_enter_scope(c, name, COMPILER_SCOPE_LAMBDA,
                               (void *)e, e->lineno))
@@ -2403,7 +2407,7 @@ compiler_import_as(struct compiler *c, identifier name, identifier asname)
     Py_ssize_t dot = PyUnicode_FindChar(name, '.', 0,
                                         PyUnicode_GET_LENGTH(name), 1);
     if (dot == -2)
-        return -1;
+        return 0;
     if (dot != -1) {
         /* Consume the base module name to get the first attribute */
         Py_ssize_t pos = dot + 1;
@@ -2412,12 +2416,12 @@ compiler_import_as(struct compiler *c, identifier name, identifier asname)
             dot = PyUnicode_FindChar(name, '.', pos,
                                      PyUnicode_GET_LENGTH(name), 1);
             if (dot == -2)
-                return -1;
+                return 0;
             attr = PyUnicode_Substring(name, pos,
                                        (dot != -1) ? dot :
                                        PyUnicode_GET_LENGTH(name));
             if (!attr)
-                return -1;
+                return 0;
             ADDOP_O(c, LOAD_ATTR, attr, names);
             Py_DECREF(attr);
             pos = dot + 1;
@@ -2509,7 +2513,7 @@ compiler_from_import(struct compiler *c, stmt_ty s)
     }
 
     if (s->lineno > c->c_future->ff_lineno && s->v.ImportFrom.module &&
-        !PyUnicode_CompareWithASCIIString(s->v.ImportFrom.module, "__future__")) {
+        _PyUnicode_EqualToASCIIString(s->v.ImportFrom.module, "__future__")) {
         Py_DECREF(level);
         Py_DECREF(names);
         return compiler_error(c, "from __future__ imports must occur "
@@ -2833,9 +2837,9 @@ compiler_nameop(struct compiler *c, identifier name, expr_context_ty ctx)
     if (!mangled)
         return 0;
 
-    assert(PyUnicode_CompareWithASCIIString(name, "None") &&
-           PyUnicode_CompareWithASCIIString(name, "True") &&
-           PyUnicode_CompareWithASCIIString(name, "False"));
+    assert(!_PyUnicode_EqualToASCIIString(name, "None") &&
+           !_PyUnicode_EqualToASCIIString(name, "True") &&
+           !_PyUnicode_EqualToASCIIString(name, "False"));
 
     op = 0;
     optype = OP_NAME;
@@ -3262,7 +3266,7 @@ compiler_call_helper(struct compiler *c,
         code |= 2;
         if (nsubkwargs > 1) {
             /* Pack it all up */
-            int function_pos = n + (code & 1) + nkw + 1;
+            int function_pos = n + (code & 1) + 2 * nkw + 1;
             ADDOP_I(c, BUILD_MAP_UNPACK_WITH_CALL, nsubkwargs | (function_pos << 8));
         }
     }
@@ -3976,7 +3980,7 @@ compiler_push_fblock(struct compiler *c, enum fblocktype t, basicblock *b)
 {
     struct fblockinfo *f;
     if (c->u->u_nfblocks >= CO_MAXBLOCKS) {
-        PyErr_SetString(PyExc_SystemError,
+        PyErr_SetString(PyExc_SyntaxError,
                         "too many statically nested blocks");
         return 0;
     }

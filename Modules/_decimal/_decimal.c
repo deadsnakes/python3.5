@@ -1119,12 +1119,12 @@ context_getattr(PyObject *self, PyObject *name)
     PyObject *retval;
 
     if (PyUnicode_Check(name)) {
-        if (PyUnicode_CompareWithASCIIString(name, "traps") == 0) {
+        if (_PyUnicode_EqualToASCIIString(name, "traps")) {
             retval = ((PyDecContextObject *)self)->traps;
             Py_INCREF(retval);
             return retval;
         }
-        if (PyUnicode_CompareWithASCIIString(name, "flags") == 0) {
+        if (_PyUnicode_EqualToASCIIString(name, "flags")) {
             retval = ((PyDecContextObject *)self)->flags;
             Py_INCREF(retval);
             return retval;
@@ -1144,10 +1144,10 @@ context_setattr(PyObject *self, PyObject *name, PyObject *value)
     }
 
     if (PyUnicode_Check(name)) {
-        if (PyUnicode_CompareWithASCIIString(name, "traps") == 0) {
+        if (_PyUnicode_EqualToASCIIString(name, "traps")) {
             return context_settraps_dict(self, value);
         }
-        if (PyUnicode_CompareWithASCIIString(name, "flags") == 0) {
+        if (_PyUnicode_EqualToASCIIString(name, "flags")) {
             return context_setstatus_dict(self, value);
         }
     }
@@ -2208,6 +2208,14 @@ PyDecType_FromLongExact(PyTypeObject *type, const PyObject *pylong,
     return dec;
 }
 
+/* External C-API functions */
+static binaryfunc _py_long_multiply;
+static binaryfunc _py_long_floor_divide;
+static ternaryfunc _py_long_power;
+static unaryfunc _py_float_abs;
+static PyCFunction _py_long_bit_length;
+static PyCFunction _py_float_as_integer_ratio;
+
 /* Return a PyDecObject or a subtype from a PyFloatObject.
    Conversion is exact. */
 static PyObject *
@@ -2258,13 +2266,13 @@ PyDecType_FromFloatExact(PyTypeObject *type, PyObject *v,
     }
 
     /* absolute value of the float */
-    tmp = PyObject_CallMethod(v, "__abs__", NULL);
+    tmp = _py_float_abs(v);
     if (tmp == NULL) {
         return NULL;
     }
 
     /* float as integer ratio: numerator/denominator */
-    n_d = PyObject_CallMethod(tmp, "as_integer_ratio", NULL);
+    n_d = _py_float_as_integer_ratio(tmp, NULL);
     Py_DECREF(tmp);
     if (n_d == NULL) {
         return NULL;
@@ -2272,7 +2280,7 @@ PyDecType_FromFloatExact(PyTypeObject *type, PyObject *v,
     n = PyTuple_GET_ITEM(n_d, 0);
     d = PyTuple_GET_ITEM(n_d, 1);
 
-    tmp = PyObject_CallMethod(d, "bit_length", NULL);
+    tmp = _py_long_bit_length(d, NULL);
     if (tmp == NULL) {
         Py_DECREF(n_d);
         return NULL;
@@ -2438,14 +2446,14 @@ dectuple_as_str(PyObject *dectuple)
     tmp = PyTuple_GET_ITEM(dectuple, 2);
     if (PyUnicode_Check(tmp)) {
         /* special */
-        if (PyUnicode_CompareWithASCIIString(tmp, "F") == 0) {
+        if (_PyUnicode_EqualToASCIIString(tmp, "F")) {
             strcat(sign_special, "Inf");
             is_infinite = 1;
         }
-        else if (PyUnicode_CompareWithASCIIString(tmp, "n") == 0) {
+        else if (_PyUnicode_EqualToASCIIString(tmp, "n")) {
             strcat(sign_special, "NaN");
         }
-        else if (PyUnicode_CompareWithASCIIString(tmp, "N") == 0) {
+        else if (_PyUnicode_EqualToASCIIString(tmp, "N")) {
             strcat(sign_special, "sNaN");
         }
         else {
@@ -2630,12 +2638,18 @@ PyDecType_FromSequenceExact(PyTypeObject *type, PyObject *v,
 
 /* class method */
 static PyObject *
-dec_from_float(PyObject *dec, PyObject *pyfloat)
+dec_from_float(PyObject *type, PyObject *pyfloat)
 {
     PyObject *context;
+    PyObject *result;
 
     CURRENT_CONTEXT(context);
-    return PyDecType_FromFloatExact((PyTypeObject *)dec, pyfloat, context);
+    result = PyDecType_FromFloatExact(&PyDec_Type, pyfloat, context);
+    if (type != (PyObject *)&PyDec_Type && result != NULL) {
+        Py_SETREF(result, PyObject_CallFunctionObjArgs(type, result, NULL));
+    }
+
+    return result;
 }
 
 /* create_decimal_from_float */
@@ -5505,6 +5519,32 @@ static struct int_constmap int_constants [] = {
 #define CHECK_PTR(expr) \
     do { if ((expr) == NULL) goto error; } while (0)
 
+
+static PyCFunction
+cfunc_noargs(PyTypeObject *t, const char *name)
+{
+    struct PyMethodDef *m;
+
+    if (t->tp_methods == NULL) {
+        goto error;
+    }
+
+    for (m = t->tp_methods; m->ml_name != NULL; m++) {
+        if (strcmp(name, m->ml_name) == 0) {
+            if (!(m->ml_flags & METH_NOARGS)) {
+                goto error;
+            }
+            return m->ml_meth;
+        }
+    }
+
+error:
+    PyErr_Format(PyExc_RuntimeError,
+        "internal error: could not find method %s", name);
+    return NULL;
+}
+
+
 PyMODINIT_FUNC
 PyInit__decimal(void)
 {
@@ -5527,6 +5567,16 @@ PyInit__decimal(void)
     mpd_callocfunc = mpd_callocfunc_em;
     mpd_free = PyMem_Free;
     mpd_setminalloc(_Py_DEC_MINALLOC);
+
+
+    /* Init external C-API functions */
+    _py_long_multiply = PyLong_Type.tp_as_number->nb_multiply;
+    _py_long_floor_divide = PyLong_Type.tp_as_number->nb_floor_divide;
+    _py_long_power = PyLong_Type.tp_as_number->nb_power;
+    _py_float_abs = PyFloat_Type.tp_as_number->nb_absolute;
+    ASSIGN_PTR(_py_float_as_integer_ratio, cfunc_noargs(&PyFloat_Type,
+                                                        "as_integer_ratio"));
+    ASSIGN_PTR(_py_long_bit_length, cfunc_noargs(&PyLong_Type, "bit_length"));
 
 
     /* Init types */

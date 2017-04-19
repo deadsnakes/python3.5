@@ -59,7 +59,7 @@ the coroutine object returned by the call doesn't do anything until you
 schedule its execution.  There are two basic ways to start it running:
 call ``await coroutine`` or ``yield from coroutine`` from another coroutine
 (assuming the other coroutine is already running!), or schedule its execution
-using the :func:`ensure_future` function or the :meth:`BaseEventLoop.create_task`
+using the :func:`ensure_future` function or the :meth:`AbstractEventLoop.create_task`
 method.
 
 
@@ -108,7 +108,7 @@ Example of coroutine displaying ``"Hello World"``::
 .. seealso::
 
    The :ref:`Hello World with call_soon() <asyncio-hello-world-callback>`
-   example uses the :meth:`BaseEventLoop.call_soon` method to schedule a
+   example uses the :meth:`AbstractEventLoop.call_soon` method to schedule a
    callback.
 
 
@@ -151,7 +151,7 @@ The same coroutine implemented using a generator::
 
    The :ref:`display the current date with call_later()
    <asyncio-date-callback>` example uses a callback with the
-   :meth:`BaseEventLoop.call_later` method.
+   :meth:`AbstractEventLoop.call_later` method.
 
 
 Example: Chain coroutines
@@ -182,12 +182,12 @@ Sequence diagram of the example:
 .. image:: tulip_coro.png
    :align: center
 
-The "Task" is created by the :meth:`BaseEventLoop.run_until_complete` method
+The "Task" is created by the :meth:`AbstractEventLoop.run_until_complete` method
 when it gets a coroutine object instead of a task.
 
 The diagram shows the control flow, it does not describe exactly how things
 work internally. For example, the sleep coroutine creates an internal future
-which uses :meth:`BaseEventLoop.call_later` to wake up the task in 1 second.
+which uses :meth:`AbstractEventLoop.call_later` to wake up the task in 1 second.
 
 
 InvalidStateError
@@ -223,7 +223,7 @@ Future
      raise an exception when the future isn't done yet.
 
    - Callbacks registered with :meth:`add_done_callback` are always called
-     via the event loop's :meth:`~BaseEventLoop.call_soon_threadsafe`.
+     via the event loop's :meth:`~AbstractEventLoop.call_soon_threadsafe`.
 
    - This class is not compatible with the :func:`~concurrent.futures.wait` and
      :func:`~concurrent.futures.as_completed` functions in the
@@ -245,7 +245,7 @@ Future
 
    .. method:: done()
 
-      Return True if the future is done.
+      Return ``True`` if the future is done.
 
       Done means either that a result / exception are available, or that the
       future was cancelled.
@@ -273,7 +273,7 @@ Future
 
       The callback is called with a single argument - the future object. If the
       future is already done when this is called, the callback is scheduled
-      with :meth:`~BaseEventLoop.call_soon`.
+      with :meth:`~AbstractEventLoop.call_soon`.
 
       :ref:`Use functools.partial to pass parameters to the callback
       <asyncio-pass-keywords>`. For example,
@@ -323,11 +323,11 @@ Example combining a :class:`Future` and a :ref:`coroutine function
 
 The coroutine function is responsible for the computation (which takes 1 second)
 and it stores the result into the future. The
-:meth:`~BaseEventLoop.run_until_complete` method waits for the completion of
+:meth:`~AbstractEventLoop.run_until_complete` method waits for the completion of
 the future.
 
 .. note::
-   The :meth:`~BaseEventLoop.run_until_complete` method uses internally the
+   The :meth:`~AbstractEventLoop.run_until_complete` method uses internally the
    :meth:`~Future.add_done_callback` method to be notified when the future is
    done.
 
@@ -374,7 +374,7 @@ Task
 
    A task is responsible for executing a coroutine object in an event loop.  If
    the wrapped coroutine yields from a future, the task suspends the execution
-   of the wrapped coroutine and waits for the completition of the future. When
+   of the wrapped coroutine and waits for the completion of the future. When
    the future is done, the execution of the wrapped coroutine restarts with the
    result or the exception of the future.
 
@@ -396,7 +396,7 @@ Task
    logged: see :ref:`Pending task destroyed <asyncio-pending-task-destroyed>`.
 
    Don't directly create :class:`Task` instances: use the :func:`ensure_future`
-   function or the :meth:`BaseEventLoop.create_task` method.
+   function or the :meth:`AbstractEventLoop.create_task` method.
 
    This class is :ref:`not thread safe <asyncio-multithreading>`.
 
@@ -486,7 +486,7 @@ Example executing 3 tasks (A, B, C) in parallel::
         asyncio.ensure_future(factorial("A", 2)),
         asyncio.ensure_future(factorial("B", 3)),
         asyncio.ensure_future(factorial("C", 4))]
-    loop.run_until_complete(asyncio.wait(tasks))
+    loop.run_until_complete(asyncio.gather(*tasks))
     loop.close()
 
 Output::
@@ -546,7 +546,7 @@ Task functions
 
    .. seealso::
 
-      The :meth:`BaseEventLoop.create_task` method.
+      The :meth:`AbstractEventLoop.create_task` method.
 
 .. function:: async(coro_or_future, \*, loop=None)
 
@@ -562,7 +562,7 @@ Task functions
    All futures must share the same event loop.  If all the tasks are done
    successfully, the returned future's result is the list of results (in the
    order of the original sequence, not necessarily the order of results
-   arrival).  If *return_exceptions* is True, exceptions in the tasks are
+   arrival).  If *return_exceptions* is true, exceptions in the tasks are
    treated the same as successful results, and gathered in the result list;
    otherwise, the first raised exception will be immediately propagated to the
    returned future.

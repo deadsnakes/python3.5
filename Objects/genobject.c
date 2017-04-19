@@ -21,20 +21,8 @@ void
 _PyGen_Finalize(PyObject *self)
 {
     PyGenObject *gen = (PyGenObject *)self;
-    PyObject *res;
+    PyObject *res = NULL;
     PyObject *error_type, *error_value, *error_traceback;
-
-    /* If `gen` is a coroutine, and if it was never awaited on,
-       issue a RuntimeWarning. */
-    if (gen->gi_code != NULL
-            && ((PyCodeObject *)gen->gi_code)->co_flags & CO_COROUTINE
-            && gen->gi_frame != NULL
-            && gen->gi_frame->f_lasti == -1
-            && !PyErr_Occurred()
-            && PyErr_WarnFormat(PyExc_RuntimeWarning, 1,
-                                "coroutine '%.50S' was never awaited",
-                                gen->gi_qualname))
-        return;
 
     if (gen->gi_frame == NULL || gen->gi_frame->f_stacktop == NULL)
         /* Generator isn't paused, so no need to close */
@@ -43,12 +31,28 @@ _PyGen_Finalize(PyObject *self)
     /* Save the current exception, if any. */
     PyErr_Fetch(&error_type, &error_value, &error_traceback);
 
-    res = gen_close(gen, NULL);
+    /* If `gen` is a coroutine, and if it was never awaited on,
+       issue a RuntimeWarning. */
+    if (gen->gi_code != NULL &&
+        ((PyCodeObject *)gen->gi_code)->co_flags & CO_COROUTINE &&
+        gen->gi_frame->f_lasti == -1) {
+        if (!error_value) {
+            PyErr_WarnFormat(PyExc_RuntimeWarning, 1,
+                             "coroutine '%.50S' was never awaited",
+                             gen->gi_qualname);
+        }
+    }
+    else {
+        res = gen_close(gen, NULL);
+    }
 
-    if (res == NULL)
-        PyErr_WriteUnraisable(self);
-    else
+    if (res == NULL) {
+        if (PyErr_Occurred())
+            PyErr_WriteUnraisable(self);
+    }
+    else {
         Py_DECREF(res);
+    }
 
     /* Restore the saved exception. */
     PyErr_Restore(error_type, error_value, error_traceback);
@@ -70,7 +74,10 @@ gen_dealloc(PyGenObject *gen)
         return;                     /* resurrected.  :( */
 
     _PyObject_GC_UNTRACK(self);
-    Py_CLEAR(gen->gi_frame);
+    if (gen->gi_frame != NULL) {
+        gen->gi_frame->f_gen = NULL;
+        Py_CLEAR(gen->gi_frame);
+    }
     Py_CLEAR(gen->gi_code);
     Py_CLEAR(gen->gi_name);
     Py_CLEAR(gen->gi_qualname);
@@ -147,12 +154,7 @@ gen_send_ex(PyGenObject *gen, PyObject *arg, int exc, int closing)
             /* Delay exception instantiation if we can */
             PyErr_SetNone(PyExc_StopIteration);
         } else {
-            PyObject *e = PyObject_CallFunctionObjArgs(
-                               PyExc_StopIteration, result, NULL);
-            if (e != NULL) {
-                PyErr_SetObject(PyExc_StopIteration, e);
-                Py_DECREF(e);
-            }
+            _PyGen_SetStopIterationValue(result);
         }
         Py_CLEAR(result);
     }
@@ -453,6 +455,43 @@ gen_iternext(PyGenObject *gen)
 }
 
 /*
+ * Set StopIteration with specified value.  Value can be arbitrary object
+ * or NULL.
+ *
+ * Returns 0 if StopIteration is set and -1 if any other exception is set.
+ */
+int
+_PyGen_SetStopIterationValue(PyObject *value)
+{
+    PyObject *e;
+
+    if (value == NULL ||
+        (!PyTuple_Check(value) &&
+         !PyObject_TypeCheck(value, (PyTypeObject *) PyExc_StopIteration)))
+    {
+        /* Delay exception instantiation if we can */
+        PyErr_SetObject(PyExc_StopIteration, value);
+        return 0;
+    }
+    /* Construct an exception instance manually with
+     * PyObject_CallFunctionObjArgs and pass it to PyErr_SetObject.
+     *
+     * We do this to handle a situation when "value" is a tuple, in which
+     * case PyErr_SetObject would set the value of StopIteration to
+     * the first element of the tuple.
+     *
+     * (See PyErr_SetObject/_PyErr_CreateException code for details.)
+     */
+    e = PyObject_CallFunctionObjArgs(PyExc_StopIteration, value, NULL);
+    if (e == NULL) {
+        return -1;
+    }
+    PyErr_SetObject(PyExc_StopIteration, e);
+    Py_DECREF(e);
+    return 0;
+}
+
+/*
  *   If StopIteration exception is set, fetches its 'value'
  *   attribute if any, otherwise sets pvalue to None.
  *
@@ -462,7 +501,8 @@ gen_iternext(PyGenObject *gen)
  */
 
 int
-_PyGen_FetchStopIterationValue(PyObject **pvalue) {
+_PyGen_FetchStopIterationValue(PyObject **pvalue)
+{
     PyObject *et, *ev, *tb;
     PyObject *value = NULL;
 
@@ -474,8 +514,15 @@ _PyGen_FetchStopIterationValue(PyObject **pvalue) {
                 value = ((PyStopIterationObject *)ev)->value;
                 Py_INCREF(value);
                 Py_DECREF(ev);
-            } else if (et == PyExc_StopIteration) {
-                /* avoid normalisation and take ev as value */
+            } else if (et == PyExc_StopIteration && !PyTuple_Check(ev)) {
+                /* Avoid normalisation and take ev as value.
+                 *
+                 * Normalization is required if the value is a tuple, in
+                 * that case the value of StopIteration would be set to
+                 * the first element of the tuple.
+                 *
+                 * (See _PyErr_CreateException code for details.)
+                 */
                 value = ev;
             } else {
                 /* normalisation required */
@@ -984,7 +1031,7 @@ PyTypeObject _PyCoroWrapper_Type = {
     0,                                          /* tp_init */
     0,                                          /* tp_alloc */
     0,                                          /* tp_new */
-    PyObject_Del,                               /* tp_free */
+    0,                                          /* tp_free */
 };
 
 PyObject *
@@ -1005,7 +1052,7 @@ typedef struct {
 static PyObject *
 aiter_wrapper_iternext(PyAIterWrapper *aw)
 {
-    PyErr_SetObject(PyExc_StopIteration, aw->aw_aiter);
+    _PyGen_SetStopIterationValue(aw->aw_aiter);
     return NULL;
 }
 
@@ -1069,7 +1116,7 @@ PyTypeObject _PyAIterWrapper_Type = {
     0,                                          /* tp_init */
     0,                                          /* tp_alloc */
     0,                                          /* tp_new */
-    PyObject_Del,                               /* tp_free */
+    0,                                          /* tp_free */
 };
 
 

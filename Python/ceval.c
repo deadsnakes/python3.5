@@ -1563,7 +1563,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             if (PyUnicode_CheckExact(left) &&
                      PyUnicode_CheckExact(right)) {
                 sum = unicode_concatenate(left, right, f, next_instr);
-                /* unicode_concatenate consumed the ref to v */
+                /* unicode_concatenate consumed the ref to left */
             }
             else {
                 sum = PyNumber_Add(left, right);
@@ -1762,7 +1762,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             PyObject *sum;
             if (PyUnicode_CheckExact(left) && PyUnicode_CheckExact(right)) {
                 sum = unicode_concatenate(left, right, f, next_instr);
-                /* unicode_concatenate consumed the ref to v */
+                /* unicode_concatenate consumed the ref to left */
             }
             else {
                 sum = PyNumber_InPlaceAdd(left, right);
@@ -1853,7 +1853,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             PyObject *v = THIRD();
             int err;
             STACKADJ(-3);
-            /* v[w] = u */
+            /* container[sub] = v */
             err = PyObject_SetItem(container, sub, v);
             Py_DECREF(v);
             Py_DECREF(container);
@@ -1868,7 +1868,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             PyObject *container = SECOND();
             int err;
             STACKADJ(-2);
-            /* del v[w] */
+            /* del container[sub] */
             err = PyObject_DelItem(container, sub);
             Py_DECREF(container);
             Py_DECREF(sub);
@@ -2107,7 +2107,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
                 SET_TOP(val);
                 DISPATCH();
             }
-            /* x remains on stack, retval is value to be yielded */
+            /* receiver remains on stack, retval is value to be yielded */
             f->f_stacktop = stack_pointer;
             why = WHY_YIELD;
             /* and repeat... */
@@ -2196,7 +2196,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             else {
                 PyObject *build_class_str = _PyUnicode_FromId(&PyId___build_class__);
                 if (build_class_str == NULL)
-                    break;
+                    goto error;
                 bc = PyObject_GetItem(f->f_builtins, build_class_str);
                 if (bc == NULL) {
                     if (PyErr_ExceptionMatches(PyExc_KeyError))
@@ -2580,14 +2580,16 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
         TARGET(BUILD_SET) {
             PyObject *set = PySet_New(NULL);
             int err = 0;
+            int i;
             if (set == NULL)
                 goto error;
-            while (--oparg >= 0) {
-                PyObject *item = POP();
+            for (i = oparg; i > 0; i--) {
+                PyObject *item = PEEK(i);
                 if (err == 0)
                     err = PySet_Add(set, item);
                 Py_DECREF(item);
             }
+            STACKADJ(-oparg);
             if (err != 0) {
                 Py_DECREF(set);
                 goto error;
@@ -2644,14 +2646,12 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
         _build_map_unpack: {
             int with_call = opcode == BUILD_MAP_UNPACK_WITH_CALL;
             int num_maps;
-            int function_location;
             int i;
             PyObject *sum = PyDict_New();
             if (sum == NULL)
                 goto error;
             if (with_call) {
                 num_maps = oparg & 0xff;
-                function_location = (oparg>>8) & 0xff;
             }
             else {
                 num_maps = oparg;
@@ -2663,7 +2663,9 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
                     PyObject *intersection = _PyDictView_Intersect(sum, arg);
 
                     if (intersection == NULL) {
-                        if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
+                        if (PyErr_ExceptionMatches(PyExc_AttributeError) ||
+                            !PyMapping_Check(arg)) {
+                            int function_location = (oparg>>8) & 0xff;
                             PyObject *func = (
                                     PEEK(function_location + num_maps));
                             PyErr_Format(PyExc_TypeError,
@@ -2680,6 +2682,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
                     if (PySet_GET_SIZE(intersection)) {
                         Py_ssize_t idx = 0;
                         PyObject *key;
+                        int function_location = (oparg>>8) & 0xff;
                         PyObject *func = PEEK(function_location + num_maps);
                         Py_hash_t hash;
                         _PySet_NextEntry(intersection, &idx, &key, &hash);
@@ -2705,9 +2708,21 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
 
                 if (PyDict_Update(sum, arg) < 0) {
                     if (PyErr_ExceptionMatches(PyExc_AttributeError)) {
-                        PyErr_Format(PyExc_TypeError,
-                                "'%.200s' object is not a mapping",
-                                arg->ob_type->tp_name);
+                        if (with_call) {
+                            int function_location = (oparg>>8) & 0xff;
+                            PyObject *func = PEEK(function_location + num_maps);
+                            PyErr_Format(PyExc_TypeError,
+                                    "%.200s%.200s argument after ** "
+                                    "must be a mapping, not %.200s",
+                                    PyEval_GetFuncName(func),
+                                    PyEval_GetFuncDesc(func),
+                                    arg->ob_type->tp_name);
+                        }
+                        else {
+                            PyErr_Format(PyExc_TypeError,
+                                    "'%.200s' object is not a mapping",
+                                    arg->ob_type->tp_name);
+                        }
                     }
                     Py_DECREF(sum);
                     goto error;
@@ -2728,7 +2743,7 @@ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
             STACKADJ(-2);
             map = stack_pointer[-oparg];  /* dict */
             assert(PyDict_CheckExact(map));
-            err = PyDict_SetItem(map, key, value);  /* v[w] = u */
+            err = PyDict_SetItem(map, key, value);  /* map[key] = value */
             Py_DECREF(value);
             Py_DECREF(key);
             if (err != 0)
@@ -4123,7 +4138,7 @@ do_raise(PyObject *exc, PyObject *cause)
         type = tstate->exc_type;
         value = tstate->exc_value;
         tb = tstate->exc_traceback;
-        if (type == Py_None) {
+        if (type == Py_None || type == NULL) {
             PyErr_SetString(PyExc_RuntimeError,
                             "No active exception to reraise");
             return 0;

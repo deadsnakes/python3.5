@@ -527,6 +527,8 @@ compress(Compressor *c, uint8_t *data, size_t len, lzma_action action)
         Py_BEGIN_ALLOW_THREADS
         lzret = lzma_code(&c->lzs, action);
         data_size = (char *)c->lzs.next_out - PyBytes_AS_STRING(result);
+        if (lzret == LZMA_BUF_ERROR && len == 0 && c->lzs.avail_out > 0)
+            lzret = LZMA_OK; /* That wasn't a real error */
         Py_END_ALLOW_THREADS
         if (catch_lzma_error(lzret))
             goto error;
@@ -906,6 +908,9 @@ decompress_buf(Decompressor *d, Py_ssize_t max_length)
     PyObject *result;
     lzma_stream *lzs = &d->lzs;
 
+    if (lzs->avail_in == 0)
+        return PyBytes_FromStringAndSize(NULL, 0);
+
     if (max_length < 0 || max_length >= INITIAL_BUFFER_SIZE)
         result = PyBytes_FromStringAndSize(NULL, INITIAL_BUFFER_SIZE);
     else
@@ -1005,8 +1010,10 @@ decompress(Decompressor *d, uint8_t *data, size_t len, Py_ssize_t max_length)
     }
 
     result = decompress_buf(d, max_length);
-    if(result == NULL)
+    if (result == NULL) {
+        lzs->next_in = NULL;
         return NULL;
+    }
 
     if (d->eof) {
         d->needs_input = 0;
@@ -1342,8 +1349,8 @@ Always returns True for CHECK_NONE and CHECK_CRC32.
 [clinic start generated code]*/
 
 static PyObject *
-_lzma_is_check_supported_impl(PyModuleDef *module, int check_id)
-/*[clinic end generated code: output=bb828e90e00ad96e input=5518297b97b2318f]*/
+_lzma_is_check_supported_impl(PyObject *module, int check_id)
+/*[clinic end generated code: output=e4f14ba3ce2ad0a5 input=5518297b97b2318f]*/
 {
     return PyBool_FromLong(lzma_check_is_supported(check_id));
 }
@@ -1360,8 +1367,8 @@ The result does not include the filter ID itself, only the options.
 [clinic start generated code]*/
 
 static PyObject *
-_lzma__encode_filter_properties_impl(PyModuleDef *module, lzma_filter filter)
-/*[clinic end generated code: output=b5fe690acd6b61d1 input=d4c64f1b557c77d4]*/
+_lzma__encode_filter_properties_impl(PyObject *module, lzma_filter filter)
+/*[clinic end generated code: output=5c93c8e14e7be5a8 input=d4c64f1b557c77d4]*/
 {
     lzma_ret lzret;
     uint32_t encoded_size;
@@ -1400,9 +1407,9 @@ The result does not include the filter ID itself, only the options.
 [clinic start generated code]*/
 
 static PyObject *
-_lzma__decode_filter_properties_impl(PyModuleDef *module, lzma_vli filter_id,
+_lzma__decode_filter_properties_impl(PyObject *module, lzma_vli filter_id,
                                      Py_buffer *encoded_props)
-/*[clinic end generated code: output=af248f570746668b input=246410800782160c]*/
+/*[clinic end generated code: output=714fd2ef565d5c60 input=246410800782160c]*/
 {
     lzma_filter filter;
     lzma_ret lzret;

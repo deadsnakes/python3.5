@@ -80,7 +80,7 @@ sends logging output to a disk file.  It inherits the output functionality from
 
    Returns a new instance of the :class:`FileHandler` class. The specified file is
    opened and used as the stream for logging. If *mode* is not specified,
-   :const:`'a'` is used.  If *encoding* is not *None*, it is used to open the file
+   :const:`'a'` is used.  If *encoding* is not ``None``, it is used to open the file
    with that encoding.  If *delay* is true, then file opening is deferred until the
    first call to :meth:`emit`. By default, the file grows indefinitely.
 
@@ -152,11 +152,11 @@ exclusive locks - and so there is no need for such a handler. Furthermore,
 for this value.
 
 
-.. class:: WatchedFileHandler(filename[,mode[, encoding[, delay]]])
+.. class:: WatchedFileHandler(filename, mode='a', encoding=None, delay=False)
 
    Returns a new instance of the :class:`WatchedFileHandler` class. The specified
    file is opened and used as the stream for logging. If *mode* is not specified,
-   :const:`'a'` is used.  If *encoding* is not *None*, it is used to open the file
+   :const:`'a'` is used.  If *encoding* is not ``None``, it is used to open the file
    with that encoding.  If *delay* is true, then file opening is deferred until the
    first call to :meth:`emit`.  By default, the file grows indefinitely.
 
@@ -257,11 +257,11 @@ The :class:`RotatingFileHandler` class, located in the :mod:`logging.handlers`
 module, supports rotation of disk log files.
 
 
-.. class:: RotatingFileHandler(filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=0)
+.. class:: RotatingFileHandler(filename, mode='a', maxBytes=0, backupCount=0, encoding=None, delay=False)
 
    Returns a new instance of the :class:`RotatingFileHandler` class. The specified
    file is opened and used as the stream for logging. If *mode* is not specified,
-   ``'a'`` is used.  If *encoding* is not *None*, it is used to open the file
+   ``'a'`` is used.  If *encoding* is not ``None``, it is used to open the file
    with that encoding.  If *delay* is true, then file opening is deferred until the
    first call to :meth:`emit`.  By default, the file grows indefinitely.
 

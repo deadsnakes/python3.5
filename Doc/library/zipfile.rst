@@ -142,8 +142,8 @@ ZipFile Objects
    file, then additional files are added to it.  If *file* does not refer to a
    ZIP file, then a new ZIP archive is appended to the file.  This is meant for
    adding a ZIP archive to another file (such as :file:`python.exe`).  If
-   *mode* is ``a`` and the file does not exist at all, it is created.
-   If *mode* is ``r`` or ``a``, the file should be seekable.
+   *mode* is ``'a'`` and the file does not exist at all, it is created.
+   If *mode* is ``'r'`` or ``'a'``, the file should be seekable.
    *compression* is the ZIP compression method to use when writing the archive,
    and should be :const:`ZIP_STORED`, :const:`ZIP_DEFLATED`,
    :const:`ZIP_BZIP2` or :const:`ZIP_LZMA`; unrecognized
@@ -152,7 +152,7 @@ ZipFile Objects
    (:mod:`zlib`, :mod:`bz2` or :mod:`lzma`) is not available, :exc:`RuntimeError`
    is also raised. The default is :const:`ZIP_STORED`.  If *allowZip64* is
    ``True`` (the default) zipfile will create ZIP files that use the ZIP64
-   extensions when the zipfile is larger than 2 GiB. If it is  false :mod:`zipfile`
+   extensions when the zipfile is larger than 4 GiB. If it is  false :mod:`zipfile`
    will raise an exception when the ZIP file would require ZIP64 extensions.
 
    If the file is created with mode ``'w'``, ``'x'`` or ``'a'`` and then
@@ -250,7 +250,7 @@ ZipFile Objects
 .. method:: ZipFile.extract(member, path=None, pwd=None)
 
    Extract a member from the archive to the current working directory; *member*
-   must be its full name or a :class:`ZipInfo` object).  Its file information is
+   must be its full name or a :class:`ZipInfo` object.  Its file information is
    extracted as accurately as possible.  *path* specifies a different directory
    to extract to.  *member* can be a filename or a :class:`ZipInfo` object.
    *pwd* is the password used for encrypted files.
@@ -343,9 +343,9 @@ ZipFile Objects
       If ``arcname`` (or ``filename``, if ``arcname`` is  not given) contains a null
       byte, the name of the file in the archive will be truncated at the null byte.
 
-.. method:: ZipFile.writestr(zinfo_or_arcname, bytes[, compress_type])
+.. method:: ZipFile.writestr(zinfo_or_arcname, data[, compress_type])
 
-   Write the string *bytes* to the archive; *zinfo_or_arcname* is either the file
+   Write the string *data* to the archive; *zinfo_or_arcname* is either the file
    name it will be given in the archive, or a :class:`ZipInfo` instance.  If it's
    an instance, at least the filename, date, and time must be given.  If it's a
    name, the date and time is set to the current date and time.
@@ -573,5 +573,62 @@ Instances have the following attributes:
 .. attribute:: ZipInfo.file_size
 
    Size of the uncompressed file.
+
+
+.. _zipfile-commandline:
+.. program:: zipfile
+
+Command-Line Interface
+----------------------
+
+The :mod:`zipfile` module provides a simple command-line interface to interact
+with ZIP archives.
+
+If you want to create a new ZIP archive, specify its name after the :option:`-c`
+option and then list the filename(s) that should be included:
+
+.. code-block:: shell-session
+
+    $ python -m zipfile -c monty.zip spam.txt eggs.txt
+
+Passing a directory is also acceptable:
+
+.. code-block:: shell-session
+
+    $ python -m zipfile -c monty.zip life-of-brian_1979/
+
+If you want to extract a ZIP archive into the specified directory, use
+the :option:`-e` option:
+
+.. code-block:: shell-session
+
+    $ python -m zipfile -e monty.zip target-dir/
+
+For a list of the files in a ZIP archive, use the :option:`-l` option:
+
+.. code-block:: shell-session
+
+    $ python -m zipfile -l monty.zip
+
+
+Command-line options
+~~~~~~~~~~~~~~~~~~~~
+
+.. cmdoption:: -l <zipfile>
+
+   List files in a zipfile.
+
+.. cmdoption:: -c <zipfile> <source1> ... <sourceN>
+
+   Create zipfile from source files.
+
+.. cmdoption:: -e <zipfile> <output_dir>
+
+   Extract zipfile into target directory.
+
+.. cmdoption:: -t <zipfile>
+
+   Test whether the zipfile is valid or not.
+
 
 .. _PKZIP Application Note: https://pkware.cachefly.net/webdocs/casestudies/APPNOTE.TXT

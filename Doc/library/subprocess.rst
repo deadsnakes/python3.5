@@ -64,7 +64,7 @@ compatibility with older versions, see the :ref:`call-function-trio` section.
    is automatically created with ``stdin=PIPE``, and the *stdin* argument may
    not be used as well.
 
-   If *check* is True, and the process exits with a non-zero exit code, a
+   If *check* is true, and the process exits with a non-zero exit code, a
    :exc:`CalledProcessError` exception will be raised. Attributes of that
    exception hold the arguments, the exit code, and stdout and stderr if they
    were captured.
@@ -104,17 +104,17 @@ compatibility with older versions, see the :ref:`call-function-trio` section.
    .. attribute:: stdout
 
       Captured stdout from the child process. A bytes sequence, or a string if
-      :func:`run` was called with ``universal_newlines=True``. None if stdout
+      :func:`run` was called with ``universal_newlines=True``. ``None`` if stdout
       was not captured.
 
       If you ran the process with ``stderr=subprocess.STDOUT``, stdout and
       stderr will be combined in this attribute, and :attr:`stderr` will be
-      None.
+      ``None``.
 
    .. attribute:: stderr
 
       Captured stderr from the child process. A bytes sequence, or a string if
-      :func:`run` was called with ``universal_newlines=True``. None if stderr
+      :func:`run` was called with ``universal_newlines=True``. ``None`` if stderr
       was not captured.
 
    .. method:: check_returncode()
@@ -347,8 +347,8 @@ functions.
    manner described in :ref:`converting-argument-sequence`.  This is because
    the underlying ``CreateProcess()`` operates on strings.
 
-   The *shell* argument (which defaults to *False*) specifies whether to use
-   the shell as the program to execute.  If *shell* is *True*, it is
+   The *shell* argument (which defaults to ``False``) specifies whether to use
+   the shell as the program to execute.  If *shell* is ``True``, it is
    recommended to pass *args* as a string rather than as a sequence.
 
    On POSIX with ``shell=True``, the shell defaults to :file:`/bin/sh`.  If
@@ -950,20 +950,23 @@ been imported from the :mod:`subprocess` module.
 Replacing /bin/sh shell backquote
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: bash
 
    output=`mycmd myarg`
-   # becomes
-   output = check_output(["mycmd", "myarg"])
 
+becomes::
+
+   output = check_output(["mycmd", "myarg"])
 
 Replacing shell pipeline
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: bash
 
    output=`dmesg | grep hda`
-   # becomes
+
+becomes::
+
    p1 = Popen(["dmesg"], stdout=PIPE)
    p2 = Popen(["grep", "hda"], stdin=p1.stdout, stdout=PIPE)
    p1.stdout.close()  # Allow p1 to receive a SIGPIPE if p2 exits.
@@ -973,10 +976,14 @@ The p1.stdout.close() call after starting the p2 is important in order for p1
 to receive a SIGPIPE if p2 exits before p1.
 
 Alternatively, for trusted input, the shell's own pipeline support may still
-be used directly::
+be used directly:
+
+.. code-block:: bash
 
    output=`dmesg | grep hda`
-   # becomes
+
+becomes::
+
    output=check_output("dmesg | grep hda", shell=True)
 
 

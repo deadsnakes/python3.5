@@ -64,19 +64,19 @@ Some facts and figures:
    | ``'x'`` or       | Create a tarfile exclusively without        |
    | ``'x:'``         | compression.                                |
    |                  | Raise an :exc:`FileExistsError` exception   |
-   |                  | if it is already exists.                    |
+   |                  | if it already exists.                       |
    +------------------+---------------------------------------------+
    | ``'x:gz'``       | Create a tarfile with gzip compression.     |
    |                  | Raise an :exc:`FileExistsError` exception   |
-   |                  | if it is already exists.                    |
+   |                  | if it already exists.                       |
    +------------------+---------------------------------------------+
    | ``'x:bz2'``      | Create a tarfile with bzip2 compression.    |
    |                  | Raise an :exc:`FileExistsError` exception   |
-   |                  | if it is already exists.                    |
+   |                  | if it already exists.                       |
    +------------------+---------------------------------------------+
    | ``'x:xz'``       | Create a tarfile with lzma compression.     |
    |                  | Raise an :exc:`FileExistsError` exception   |
-   |                  | if it is already exists.                    |
+   |                  | if it already exists.                       |
    +------------------+---------------------------------------------+
    | ``'a' or 'a:'``  | Open for appending with no compression. The |
    |                  | file is created if it does not exist.       |
@@ -148,8 +148,8 @@ Some facts and figures:
 
 .. class:: TarFile
 
-   Class for reading and writing tar archives. Do not use this class directly,
-   better use :func:`tarfile.open` instead. See :ref:`tarfile-objects`.
+   Class for reading and writing tar archives. Do not use this class directly:
+   use :func:`tarfile.open` instead. See :ref:`tarfile-objects`.
 
 
 .. function:: is_tarfile(name)
@@ -271,7 +271,7 @@ be finalized; only the internally used file object will be closed. See the
 
    *mode* is either ``'r'`` to read from an existing archive, ``'a'`` to append
    data to an existing file, ``'w'`` to create a new file overwriting an existing
-   one or ``'x'`` to create a new file only if it's not exists.
+   one, or ``'x'`` to create a new file only if it does not already exist.
 
    If *fileobj* is given, it is used for reading or writing data. If it can be
    determined, *mode* is overridden by *fileobj*'s mode. *fileobj* will be used
@@ -388,7 +388,7 @@ be finalized; only the internally used file object will be closed. See the
       dots ``".."``.
 
    .. versionchanged:: 3.5
-      Added the *numeric_only* parameter.
+      Added the *numeric_owner* parameter.
 
 
 .. method:: TarFile.extract(member, path="", set_attrs=True, *, numeric_owner=False)
@@ -416,7 +416,7 @@ be finalized; only the internally used file object will be closed. See the
       Added the *set_attrs* parameter.
 
    .. versionchanged:: 3.5
-      Added the *numeric_only* parameter.
+      Added the *numeric_owner* parameter.
 
 .. method:: TarFile.extractfile(member)
 
@@ -644,40 +644,51 @@ A :class:`TarInfo` object also provides some convenient query methods:
 
 
 .. _tarfile-commandline:
+.. program:: tarfile
 
-Command Line Interface
+Command-Line Interface
 ----------------------
 
 .. versionadded:: 3.4
 
-The :mod:`tarfile` module provides a simple command line interface to interact
+The :mod:`tarfile` module provides a simple command-line interface to interact
 with tar archives.
 
 If you want to create a new tar archive, specify its name after the :option:`-c`
-option and then list the filename(s) that should be included::
+option and then list the filename(s) that should be included:
+
+.. code-block:: shell-session
 
     $ python -m tarfile -c monty.tar  spam.txt eggs.txt
 
-Passing a directory is also acceptable::
+Passing a directory is also acceptable:
+
+.. code-block:: shell-session
 
     $ python -m tarfile -c monty.tar life-of-brian_1979/
 
 If you want to extract a tar archive into the current directory, use
-the :option:`-e` option::
+the :option:`-e` option:
+
+.. code-block:: shell-session
 
     $ python -m tarfile -e monty.tar
 
 You can also extract a tar archive into a different directory by passing the
-directory's name::
+directory's name:
+
+.. code-block:: shell-session
 
     $ python -m tarfile -e monty.tar  other-dir/
 
-For a list of the files in a tar archive, use the :option:`-l` option::
+For a list of the files in a tar archive, use the :option:`-l` option:
+
+.. code-block:: shell-session
 
     $ python -m tarfile -l monty.tar
 
 
-Command line options
+Command-line options
 ~~~~~~~~~~~~~~~~~~~~
 
 .. cmdoption:: -l <tarfile>
@@ -685,8 +696,8 @@ Command line options
 
    List files in a tarfile.
 
-.. cmdoption:: -c <tarfile> <source1> <sourceN>
-               --create <tarfile> <source1> <sourceN>
+.. cmdoption:: -c <tarfile> <source1> ... <sourceN>
+               --create <tarfile> <source1> ... <sourceN>
 
    Create tarfile from source files.
 
@@ -702,7 +713,7 @@ Command line options
 
 .. cmdoption:: -v, --verbose
 
-   Verbose output
+   Verbose output.
 
 .. _tar-examples:
 

@@ -454,6 +454,19 @@ Callable types
 
       .. tabularcolumns:: |l|L|l|
 
+      .. index::
+         single: __doc__ (function attribute)
+         single: __name__ (function attribute)
+         single: __module__ (function attribute)
+         single: __dict__ (function attribute)
+         single: __defaults__ (function attribute)
+         single: __closure__ (function attribute)
+         single: __code__ (function attribute)
+         single: __globals__ (function attribute)
+         single: __annotations__ (function attribute)
+         single: __kwdefaults__ (function attribute)
+         pair: global; namespace
+
       +-------------------------+-------------------------------+-----------+
       | Attribute               | Meaning                       |           |
       +=========================+===============================+===========+
@@ -462,10 +475,11 @@ Callable types
       |                         | unavailable; not inherited by |           |
       |                         | subclasses                    |           |
       +-------------------------+-------------------------------+-----------+
-      | :attr:`__name__`        | The function's name           | Writable  |
+      | :attr:`~definition.\    | The function's name           | Writable  |
+      | __name__`               |                               |           |
       +-------------------------+-------------------------------+-----------+
-      | :attr:`__qualname__`    | The function's                | Writable  |
-      |                         | :term:`qualified name`        |           |
+      | :attr:`~definition.\    | The function's                | Writable  |
+      | __qualname__`           | :term:`qualified name`        |           |
       |                         |                               |           |
       |                         | .. versionadded:: 3.3         |           |
       +-------------------------+-------------------------------+-----------+
@@ -489,7 +503,7 @@ Callable types
       |                         | module in which the function  |           |
       |                         | was defined.                  |           |
       +-------------------------+-------------------------------+-----------+
-      | :attr:`__dict__`        | The namespace supporting      | Writable  |
+      | :attr:`~object.__dict__`| The namespace supporting      | Writable  |
       |                         | arbitrary function            |           |
       |                         | attributes.                   |           |
       +-------------------------+-------------------------------+-----------+
@@ -519,19 +533,6 @@ Callable types
       Additional information about a function's definition can be retrieved from its
       code object; see the description of internal types below.
 
-      .. index::
-         single: __doc__ (function attribute)
-         single: __name__ (function attribute)
-         single: __module__ (function attribute)
-         single: __dict__ (function attribute)
-         single: __defaults__ (function attribute)
-         single: __closure__ (function attribute)
-         single: __code__ (function attribute)
-         single: __globals__ (function attribute)
-         single: __annotations__ (function attribute)
-         single: __kwdefaults__ (function attribute)
-         pair: global; namespace
-
    Instance methods
       .. index::
          object: method
@@ -550,7 +551,7 @@ Callable types
 
       Special read-only attributes: :attr:`__self__` is the class instance object,
       :attr:`__func__` is the function object; :attr:`__doc__` is the method's
-      documentation (same as ``__func__.__doc__``); :attr:`__name__` is the
+      documentation (same as ``__func__.__doc__``); :attr:`~definition.__name__` is the
       method name (same as ``__func__.__name__``); :attr:`__module__` is the
       name of the module the method was defined in, or ``None`` if unavailable.
 
@@ -637,7 +638,7 @@ Callable types
       standard built-in module). The number and type of the arguments are
       determined by the C function. Special read-only attributes:
       :attr:`__doc__` is the function's documentation string, or ``None`` if
-      unavailable; :attr:`__name__` is the function's name; :attr:`__self__` is
+      unavailable; :attr:`~definition.__name__` is the function's name; :attr:`__self__` is
       set to ``None`` (but see the next item); :attr:`__module__` is the name of
       the module the function was defined in or ``None`` if unavailable.
 
@@ -687,7 +688,7 @@ Modules
 
    .. index:: single: __dict__ (module attribute)
 
-   Special read-only attribute: :attr:`__dict__` is the module's namespace as a
+   Special read-only attribute: :attr:`~object.__dict__` is the module's namespace as a
    dictionary object.
 
    .. impl-detail::
@@ -743,7 +744,7 @@ Custom classes
    method object, it is transformed into the object wrapped by the static method
    object. See section :ref:`descriptors` for another way in which attributes
    retrieved from a class may differ from those actually contained in its
-   :attr:`__dict__`.
+   :attr:`~object.__dict__`.
 
    .. index:: triple: class; attribute; assignment
 
@@ -761,12 +762,12 @@ Custom classes
       single: __bases__ (class attribute)
       single: __doc__ (class attribute)
 
-   Special attributes: :attr:`__name__` is the class name; :attr:`__module__` is
-   the module name in which the class was defined; :attr:`__dict__` is the
+   Special attributes: :attr:`~definition.__name__` is the class name; :attr:`__module__` is
+   the module name in which the class was defined; :attr:`~object.__dict__` is the
    dictionary containing the class's namespace; :attr:`~class.__bases__` is a
-   tuple (possibly empty or a singleton) containing the base classes, in the
+   tuple (possibly a singleton) containing the base classes, in the
    order of their occurrence in the base class list; :attr:`__doc__` is the
-   class's documentation string, or None if undefined.
+   class's documentation string, or ``None`` if undefined.
 
 Class instances
    .. index::
@@ -785,7 +786,7 @@ Class instances
    class method objects are also transformed; see above under "Classes".  See
    section :ref:`descriptors` for another way in which attributes of a class
    retrieved via its instances may differ from the objects actually stored in
-   the class's :attr:`__dict__`.  If no class attribute is found, and the
+   the class's :attr:`~object.__dict__`.  If no class attribute is found, and the
    object's class has a :meth:`__getattr__` method, that is called to satisfy
    the lookup.
 
@@ -1116,7 +1117,7 @@ Basic customization
    instance; for example: ``BaseClass.__init__(self, [args...])``.
 
    Because :meth:`__new__` and :meth:`__init__` work together in constructing
-   objects (:meth:`__new__` to create it, and :meth:`__init__` to customise it),
+   objects (:meth:`__new__` to create it, and :meth:`__init__` to customize it),
    no non-``None`` value may be returned by :meth:`__init__`; doing so will
    cause a :exc:`TypeError` to be raised at runtime.
 
@@ -1304,11 +1305,14 @@ Basic customization
 
    Called by built-in function :func:`hash` and for operations on members of
    hashed collections including :class:`set`, :class:`frozenset`, and
-   :class:`dict`.  :meth:`__hash__` should return an integer.  The only
-   required property is that objects which compare equal have the same hash
-   value; it is advised to somehow mix together (e.g. using exclusive or) the
-   hash values for the components of the object that also play a part in
-   comparison of objects.
+   :class:`dict`.  :meth:`__hash__` should return an integer. The only required
+   property is that objects which compare equal have the same hash value; it is
+   advised to mix together the hash values of the components of the object that
+   also play a part in comparison of objects by packing them into a tuple and
+   hashing the tuple. Example::
+
+       def __hash__(self):
+           return hash((self.name, self.nick, self.color))
 
    .. note::
 
@@ -1466,7 +1470,7 @@ method (a so-called *descriptor* class) appears in an *owner* class (the
 descriptor must be in either the owner's class dictionary or in the class
 dictionary for one of its parents).  In the examples below, "the attribute"
 refers to the attribute whose name is the key of the property in the owner
-class' :attr:`__dict__`.
+class' :attr:`~object.__dict__`.
 
 
 .. method:: object.__get__(self, instance, owner)
@@ -1636,7 +1640,7 @@ By default, classes are constructed using :func:`type`. The class body is
 executed in a new namespace and the class name is bound locally to the
 result of ``type(name, bases, namespace)``.
 
-The class creation process can be customised by passing the ``metaclass``
+The class creation process can be customized by passing the ``metaclass``
 keyword argument in the class definition line, or by inheriting from an
 existing class that included such an argument. In the following example,
 both ``MyClass`` and ``MySubclass`` are instances of ``Meta``::

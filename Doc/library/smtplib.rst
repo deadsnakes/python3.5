@@ -341,10 +341,10 @@ An :class:`SMTP` instance has the following methods:
    :rfc:`4954` "initial response" bytes which will be encoded and sent with
    the ``AUTH`` command as below.  If the ``authobject()`` does not support an
    initial response (e.g. because it requires a challenge), it should return
-   None when called with ``challenge=None``.  If *initial_response_ok* is
-   false, then ``authobject()`` will not be called first with None.
+   ``None`` when called with ``challenge=None``.  If *initial_response_ok* is
+   false, then ``authobject()`` will not be called first with ``None``.
 
-   If the initial response check returns None, or if *initial_response_ok* is
+   If the initial response check returns ``None``, or if *initial_response_ok* is
    false, ``authobject()`` will be called to process the server's challenge
    response; the *challenge* argument it is passed will be a ``bytes``.  It
    should return ``bytes`` *data* that will be base64 encoded and sent to the
@@ -374,8 +374,9 @@ An :class:`SMTP` instance has the following methods:
    If *keyfile* and *certfile* are provided, these are passed to the :mod:`socket`
    module's :func:`ssl` function.
 
-   Optional *context* parameter is a :class:`ssl.SSLContext` object; This is an alternative to
-   using a keyfile and a certfile and if specified both *keyfile* and *certfile* should be None.
+   Optional *context* parameter is a :class:`ssl.SSLContext` object; This is
+   an alternative to using a keyfile and a certfile and if specified both
+   *keyfile* and *certfile* should be ``None``.
 
    If there has been no previous ``EHLO`` or ``HELO`` command this session,
    this method tries ESMTP ``EHLO`` first.
@@ -439,7 +440,7 @@ An :class:`SMTP` instance has the following methods:
    and the accompanying error message sent by the server.
 
    If ``SMTPUTF8`` is included in *mail_options*, and the server supports it,
-   *from_addr* and *to_addr* may contain non-ASCII characters.
+   *from_addr* and *to_addrs* may contain non-ASCII characters.
 
    This method may raise the following exceptions:
 
@@ -486,7 +487,7 @@ An :class:`SMTP` instance has the following methods:
    those arguments with addresses extracted from the headers of *msg* as
    specified in :rfc:`5322`\: *from_addr* is set to the :mailheader:`Sender`
    field if it is present, and otherwise to the :mailheader:`From` field.
-   *to_adresses* combines the values (if any) of the :mailheader:`To`,
+   *to_addrs* combines the values (if any) of the :mailheader:`To`,
    :mailheader:`Cc`, and :mailheader:`Bcc` fields from *msg*.  If exactly one
    set of :mailheader:`Resent-*` headers appear in the message, the regular
    headers are ignored and the :mailheader:`Resent-*` headers are used instead.
