@@ -20,6 +20,7 @@
 
 # === Variables set by makesetup ===
 
+MODNAMES=       _MODNAMES_
 MODOBJS=        _MODOBJS_
 MODLIBS=        _MODLIBS_
 
@@ -90,7 +91,7 @@ PY_CFLAGS_NODIST=$(CONFIGURE_CFLAGS_NODIST) $(CFLAGS_NODIST)
 # Both CPPFLAGS and LDFLAGS need to contain the shell's value for setup.py to
 # be able to build extension modules using the directories specified in the
 # environment variables
-PY_CPPFLAGS=	$(BASECPPFLAGS) -I. -IInclude -I$(srcdir)/Include $(CONFIGURE_CPPFLAGS) $(CPPFLAGS)
+PY_CPPFLAGS=	$(BASECPPFLAGS) -I. -I$(srcdir)/Include $(CONFIGURE_CPPFLAGS) $(CPPFLAGS)
 PY_LDFLAGS=	$(CONFIGURE_LDFLAGS) $(LDFLAGS)
 NO_AS_NEEDED=	@NO_AS_NEEDED@
 LDLAST=		@LDLAST@
@@ -221,7 +222,7 @@ LIBOBJS=	@LIBOBJS@
 PYTHON=		python$(EXE)
 BUILDPYTHON=	python$(BUILDEXE)
 
-cross_compiling=@cross_compiling@
+PYTHON_FOR_GEN=@PYTHON_FOR_GEN@
 PYTHON_FOR_BUILD=@PYTHON_FOR_BUILD@
 _PYTHON_HOST_PLATFORM=@_PYTHON_HOST_PLATFORM@
 BUILD_GNU_TYPE=	@build@
@@ -339,7 +340,7 @@ PGENOBJS=	$(POBJS) $(PGOBJS)
 OPCODE_H_DIR= 	$(srcdir)/Include
 OPCODE_H_SCRIPT= $(srcdir)/Tools/scripts/generate_opcode_h.py
 OPCODE_H=	$(OPCODE_H_DIR)/opcode.h
-OPCODE_H_GEN=	@OPCODEHGEN@  $(OPCODE_H_SCRIPT) $(srcdir)/Lib/opcode.py $(OPCODE_H)
+OPCODE_H_GEN=	$(PYTHON_FOR_GEN) $(OPCODE_H_SCRIPT) $(srcdir)/Lib/opcode.py $(OPCODE_H)
 #
 ##########################################################################
 # AST
@@ -352,7 +353,7 @@ AST_ASDL=	$(srcdir)/Parser/Python.asdl
 ASDLGEN_FILES=	$(srcdir)/Parser/asdl.py $(srcdir)/Parser/asdl_c.py
 # Note that a build now requires Python to exist before the build starts.
 # Use "hg touch" to fix up screwed up file mtimes in a checkout.
-ASDLGEN=	@ASDLGEN@ $(srcdir)/Parser/asdl_c.py
+ASDLGEN=	$(PYTHON_FOR_GEN) $(srcdir)/Parser/asdl_c.py
 
 ##########################################################################
 # Python
@@ -481,7 +482,7 @@ LIBRARY_OBJS=	\
 # Rules
 
 # Default target
-all:		build_all
+all:		@DEF_MAKE_ALL_RULE@
 build_all:	$(BUILDPYTHON) oldsharedmods sharedmods gdbhooks Programs/_testembed python-config
 
 # Compile a binary with profile guided optimization.
@@ -505,7 +506,7 @@ profile-opt:
 	$(MAKE) profile-removal
 
 build_all_generate_profile:
-	$(MAKE) all CFLAGS_NODIST="$(CFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LDFLAGS="$(LDFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LIBS="$(LIBS)"
+	$(MAKE) @DEF_MAKE_RULE@ CFLAGS_NODIST="$(CFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LDFLAGS="$(LDFLAGS) $(PGO_PROF_GEN_FLAG) @LTOFLAGS@" LIBS="$(LIBS)"
 
 run_profile_task:
 	: # FIXME: can't run for a cross build
@@ -515,14 +516,14 @@ build_all_merge_profile:
 	$(LLVM_PROF_MERGER)
 
 build_all_use_profile:
-	$(MAKE) all CFLAGS_NODIST="$(CFLAGS) $(PGO_PROF_USE_FLAG) @LTOFLAGS@" LDFLAGS="$(LDFLAGS) @LTOFLAGS@"
+	$(MAKE) @DEF_MAKE_RULE@ CFLAGS_NODIST="$(CFLAGS) $(PGO_PROF_USE_FLAG) @LTOFLAGS@" LDFLAGS="$(LDFLAGS) @LTOFLAGS@"
 
 # Compile and run with gcov
 .PHONY=coverage coverage-lcov coverage-report
 coverage:
 	@echo "Building with support for coverage checking:"
 	$(MAKE) clean profile-removal
-	$(MAKE) all CFLAGS="$(CFLAGS) -O0 -pg -fprofile-arcs -ftest-coverage" LIBS="$(LIBS) -lgcov"
+	$(MAKE) @DEF_MAKE_RULE@ CFLAGS="$(CFLAGS) -O0 -pg -fprofile-arcs -ftest-coverage" LIBS="$(LIBS) -lgcov"
 
 coverage-lcov:
 	@echo "Creating Coverage HTML report with LCOV:"
@@ -718,17 +719,13 @@ Programs/_freeze_importlib.o: Programs/_freeze_importlib.c Makefile
 Programs/_freeze_importlib: Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN)
 	$(LINKCC) $(PY_LDFLAGS) -o $@ Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
 
-Python/importlib_external.h: $(srcdir)/Lib/importlib/_bootstrap_external.py Programs/_freeze_importlib
-	if test "$(cross_compiling)" != "yes"; then \
-	    ./Programs/_freeze_importlib \
-	        $(srcdir)/Lib/importlib/_bootstrap_external.py Python/importlib_external.h; \
-	fi
+Python/importlib_external.h: @GENERATED_COMMENT@ $(srcdir)/Lib/importlib/_bootstrap_external.py Programs/_freeze_importlib
+	./Programs/_freeze_importlib \
+	    $(srcdir)/Lib/importlib/_bootstrap_external.py Python/importlib_external.h
 
-Python/importlib.h: $(srcdir)/Lib/importlib/_bootstrap.py Programs/_freeze_importlib
-	if test "$(cross_compiling)" != "yes"; then \
-	    ./Programs/_freeze_importlib \
-	        $(srcdir)/Lib/importlib/_bootstrap.py Python/importlib.h; \
-	fi
+Python/importlib.h: @GENERATED_COMMENT@ $(srcdir)/Lib/importlib/_bootstrap.py Programs/_freeze_importlib
+	./Programs/_freeze_importlib \
+	    $(srcdir)/Lib/importlib/_bootstrap.py Python/importlib.h
 
 
 ############################################################################
@@ -788,22 +785,11 @@ Python/sysmodule.o: $(srcdir)/Python/sysmodule.c Makefile
 
 $(IO_OBJS): $(IO_H)
 
-$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGEN)
+$(GRAMMAR_H): @GENERATED_COMMENT@ $(GRAMMAR_INPUT) $(PGEN)
 	@$(MKDIR_P) Include
-	# Avoid copying the file onto itself for an in-tree build
-	if test "$(cross_compiling)" != "yes"; then \
-		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C); \
-	else \
-		cp $(srcdir)/Include/graminit.h $(GRAMMAR_H).tmp; \
-		mv $(GRAMMAR_H).tmp $(GRAMMAR_H); \
-	fi
-$(GRAMMAR_C): $(GRAMMAR_H)
-	if test "$(cross_compiling)" != "yes"; then \
-		touch $(GRAMMAR_C); \
-	else \
-		cp $(srcdir)/Python/graminit.c $(GRAMMAR_C).tmp; \
-		mv $(GRAMMAR_C).tmp $(GRAMMAR_C); \
-	fi
+	$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+$(GRAMMAR_C): @GENERATED_COMMENT@ $(GRAMMAR_H)
+	touch $(GRAMMAR_C)
 
 $(PGEN): $(PGENOBJS)
 		$(CC) $(OPT) $(PY_LDFLAGS) $(PGENOBJS) $(LIBS) -o $(PGEN)
@@ -880,7 +866,7 @@ Objects/dictobject.o: $(srcdir)/Objects/stringlib/eq.h
 Objects/setobject.o: $(srcdir)/Objects/stringlib/eq.h
 
 $(OPCODETARGETS_H): $(OPCODETARGETGEN_FILES)
-	$(OPCODETARGETGEN) $(OPCODETARGETS_H)
+	$(PYTHON_FOR_GEN) $(OPCODETARGETGEN) $(OPCODETARGETS_H)
 
 Python/ceval.o: $(OPCODETARGETS_H) $(srcdir)/Python/ceval_gil.h
 
@@ -888,7 +874,7 @@ Python/frozen.o: Python/importlib.h Python/importlib_external.h
 
 Objects/typeobject.o: Objects/typeslots.inc
 Objects/typeslots.inc: $(srcdir)/Include/typeslots.h $(srcdir)/Objects/typeslots.py
-	$(PYTHON) $(srcdir)/Objects/typeslots.py < $(srcdir)/Include/typeslots.h > Objects/typeslots.inc
+	$(PYTHON_FOR_GEN) $(srcdir)/Objects/typeslots.py < $(srcdir)/Include/typeslots.h Objects/typeslots.inc
 
 ############################################################################
 # Header files
@@ -1026,7 +1012,7 @@ testuniversal:	all platform
 
 # Like testall, but with only one pass and without multiple processes.
 # Run an optional script to include information about the build environment.
-buildbottest:	all platform
+buildbottest:	build_all platform
 		-@if which pybuildbot.identify >/dev/null 2>&1; then \
 			pybuildbot.identify "CC='$(CC)'" "CXX='$(CXX)'"; \
 		fi
@@ -1236,6 +1222,7 @@ LIBSUBDIRS=	tkinter tkinter/test tkinter/test/test_tkinter \
 		importlib test/test_importlib test/test_importlib/builtin \
 		test/test_importlib/extension test/test_importlib/frozen \
 		test/test_importlib/import_ test/test_importlib/source \
+		test/test_tools test/test_warnings test/test_warnings/data \
 		turtledemo \
 		multiprocessing multiprocessing/dummy \
 		unittest unittest/test unittest/test/testmock \
@@ -1355,7 +1342,7 @@ python-config: $(srcdir)/Misc/python-config.in Misc/python-config.sh
 	# is not available in configure
 	sed -e "s,@EXENAME@,$(BINDIR)/python$(LDVERSION)$(EXE)," < $(srcdir)/Misc/python-config.in >python-config.py
 	# Replace makefile compat. variable references with shell script compat. ones; $(VAR) -> ${VAR}
-	sed -e 's,\$$(\([A-Za-z0-9_]*\)),\$$\{\1\},g' < Misc/python-config.sh >python-config
+	LC_ALL=C sed -e 's,\$$(\([A-Za-z0-9_]*\)),\$$\{\1\},g' < Misc/python-config.sh >python-config
 	# On Darwin, always use the python version of the script, the shell
 	# version doesn't use the compiler customizations that are provided
 	# in python (_osx_support.py).
@@ -1422,16 +1409,16 @@ libainstall:	all python-config
 	$(INSTALL_SCRIPT) $(srcdir)/install-sh $(DESTDIR)$(LIBPL)/install-sh
 	$(INSTALL_SCRIPT) python-config.py $(DESTDIR)$(LIBPL)/python-config.py
 	$(INSTALL_SCRIPT) python-config $(DESTDIR)$(BINDIR)/python$(LDVERSION)-config
-	@if [ -s Programs/python.exp -a \
+	@if [ -s Modules/python.exp -a \
 		"`echo $(MACHDEP) | sed 's/^\(...\).*/\1/'`" = "aix" ]; then \
 		echo; echo "Installing support files for building shared extension modules on AIX:"; \
-		$(INSTALL_DATA) Programs/python.exp		\
+		$(INSTALL_DATA) Modules/python.exp		\
 				$(DESTDIR)$(LIBPL)/python.exp;		\
 		echo; echo "$(LIBPL)/python.exp";		\
 		$(INSTALL_SCRIPT) $(srcdir)/Modules/makexp_aix	\
 				$(DESTDIR)$(LIBPL)/makexp_aix;		\
 		echo "$(LIBPL)/makexp_aix";			\
-		$(INSTALL_SCRIPT) $(srcdir)/Modules/ld_so_aix	\
+		$(INSTALL_SCRIPT) Modules/ld_so_aix	\
 				$(DESTDIR)$(LIBPL)/ld_so_aix;		\
 		echo "$(LIBPL)/ld_so_aix";			\
 		echo; echo "See Misc/AIX-NOTES for details.";	\
@@ -1563,10 +1550,10 @@ autoconf:
 # Create a tags file for vi
 tags::
 	cd $(srcdir); \
-	ctags -w -t Include/*.h; \
-	for i in $(SRCDIRS); do ctags -w -t -a $$i/*.[ch]; \
+	ctags -w Include/*.h; \
+	for i in $(SRCDIRS); do ctags -w -a $$i/*.[ch]; \
 	done; \
-	sort -o tags tags
+	LC_ALL=C sort -o tags tags
 
 # Create a tags file for GNU Emacs
 TAGS::
@@ -1609,7 +1596,7 @@ clean: pycremoval
 	-rm -f pybuilddir.txt
 	-rm -f Lib/lib2to3/*Grammar*.pickle
 	-rm -f Programs/_testembed Programs/_freeze_importlib
-	-rm -rf build
+	-find build -type f -a ! -name '*.gc??' -exec rm -f {} ';'
 
 profile-removal:
 	find . -name '*.gc??' -exec rm -f {} ';'
@@ -1635,9 +1622,13 @@ distclean: clobber
 	done
 	-rm -f core Makefile Makefile.pre config.status \
 		Modules/Setup Modules/Setup.local Modules/Setup.config \
-		Modules/ld_so_aix Programs/python.exp Misc/python.pc
+		Modules/ld_so_aix Modules/python.exp Misc/python.pc
 	-rm -f python*-gdb.py
-	find $(srcdir)/[a-zA-Z]* '(' -name '*.fdc' -o -name '*~' \
+	# Issue #28258: set LC_ALL to avoid issues with Estonian locale.
+	# Expansion is performed here by shell (spawned by make) itself before
+	# arguments are passed to find. So LC_ALL=C must be set as a separate
+	# command.
+	LC_ALL=C; find $(srcdir)/[a-zA-Z]* '(' -name '*.fdc' -o -name '*~' \
 				     -o -name '[@,#]*' -o -name '*.old' \
 				     -o -name '*.orig' -o -name '*.rej' \
 				     -o -name '*.bak' ')' \

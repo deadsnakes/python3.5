@@ -157,8 +157,10 @@ _ctypes_get_errobj(int **pspace)
             return NULL;
         memset(space, 0, sizeof(int) * 2);
         errobj = PyCapsule_New(space, CTYPES_CAPSULE_NAME_PYMEM, pymem_destructor);
-        if (errobj == NULL)
+        if (errobj == NULL) {
+            PyMem_Free(space);
             return NULL;
+        }
         if (-1 == PyDict_SetItem(dict, error_object_name,
                                  errobj)) {
             Py_DECREF(errobj);
@@ -1668,7 +1670,9 @@ POINTER(PyObject *self, PyObject *cls)
         return result;
     }
     if (PyUnicode_CheckExact(cls)) {
-        char *name = _PyUnicode_AsString(cls);
+        const char *name = PyUnicode_AsUTF8(cls);
+        if (name == NULL)
+            return NULL;
         buf = PyMem_Malloc(strlen(name) + 3 + 1);
         if (buf == NULL)
             return PyErr_NoMemory();
@@ -1681,6 +1685,10 @@ POINTER(PyObject *self, PyObject *cls)
         if (result == NULL)
             return result;
         key = PyLong_FromVoidPtr(result);
+        if (key == NULL) {
+            Py_DECREF(result);
+            return NULL;
+        }
     } else if (PyType_Check(cls)) {
         typ = (PyTypeObject *)cls;
         buf = PyMem_Malloc(strlen(typ->tp_name) + 3 + 1);

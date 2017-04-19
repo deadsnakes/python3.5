@@ -252,7 +252,7 @@ outdated.
 
     Guido van Rossum and Jelke de Boer, "Interactively Testing Remote Servers
     Using the Python Programming Language", CWI Quarterly, Volume 4, Issue 4
-    (December 1991), Amsterdam, pp 283-303.
+    (December 1991), Amsterdam, pp 283--303.
 
 
 Are there any books on Python?
@@ -438,7 +438,7 @@ remember the methods for a list, they can do something like this::
    >>> L
    [1]
 
-With the interpreter, documentation is never far from the student as he's
+With the interpreter, documentation is never far from the student as they are
 programming.
 
 There are also good IDEs for Python.  IDLE is a cross-platform IDE for Python

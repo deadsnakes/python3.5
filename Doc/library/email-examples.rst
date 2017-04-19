@@ -59,9 +59,11 @@ way we could process it:
 
 .. literalinclude:: ../includes/email-read-alternative-new-api.py
 
-Up to the prompt, the output from the above is::
+Up to the prompt, the output from the above is:
 
-    To: Penelope Pussycat <"penelope@example.com">, Fabrette Pussycat <"fabrette@example.com">
+.. code-block:: none
+
+    To: Penelope Pussycat <penelope@example.com>, Fabrette Pussycat <fabrette@example.com>
     From: Pepé Le Pew <pepe@example.com>
     Subject: Ayons asperges pour le déjeuner
 

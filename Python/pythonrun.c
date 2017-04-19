@@ -528,7 +528,7 @@ print_error_text(PyObject *f, int offset, PyObject *text_obj)
             offset -= (int)(nl+1-text);
             text = nl+1;
         }
-        while (*text == ' ' || *text == '\t') {
+        while (*text == ' ' || *text == '\t' || *text == '\f') {
             text++;
             offset--;
         }
@@ -747,7 +747,7 @@ print_exception(PyObject *f, PyObject *value)
             err = PyFile_WriteString("<unknown>", f);
         }
         else {
-            if (_PyUnicode_CompareWithId(moduleName, &PyId_builtins) != 0)
+            if (!_PyUnicode_EqualToASCIIId(moduleName, &PyId_builtins))
             {
                 err = PyFile_WriteObject(moduleName, f, Py_PRINT_RAW);
                 err += PyFile_WriteString(".", f);

@@ -203,40 +203,45 @@ static PyGetSetDef partial_getsetlist[] = {
 static PyObject *
 partial_repr(partialobject *pto)
 {
-    PyObject *result;
+    PyObject *result = NULL;
     PyObject *arglist;
-    PyObject *tmp;
     Py_ssize_t i, n;
     PyObject *key, *value;
+    int status;
+
+    status = Py_ReprEnter((PyObject *)pto);
+    if (status != 0) {
+        if (status < 0)
+            return NULL;
+        return PyUnicode_FromFormat("%s(...)", Py_TYPE(pto)->tp_name);
+    }
 
     arglist = PyUnicode_FromString("");
-    if (arglist == NULL) {
-        return NULL;
-    }
+    if (arglist == NULL)
+        goto done;
     /* Pack positional arguments */
     assert (PyTuple_Check(pto->args));
     n = PyTuple_GET_SIZE(pto->args);
     for (i = 0; i < n; i++) {
-        tmp = PyUnicode_FromFormat("%U, %R", arglist,
-                                   PyTuple_GET_ITEM(pto->args, i));
-        Py_DECREF(arglist);
-        if (tmp == NULL)
-            return NULL;
-        arglist = tmp;
+        Py_SETREF(arglist, PyUnicode_FromFormat("%U, %R", arglist,
+                                        PyTuple_GET_ITEM(pto->args, i)));
+        if (arglist == NULL)
+            goto done;
     }
     /* Pack keyword arguments */
     assert (PyDict_Check(pto->kw));
     for (i = 0; PyDict_Next(pto->kw, &i, &key, &value);) {
-        tmp = PyUnicode_FromFormat("%U, %U=%R", arglist,
-                                    key, value);
-        Py_DECREF(arglist);
-        if (tmp == NULL)
-            return NULL;
-        arglist = tmp;
+        Py_SETREF(arglist, PyUnicode_FromFormat("%U, %U=%R", arglist,
+                                                key, value));
+        if (arglist == NULL)
+            goto done;
     }
     result = PyUnicode_FromFormat("%s(%R%U)", Py_TYPE(pto)->tp_name,
                                   pto->fn, arglist);
     Py_DECREF(arglist);
+
+ done:
+    Py_ReprLeave((PyObject *)pto);
     return result;
 }
 
@@ -776,8 +781,10 @@ infinite_lru_cache_wrapper(lru_cache_object *self, PyObject *args, PyObject *kwd
     if (!key)
         return NULL;
     hash = PyObject_Hash(key);
-    if (hash == -1)
+    if (hash == -1) {
+        Py_DECREF(key);
         return NULL;
+    }
     result = _PyDict_GetItem_KnownHash(self->cache, key, hash);
     if (result) {
         Py_INCREF(result);
@@ -832,8 +839,10 @@ bounded_lru_cache_wrapper(lru_cache_object *self, PyObject *args, PyObject *kwds
     if (!key)
         return NULL;
     hash = PyObject_Hash(key);
-    if (hash == -1)
+    if (hash == -1) {
+        Py_DECREF(key);
         return NULL;
+    }
     link  = (lru_list_elem *)_PyDict_GetItem_KnownHash(self->cache, key, hash);
     if (link) {
         lru_cache_extricate_link(link);

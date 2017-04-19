@@ -206,6 +206,9 @@ process and user.
    Return the value of the environment variable *key* if it exists, or
    *default* if it doesn't. *key*, *default* and the result are bytes.
 
+   :func:`getenvb` is only available if :data:`supports_bytes_environ`
+   is True.
+
    Availability: most flavors of Unix.
 
    .. versionadded:: 3.2
@@ -217,7 +220,7 @@ process and user.
    executable, similar to a shell, when launching a process.
    *env*, when specified, should be an environment variable dictionary
    to lookup the PATH in.
-   By default, when *env* is None, :data:`environ` is used.
+   By default, when *env* is ``None``, :data:`environ` is used.
 
    .. versionadded:: 3.2
 
@@ -908,7 +911,7 @@ or `the MSDN <https://msdn.microsoft.com/en-us/library/z0kc8e3z.aspx>`_ on Windo
           O_EXCL
           O_TRUNC
 
-   These constants are available on Unix and Windows.
+   The above constants are available on Unix and Windows.
 
 
 .. data:: O_DSYNC
@@ -917,11 +920,9 @@ or `the MSDN <https://msdn.microsoft.com/en-us/library/z0kc8e3z.aspx>`_ on Windo
           O_NDELAY
           O_NONBLOCK
           O_NOCTTY
-          O_SHLOCK
-          O_EXLOCK
           O_CLOEXEC
 
-   These constants are only available on Unix.
+   The above constants are only available on Unix.
 
    .. versionchanged:: 3.3
       Add :data:`O_CLOEXEC` constant.
@@ -934,7 +935,7 @@ or `the MSDN <https://msdn.microsoft.com/en-us/library/z0kc8e3z.aspx>`_ on Windo
           O_SEQUENTIAL
           O_TEXT
 
-   These constants are only available on Windows.
+   The above constants are only available on Windows.
 
 
 .. data:: O_ASYNC
@@ -944,8 +945,10 @@ or `the MSDN <https://msdn.microsoft.com/en-us/library/z0kc8e3z.aspx>`_ on Windo
           O_NOATIME
           O_PATH
           O_TMPFILE
+          O_SHLOCK
+          O_EXLOCK
 
-   These constants are GNU extensions and not present if they are not defined by
+   The above constants are extensions and not present if they are not defined by
    the C library.
 
    .. versionchanged:: 3.4
@@ -1195,7 +1198,11 @@ or `the MSDN <https://msdn.microsoft.com/en-us/library/z0kc8e3z.aspx>`_ on Windo
 .. function:: writev(fd, buffers)
 
    Write the contents of *buffers* to file descriptor *fd*. *buffers* must be a
-   sequence of :term:`bytes-like objects <bytes-like object>`.
+   sequence of :term:`bytes-like objects <bytes-like object>`. Buffers are
+   processed in array order. Entire contents of first buffer is written before
+   proceeding to second, and so on. The operating system may set a limit
+   (sysconf() value SC_IOV_MAX) on the number of buffers that can be used.
+
    :func:`~os.writev` writes the contents of each object to the file descriptor
    and returns the total number of bytes written.
 
@@ -1712,6 +1719,8 @@ features:
    This function can also support :ref:`paths relative to directory descriptors
    <dir_fd>`.
 
+   Availability: Unix.
+
    .. versionadded:: 3.3
       The *dir_fd* argument.
 
@@ -1896,7 +1905,7 @@ features:
    On Unix, *path* can be of type :class:`str` or :class:`bytes` (use
    :func:`~os.fsencode` and :func:`~os.fsdecode` to encode and decode
    :class:`bytes` paths). On Windows, *path* must be of type :class:`str`.
-   On both sytems, the type of the :attr:`~DirEntry.name` and
+   On both systems, the type of the :attr:`~DirEntry.name` and
    :attr:`~DirEntry.path` attributes of each :class:`DirEntry` will be of
    the same type as *path*.
 
@@ -2049,9 +2058,8 @@ features:
 
    Note that there is a nice correspondence between several attributes
    and methods of ``DirEntry`` and of :class:`pathlib.Path`.  In
-   particular, the ``name`` and ``path`` attributes have the same
-   meaning, as do the ``is_dir()``, ``is_file()``, ``is_symlink()``
-   and ``stat()`` methods.
+   particular, the ``name`` attribute has the same meaning, as do the
+   ``is_dir()``, ``is_file()``, ``is_symlink()`` and ``stat()`` methods.
 
    .. versionadded:: 3.5
 
@@ -3613,7 +3621,7 @@ Miscellaneous System Information
 
 .. function:: cpu_count()
 
-   Return the number of CPUs in the system. Returns None if undetermined.
+   Return the number of CPUs in the system. Returns ``None`` if undetermined.
 
    .. versionadded:: 3.4
 

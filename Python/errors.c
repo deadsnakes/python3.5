@@ -388,8 +388,11 @@ _PyErr_ChainExceptions(PyObject *exc, PyObject *val, PyObject *tb)
         PyObject *exc2, *val2, *tb2;
         PyErr_Fetch(&exc2, &val2, &tb2);
         PyErr_NormalizeException(&exc, &val, &tb);
+        if (tb != NULL) {
+            PyException_SetTraceback(val, tb);
+            Py_DECREF(tb);
+        }
         Py_DECREF(exc);
-        Py_XDECREF(tb);
         PyErr_NormalizeException(&exc2, &val2, &tb2);
         PyException_SetContext(val2, val);
         PyErr_Restore(exc2, val2, tb2);
@@ -931,7 +934,7 @@ PyErr_WriteUnraisable(PyObject *obj)
             goto done;
     }
     else {
-        if (_PyUnicode_CompareWithId(moduleName, &PyId_builtins) != 0) {
+        if (!_PyUnicode_EqualToASCIIId(moduleName, &PyId_builtins)) {
             if (PyFile_WriteObject(moduleName, f, Py_PRINT_RAW) < 0)
                 goto done;
             if (PyFile_WriteString(".", f) < 0)
@@ -1006,16 +1009,15 @@ PyErr_SyntaxLocationObject(PyObject *filename, int lineno, int col_offset)
             PyErr_Clear();
         Py_DECREF(tmp);
     }
+    tmp = NULL;
     if (col_offset >= 0) {
         tmp = PyLong_FromLong(col_offset);
         if (tmp == NULL)
             PyErr_Clear();
-        else {
-            if (_PyObject_SetAttrId(v, &PyId_offset, tmp))
-                PyErr_Clear();
-            Py_DECREF(tmp);
-        }
     }
+    if (_PyObject_SetAttrId(v, &PyId_offset, tmp ? tmp : Py_None))
+        PyErr_Clear();
+    Py_XDECREF(tmp);
     if (filename != NULL) {
         if (_PyObject_SetAttrId(v, &PyId_filename, filename))
             PyErr_Clear();
@@ -1026,9 +1028,6 @@ PyErr_SyntaxLocationObject(PyObject *filename, int lineno, int col_offset)
                 PyErr_Clear();
             Py_DECREF(tmp);
         }
-    }
-    if (_PyObject_SetAttrId(v, &PyId_offset, Py_None)) {
-        PyErr_Clear();
     }
     if (exc != PyExc_SyntaxError) {
         if (!_PyObject_HasAttrId(v, &PyId_msg)) {
@@ -1095,11 +1094,8 @@ err_programtext(FILE *fp, int lineno)
     }
     fclose(fp);
     if (i == lineno) {
-        char *p = linebuf;
         PyObject *res;
-        while (*p == ' ' || *p == '\t' || *p == '\014')
-            p++;
-        res = PyUnicode_FromString(p);
+        res = PyUnicode_FromString(linebuf);
         if (res == NULL)
             PyErr_Clear();
         return res;

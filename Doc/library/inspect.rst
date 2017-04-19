@@ -152,9 +152,9 @@ attributes:
 |           | co_firstlineno  | number of first line in   |
 |           |                 | Python source code        |
 +-----------+-----------------+---------------------------+
-|           | co_flags        | bitmap: 1=optimized ``|`` |
-|           |                 | 2=newlocals ``|`` 4=\*arg |
-|           |                 | ``|`` 8=\*\*arg           |
+|           | co_flags        | bitmap of ``CO_*`` flags, |
+|           |                 | read more :ref:`here      |
+|           |                 | <inspect-module-co-flags>`|
 +-----------+-----------------+---------------------------+
 |           | co_lnotab       | encoded mapping of line   |
 |           |                 | numbers to bytecode       |
@@ -374,8 +374,9 @@ attributes:
    are true.
 
    This, for example, is true of ``int.__add__``.  An object passing this test
-   has a :attr:`__get__` attribute but not a :attr:`__set__` attribute, but
-   beyond that the set of attributes varies.  :attr:`__name__` is usually
+   has a :meth:`~object.__get__` method but not a :meth:`~object.__set__`
+   method, but beyond that the set of attributes varies.  A
+   :attr:`~definition.__name__` attribute is usually
    sensible, and :attr:`__doc__` often is.
 
    Methods implemented via descriptors that also pass one of the other tests
@@ -388,11 +389,11 @@ attributes:
 
    Return true if the object is a data descriptor.
 
-   Data descriptors have both a :attr:`__get__` and a :attr:`__set__` attribute.
+   Data descriptors have both a :attr:`~object.__get__` and a :attr:`~object.__set__` method.
    Examples are properties (defined in Python), getsets, and members.  The
    latter two are defined in C and there are more specific tests available for
    those types, which is robust across Python implementations.  Typically, data
-   descriptors will also have :attr:`__name__` and :attr:`__doc__` attributes
+   descriptors will also have :attr:`~definition.__name__` and :attr:`__doc__` attributes
    (properties, getsets, and members have both of these attributes), but this is
    not guaranteed.
 
@@ -1229,6 +1230,61 @@ updated as expected:
    works for coroutine objects created by :keyword:`async def` functions.
 
    .. versionadded:: 3.5
+
+
+.. _inspect-module-co-flags:
+
+Code Objects Bit Flags
+----------------------
+
+Python code objects have a ``co_flags`` attribute, which is a bitmap of
+the following flags:
+
+.. data:: CO_NEWLOCALS
+
+   If set, a new dict will be created for the frame's ``f_locals`` when
+   the code object is executed.
+
+.. data:: CO_VARARGS
+
+   The code object has a variable positional parameter (``*args``-like).
+
+.. data:: CO_VARKEYWORDS
+
+   The code object has a variable keyword parameter (``**kwargs``-like).
+
+.. data:: CO_GENERATOR
+
+   The flag is set when the code object is a generator function, i.e.
+   a generator object is returned when the code object is executed.
+
+.. data:: CO_NOFREE
+
+   The flag is set if there are no free or cell variables.
+
+.. data:: CO_COROUTINE
+
+   The flag is set when the code object is a coroutine function, i.e.
+   a coroutine object is returned when the code object is executed.  See
+   :pep:`492` for more details.
+
+   .. versionadded:: 3.5
+
+.. data:: CO_ITERABLE_COROUTINE
+
+   Used to turn generators into generator-based coroutines.  Generator
+   objects with this flag can be used in ``await`` expression, and can
+   ``yield from`` coroutine objects.  See :pep:`492` for more details.
+
+   .. versionadded:: 3.5
+
+.. note::
+   The flags are specific to CPython, and may not be defined in other
+   Python implementations.  Furthermore, the flags are an implementation
+   detail, and can be removed or deprecated in future Python releases.
+   It's recommended to use public APIs from the :mod:`inspect` module
+   for any introspection needs.
+
 
 
 .. _inspect-module-cli:

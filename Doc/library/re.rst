@@ -79,6 +79,12 @@ how the regular expressions around them are interpreted. Regular
 expression pattern strings may not contain null bytes, but can specify
 the null byte using a ``\number`` notation such as ``'\x00'``.
 
+Repetition qualifiers (``*``, ``+``, ``?``, ``{m,n}``, etc) cannot be
+directly nested. This avoids ambiguity with the non-greedy modifier suffix
+``?``, and with other modifiers in other implementations. To apply a second
+repetition to an inner repetition, parentheses may be used. For example,
+the expression ``(?:a{6})*`` matches any multiple of six ``'a'`` characters.
+
 
 The special characters are:
 
@@ -443,7 +449,7 @@ three digits in length.
    The ``'\u'`` and ``'\U'`` escape sequences have been added.
 
 .. deprecated-removed:: 3.5 3.6
-   Unknown escapes consist of ``'\'`` and ASCII letter now raise a
+   Unknown escapes consisting of ``'\'`` and ASCII letter now raise a
    deprecation warning and will be forbidden in Python 3.6.
 
 

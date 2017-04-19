@@ -249,6 +249,15 @@ test_dict_iteration(PyObject* self)
 }
 
 
+static PyObject*
+dict_hassplittable(PyObject *self, PyObject *arg)
+{
+    if (!PyArg_Parse(arg, "O!:dict_hassplittable", &PyDict_Type, &arg)) {
+        return NULL;
+    }
+    return PyBool_FromLong(_PyDict_HasSplitTable((PyDictObject*)arg));
+}
+
 /* Issue #4701: Check that PyObject_Hash implicitly calls
  *   PyType_Ready if it hasn't already been called
  */
@@ -1830,6 +1839,69 @@ unicode_aswidecharstring(PyObject *self, PyObject *args)
 }
 
 static PyObject *
+unicode_asucs4(PyObject *self, PyObject *args)
+{
+    PyObject *unicode, *result;
+    Py_UCS4 *buffer;
+    int copy_null;
+    Py_ssize_t str_len, buf_len;
+
+    if (!PyArg_ParseTuple(args, "Unp:unicode_asucs4", &unicode, &str_len, &copy_null)) {
+        return NULL;
+    }
+
+    buf_len = str_len + 1;
+    buffer = PyMem_NEW(Py_UCS4, buf_len);
+    if (buffer == NULL) {
+        return PyErr_NoMemory();
+    }
+    memset(buffer, 0, sizeof(Py_UCS4)*buf_len);
+    buffer[str_len] = 0xffffU;
+
+    if (!PyUnicode_AsUCS4(unicode, buffer, buf_len, copy_null)) {
+        PyMem_FREE(buffer);
+        return NULL;
+    }
+
+    result = PyUnicode_FromKindAndData(PyUnicode_4BYTE_KIND, buffer, buf_len);
+    PyMem_FREE(buffer);
+    return result;
+}
+
+static PyObject *
+unicode_copycharacters(PyObject *self, PyObject *args)
+{
+    PyObject *from, *to, *to_copy;
+    Py_ssize_t from_start, to_start, how_many, copied;
+
+    if (!PyArg_ParseTuple(args, "UnOnn:unicode_copycharacters", &to, &to_start,
+                          &from, &from_start, &how_many)) {
+        return NULL;
+    }
+
+    if (PyUnicode_READY(to) < 0) {
+        return NULL;
+    }
+
+    if (!(to_copy = PyUnicode_New(PyUnicode_GET_LENGTH(to),
+                                  PyUnicode_MAX_CHAR_VALUE(to)))) {
+        return NULL;
+    }
+    if (PyUnicode_Fill(to_copy, 0, PyUnicode_GET_LENGTH(to_copy), 0U) < 0) {
+        Py_DECREF(to_copy);
+        return NULL;
+    }
+
+    if ((copied = PyUnicode_CopyCharacters(to_copy, to_start, from,
+                                           from_start, how_many)) < 0) {
+        Py_DECREF(to_copy);
+        return NULL;
+    }
+
+    return Py_BuildValue("(Nn)", to_copy, copied);
+}
+
+static PyObject *
 unicode_encodedecimal(PyObject *self, PyObject *args)
 {
     Py_UNICODE *unicode;
@@ -2247,7 +2319,7 @@ test_string_from_format(PyObject *self, PyObject *args)
     result = PyUnicode_FromFormat(FORMAT, (TYPE)1);                 \
     if (result == NULL)                                             \
         return NULL;                                                \
-    if (PyUnicode_CompareWithASCIIString(result, "1")) {     \
+    if (!_PyUnicode_EqualToASCIIString(result, "1")) {              \
         msg = FORMAT " failed at 1";                                \
         goto Fail;                                                  \
     }                                                               \
@@ -3781,7 +3853,7 @@ get_recursion_depth(PyObject *self, PyObject *args)
 {
     PyThreadState *tstate = PyThreadState_GET();
 
-    /* substract one to ignore the frame of the get_recursion_depth() call */
+    /* subtract one to ignore the frame of the get_recursion_depth() call */
     return PyLong_FromLong(tstate->recursion_depth - 1);
 }
 
@@ -3795,6 +3867,7 @@ static PyMethodDef TestMethods[] = {
     {"test_datetime_capi",  test_datetime_capi,              METH_NOARGS},
     {"test_list_api",           (PyCFunction)test_list_api,      METH_NOARGS},
     {"test_dict_iteration",     (PyCFunction)test_dict_iteration,METH_NOARGS},
+    {"dict_hassplittable",      dict_hassplittable,              METH_O},
     {"test_lazy_hash_inheritance",      (PyCFunction)test_lazy_hash_inheritance,METH_NOARGS},
     {"test_long_api",           (PyCFunction)test_long_api,      METH_NOARGS},
     {"test_xincref_doesnt_leak",(PyCFunction)test_xincref_doesnt_leak,      METH_NOARGS},
@@ -3884,6 +3957,8 @@ static PyMethodDef TestMethods[] = {
     {"test_widechar",           (PyCFunction)test_widechar,      METH_NOARGS},
     {"unicode_aswidechar",      unicode_aswidechar,              METH_VARARGS},
     {"unicode_aswidecharstring",unicode_aswidecharstring,        METH_VARARGS},
+    {"unicode_asucs4",          unicode_asucs4,                  METH_VARARGS},
+    {"unicode_copycharacters",  unicode_copycharacters,          METH_VARARGS},
     {"unicode_encodedecimal",   unicode_encodedecimal,           METH_VARARGS},
     {"unicode_transformdecimaltoascii", unicode_transformdecimaltoascii, METH_VARARGS},
     {"unicode_legacy_string",   unicode_legacy_string,           METH_VARARGS},

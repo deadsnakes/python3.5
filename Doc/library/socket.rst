@@ -63,6 +63,8 @@ created.  Socket addresses are represented as follows:
    .. versionchanged:: 3.5
       Writable :term:`bytes-like object` is now accepted.
 
+.. _host_port:
+
 - A pair ``(host, port)`` is used for the :const:`AF_INET` address family,
   where *host* is a string representing either a hostname in Internet domain
   notation like ``'daring.cwi.nl'`` or an IPv4 address like ``'100.50.200.5'``,
@@ -1211,7 +1213,7 @@ to sockets.
    much data, if any, was successfully sent.
 
    .. versionchanged:: 3.5
-      The socket timeout is no more reset each time data is sent successfuly.
+      The socket timeout is no more reset each time data is sent successfully.
       The socket timeout is now the maximum total duration to send all data.
 
    .. versionchanged:: 3.5
@@ -1365,7 +1367,7 @@ Note that there are no methods :meth:`read` or :meth:`write`; use
 :meth:`~socket.recv` and :meth:`~socket.send` without *flags* argument instead.
 
 Socket objects also have these (read-only) attributes that correspond to the
-values given to the :class:`socket` constructor.
+values given to the :class:`~socket.socket` constructor.
 
 
 .. attribute:: socket.family

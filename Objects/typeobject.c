@@ -858,7 +858,7 @@ type_repr(PyTypeObject *type)
         return NULL;
     }
 
-    if (mod != NULL && _PyUnicode_CompareWithId(mod, &PyId_builtins))
+    if (mod != NULL && !_PyUnicode_EqualToASCIIId(mod, &PyId_builtins))
         rtn = PyUnicode_FromFormat("<class '%U.%U'>", mod, name);
     else
         rtn = PyUnicode_FromFormat("<class '%s'>", type->tp_name);
@@ -1123,11 +1123,6 @@ subtype_dealloc(PyObject *self)
     Py_TRASHCAN_SAFE_BEGIN(self);
     --_PyTrash_delete_nesting;
     -- tstate->trash_delete_nesting;
-    /* DO NOT restore GC tracking at this point.  weakref callbacks
-     * (if any, and whether directly here or indirectly in something we
-     * call) may trigger GC, and if self is tracked at that point, it
-     * will look like trash to GC and GC will try to delete self again.
-     */
 
     /* Find the nearest base with a different tp_dealloc */
     base = type;
@@ -1138,30 +1133,36 @@ subtype_dealloc(PyObject *self)
 
     has_finalizer = type->tp_finalize || type->tp_del;
 
-    /* Maybe call finalizer; exit early if resurrected */
-    if (has_finalizer)
-        _PyObject_GC_TRACK(self);
-
     if (type->tp_finalize) {
+        _PyObject_GC_TRACK(self);
         if (PyObject_CallFinalizerFromDealloc(self) < 0) {
             /* Resurrected */
             goto endlabel;
         }
+        _PyObject_GC_UNTRACK(self);
     }
-    /* If we added a weaklist, we clear it.      Do this *before* calling
-       tp_del, clearing slots, or clearing the instance dict. */
+    /*
+      If we added a weaklist, we clear it. Do this *before* calling tp_del,
+      clearing slots, or clearing the instance dict.
+
+      GC tracking must be off at this point. weakref callbacks (if any, and
+      whether directly here or indirectly in something we call) may trigger GC,
+      and if self is tracked at that point, it will look like trash to GC and GC
+      will try to delete self again.
+    */
     if (type->tp_weaklistoffset && !base->tp_weaklistoffset)
         PyObject_ClearWeakRefs(self);
 
     if (type->tp_del) {
+        _PyObject_GC_TRACK(self);
         type->tp_del(self);
         if (self->ob_refcnt > 0) {
             /* Resurrected */
             goto endlabel;
         }
+        _PyObject_GC_UNTRACK(self);
     }
     if (has_finalizer) {
-        _PyObject_GC_UNTRACK(self);
         /* New weakrefs could be created during the finalizer call.
            If this occurs, clear them out without calling their
            finalizers since they might rely on part of the object
@@ -1432,8 +1433,10 @@ call_method(PyObject *o, _Py_Identifier *nameid, char *format, ...)
 
     va_end(va);
 
-    if (args == NULL)
+    if (args == NULL) {
+        Py_DECREF(func);
         return NULL;
+    }
 
     assert(PyTuple_Check(args));
     retval = PyObject_Call(func, args, NULL);
@@ -1468,8 +1471,10 @@ call_maybe(PyObject *o, _Py_Identifier *nameid, char *format, ...)
 
     va_end(va);
 
-    if (args == NULL)
+    if (args == NULL) {
+        Py_DECREF(func);
         return NULL;
+    }
 
     assert(PyTuple_Check(args));
     retval = PyObject_Call(func, args, NULL);
@@ -1494,7 +1499,7 @@ call_maybe(PyObject *o, _Py_Identifier *nameid, char *format, ...)
 
     The next three properties are the 3 constraints in "C3".
 
-    Local precendece order.
+    Local precedence order.
     If A precedes B in C's MRO, then A will precede B in the MRO of all
     subclasses of C.
 
@@ -2381,7 +2386,7 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
             if (!valid_identifier(tmp))
                 goto error;
             assert(PyUnicode_Check(tmp));
-            if (_PyUnicode_CompareWithId(tmp, &PyId___dict__) == 0) {
+            if (_PyUnicode_EqualToASCIIId(tmp, &PyId___dict__)) {
                 if (!may_add_dict || add_dict) {
                     PyErr_SetString(PyExc_TypeError,
                         "__dict__ slot disallowed: "
@@ -2390,7 +2395,7 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
                 }
                 add_dict++;
             }
-            if (PyUnicode_CompareWithASCIIString(tmp, "__weakref__") == 0) {
+            if (_PyUnicode_EqualToASCIIString(tmp, "__weakref__")) {
                 if (!may_add_weak || add_weak) {
                     PyErr_SetString(PyExc_TypeError,
                         "__weakref__ slot disallowed: "
@@ -2412,9 +2417,9 @@ type_new(PyTypeObject *metatype, PyObject *args, PyObject *kwds)
         for (i = j = 0; i < nslots; i++) {
             tmp = PyTuple_GET_ITEM(slots, i);
             if ((add_dict &&
-                 _PyUnicode_CompareWithId(tmp, &PyId___dict__) == 0) ||
+                 _PyUnicode_EqualToASCIIId(tmp, &PyId___dict__)) ||
                 (add_weak &&
-                 PyUnicode_CompareWithASCIIString(tmp, "__weakref__") == 0))
+                 _PyUnicode_EqualToASCIIString(tmp, "__weakref__")))
                 continue;
             tmp =_Py_Mangle(name, tmp);
             if (!tmp) {
@@ -2864,11 +2869,25 @@ _PyType_Lookup(PyTypeObject *type, PyObject *name)
     /* Look in tp_dict of types in MRO */
     mro = type->tp_mro;
 
-    /* If mro is NULL, the type is either not yet initialized
-       by PyType_Ready(), or already cleared by type_clear().
-       Either way the safest thing to do is to return NULL. */
-    if (mro == NULL)
-        return NULL;
+    if (mro == NULL) {
+        if ((type->tp_flags & Py_TPFLAGS_READYING) == 0 &&
+            PyType_Ready(type) < 0) {
+            /* It's not ideal to clear the error condition,
+               but this function is documented as not setting
+               an exception, and I don't want to change that.
+               When PyType_Ready() can't proceed, it won't
+               set the "ready" flag, so future attempts to ready
+               the same type will call it again -- hopefully
+               in a context that propagates the exception out.
+            */
+            PyErr_Clear();
+            return NULL;
+        }
+        mro = type->tp_mro;
+        if (mro == NULL) {
+            return NULL;
+        }
+    }
 
     res = NULL;
     /* keep a strong reference to mro because type->tp_mro can be replaced
@@ -3471,7 +3490,7 @@ object_repr(PyObject *self)
         Py_XDECREF(mod);
         return NULL;
     }
-    if (mod != NULL && _PyUnicode_CompareWithId(mod, &PyId_builtins))
+    if (mod != NULL && !_PyUnicode_EqualToASCIIId(mod, &PyId_builtins))
         rtn = PyUnicode_FromFormat("<%U.%U object at %p>", mod, name, self);
     else
         rtn = PyUnicode_FromFormat("<%s object at %p>",
@@ -3755,7 +3774,7 @@ import_copyreg(void)
     /* Try to fetch cached copy of copyreg from sys.modules first in an
        attempt to avoid the import overhead. Previously this was implemented
        by storing a reference to the cached module in a static variable, but
-       this broke when multiple embeded interpreters were in use (see issue
+       this broke when multiple embedded interpreters were in use (see issue
        #17408 and #19088). */
     copyreg_module = PyDict_GetItemWithError(interp->modules, copyreg_str);
     if (copyreg_module != NULL) {
@@ -4299,13 +4318,6 @@ PyDoc_STRVAR(object_subclasshook_doc,
 "NotImplemented, the normal algorithm is used.  Otherwise, it\n"
 "overrides the normal algorithm (and the outcome is cached).\n");
 
-/*
-   from PEP 3101, this code implements:
-
-   class object:
-       def __format__(self, format_spec):
-           return format(str(self), format_spec)
-*/
 static PyObject *
 object_format(PyObject *self, PyObject *args)
 {
@@ -4316,22 +4328,19 @@ object_format(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "U:__format__", &format_spec))
         return NULL;
 
+    /* Issue 7994: If we're converting to a string, we
+       should reject format specifications */
+    if (PyUnicode_GET_LENGTH(format_spec) > 0) {
+        PyErr_Format(PyExc_TypeError,
+                     "unsupported format string passed to %.200s.__format__",
+                     self->ob_type->tp_name);
+        return NULL;
+    }
     self_as_str = PyObject_Str(self);
     if (self_as_str != NULL) {
-        /* Issue 7994: If we're converting to a string, we
-           should reject format specifications */
-        if (PyUnicode_GET_LENGTH(format_spec) > 0) {
-            PyErr_SetString(PyExc_TypeError,
-               "non-empty format string passed to object.__format__");
-            goto done;
-        }
-
         result = PyObject_Format(self_as_str, format_spec);
+        Py_DECREF(self_as_str);
     }
-
-done:
-    Py_XDECREF(self_as_str);
-
     return result;
 }
 
@@ -4509,8 +4518,10 @@ add_members(PyTypeObject *type, PyMemberDef *memb)
         descr = PyDescr_NewMember(type, memb);
         if (descr == NULL)
             return -1;
-        if (PyDict_SetItemString(dict, memb->name, descr) < 0)
+        if (PyDict_SetItemString(dict, memb->name, descr) < 0) {
+            Py_DECREF(descr);
             return -1;
+        }
         Py_DECREF(descr);
     }
     return 0;
@@ -4529,8 +4540,10 @@ add_getset(PyTypeObject *type, PyGetSetDef *gsp)
 
         if (descr == NULL)
             return -1;
-        if (PyDict_SetItemString(dict, gsp->name, descr) < 0)
+        if (PyDict_SetItemString(dict, gsp->name, descr) < 0) {
+            Py_DECREF(descr);
             return -1;
+        }
         Py_DECREF(descr);
     }
     return 0;
@@ -4810,6 +4823,12 @@ PyType_Ready(PyTypeObject *type)
      */
     _Py_AddToAllObjects((PyObject *)type, 0);
 #endif
+
+    if (type->tp_name == NULL) {
+        PyErr_Format(PyExc_SystemError,
+                     "Type does not define the tp_name field.");
+        goto error;
+    }
 
     /* Initialize tp_base (defaults to BaseObject unless that's us) */
     base = type->tp_base;
@@ -7010,8 +7029,10 @@ add_operators(PyTypeObject *type)
             descr = PyDescr_NewWrapper(type, p, *ptr);
             if (descr == NULL)
                 return -1;
-            if (PyDict_SetItem(dict, p->name_strobj, descr) < 0)
+            if (PyDict_SetItem(dict, p->name_strobj, descr) < 0) {
+                Py_DECREF(descr);
                 return -1;
+            }
             Py_DECREF(descr);
         }
     }
@@ -7086,7 +7107,7 @@ super_getattro(PyObject *self, PyObject *name)
        (i.e. super, or a subclass), not the class of su->obj. */
     if (PyUnicode_Check(name) &&
         PyUnicode_GET_LENGTH(name) == 9 &&
-        _PyUnicode_CompareWithId(name, &PyId___class__) == 0)
+        _PyUnicode_EqualToASCIIId(name, &PyId___class__))
         goto skip;
 
     mro = starttype->tp_mro;
@@ -7298,7 +7319,7 @@ super_init(PyObject *self, PyObject *args, PyObject *kwds)
         for (i = 0; i < n; i++) {
             PyObject *name = PyTuple_GET_ITEM(co->co_freevars, i);
             assert(PyUnicode_Check(name));
-            if (!_PyUnicode_CompareWithId(name, &PyId___class__)) {
+            if (_PyUnicode_EqualToASCIIId(name, &PyId___class__)) {
                 Py_ssize_t index = co->co_nlocals +
                     PyTuple_GET_SIZE(co->co_cellvars) + i;
                 PyObject *cell = f->f_localsplus[index];

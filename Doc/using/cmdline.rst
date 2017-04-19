@@ -192,7 +192,7 @@ Miscellaneous options
 
    Issue a warning when comparing :class:`bytes` or :class:`bytearray` with
    :class:`str` or :class:`bytes` with :class:`int`.  Issue an error when the
-   option is given twice (:option:`-bb`).
+   option is given twice (:option:`!-bb`).
 
    .. versionchanged:: 3.5
       Affects comparisons of :class:`bytes` with :class:`int`.
@@ -239,9 +239,7 @@ Miscellaneous options
 
 .. cmdoption:: -O
 
-   Turn on basic optimizations.  This changes the filename extension for
-   compiled (:term:`bytecode`) files from ``.pyc`` to ``.pyo``.  See also
-   :envvar:`PYTHONOPTIMIZE`.
+   Turn on basic optimizations.  See also :envvar:`PYTHONOPTIMIZE`.
 
 
 .. cmdoption:: -OO
@@ -310,11 +308,12 @@ Miscellaneous options
 
    Print a message each time a module is initialized, showing the place
    (filename or built-in module) from which it is loaded.  When given twice
-   (:option:`-vv`), print a message for each file that is checked for when
+   (:option:`!-vv`), print a message for each file that is checked for when
    searching for a module.  Also provides information on module cleanup at exit.
    See also :envvar:`PYTHONVERBOSE`.
 
 
+.. _using-on-warnings:
 .. cmdoption:: -W arg
 
    Warning control.  Python's warning machinery by default prints warning

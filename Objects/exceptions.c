@@ -618,36 +618,38 @@ SimpleExtendsException(PyExc_BaseException, KeyboardInterrupt,
 static int
 ImportError_init(PyImportErrorObject *self, PyObject *args, PyObject *kwds)
 {
+    static char *kwlist[] = {"name", "path", 0};
+    PyObject *empty_tuple;
     PyObject *msg = NULL;
     PyObject *name = NULL;
     PyObject *path = NULL;
 
-/* Macro replacement doesn't allow ## to start the first line of a macro,
-   so we move the assignment and NULL check into the if-statement. */
-#define GET_KWD(kwd) { \
-    kwd = PyDict_GetItemString(kwds, #kwd); \
-    if (kwd) { \
-        Py_INCREF(kwd); \
-        Py_XSETREF(self->kwd, kwd); \
-        if (PyDict_DelItemString(kwds, #kwd)) \
-            return -1; \
-    } \
-    }
-
-    if (kwds) {
-        GET_KWD(name);
-        GET_KWD(path);
-    }
-
-    if (BaseException_init((PyBaseExceptionObject *)self, args, kwds) == -1)
-        return -1;
-    if (PyTuple_GET_SIZE(args) != 1)
-        return 0;
-    if (!PyArg_UnpackTuple(args, "ImportError", 1, 1, &msg))
+    if (BaseException_init((PyBaseExceptionObject *)self, args, NULL) == -1)
         return -1;
 
-    Py_INCREF(msg);
-    Py_XSETREF(self->msg, msg);
+    empty_tuple = PyTuple_New(0);
+    if (!empty_tuple)
+        return -1;
+    if (!PyArg_ParseTupleAndKeywords(empty_tuple, kwds, "|$OO:ImportError", kwlist,
+                                     &name, &path)) {
+        Py_DECREF(empty_tuple);
+        return -1;
+    }
+    Py_DECREF(empty_tuple);
+
+    if (name) {
+        Py_INCREF(name);
+        Py_XSETREF(self->name, name);
+    }
+    if (path) {
+        Py_INCREF(path);
+        Py_XSETREF(self->path, path);
+    }
+    if (PyTuple_GET_SIZE(args) == 1) {
+        msg = PyTuple_GET_ITEM(args, 0);
+        Py_INCREF(msg);
+        Py_XSETREF(self->msg, msg);
+    }
 
     return 0;
 }
@@ -1263,7 +1265,7 @@ SimpleExtendsException(PyExc_Exception, AttributeError,
  *    SyntaxError extends Exception
  */
 
-/* Helper function to customise error message for some syntax errors */
+/* Helper function to customize error message for some syntax errors */
 static int _report_missing_parentheses(PySyntaxErrorObject *self);
 
 static int
@@ -1855,7 +1857,7 @@ UnicodeEncodeError_str(PyObject *self)
         return PyUnicode_FromString("");
 
     /* Get reason and encoding as strings, which they might not be if
-       they've been modified after we were contructed. */
+       they've been modified after we were constructed. */
     reason_str = PyObject_Str(uself->reason);
     if (reason_str == NULL)
         goto done;
@@ -1980,7 +1982,7 @@ UnicodeDecodeError_str(PyObject *self)
         return PyUnicode_FromString("");
 
     /* Get reason and encoding as strings, which they might not be if
-       they've been modified after we were contructed. */
+       they've been modified after we were constructed. */
     reason_str = PyObject_Str(uself->reason);
     if (reason_str == NULL)
         goto done;
@@ -2078,7 +2080,7 @@ UnicodeTranslateError_str(PyObject *self)
         return PyUnicode_FromString("");
 
     /* Get reason as a string, which it might not be if it's been
-       modified after we were contructed. */
+       modified after we were constructed. */
     reason_str = PyObject_Str(uself->reason);
     if (reason_str == NULL)
         goto done;

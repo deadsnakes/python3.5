@@ -152,7 +152,7 @@ identifier.  Python currently uses eight paths:
    If *vars* is provided, it must be a dictionary of variables that will
    update the dictionary used to expand the paths.
 
-   If *expand* is set to False, the paths will not be expanded.
+   If *expand* is set to false, the paths will not be expanded.
 
    If *scheme* is not an existing scheme, :func:`get_paths` will raise a
    :exc:`KeyError`.
@@ -204,7 +204,9 @@ Other functions
 
 .. function:: is_python_build()
 
-   Return ``True`` if the current Python installation was built from source.
+   Return ``True`` if the running Python interpreter was built from source and
+   is being run from its built location, and not from a location resulting from
+   e.g. running ``make install`` or installing via a binary installer.
 
 
 .. function:: parse_config_h(fp[, vars])
@@ -229,7 +231,9 @@ Other functions
 Using :mod:`sysconfig` as a script
 ----------------------------------
 
-You can use :mod:`sysconfig` as a script with Python's *-m* option::
+You can use :mod:`sysconfig` as a script with Python's *-m* option:
+
+.. code-block:: shell-session
 
     $ python -m sysconfig
     Platform: "macosx-10.4-i386"
