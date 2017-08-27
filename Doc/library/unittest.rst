@@ -1170,6 +1170,9 @@ Test cases
          :meth:`.assertRegex`.
       .. versionadded:: 3.2
          :meth:`.assertNotRegex`.
+      .. versionadded:: 3.5
+         The name ``assertNotRegexpMatches`` is a deprecated alias
+         for :meth:`.assertNotRegex`.
 
 
    .. method:: assertCountEqual(first, second, msg=None)
@@ -1435,9 +1438,9 @@ For historical reasons, some of the :class:`TestCase` methods had one or more
 aliases that are now deprecated.  The following table lists the correct names
 along with their deprecated aliases:
 
-   ==============================  ====================== ======================
+   ==============================  ====================== =======================
     Method Name                     Deprecated alias       Deprecated alias
-   ==============================  ====================== ======================
+   ==============================  ====================== =======================
     :meth:`.assertEqual`            failUnlessEqual        assertEquals
     :meth:`.assertNotEqual`         failIfEqual            assertNotEquals
     :meth:`.assertTrue`             failUnless             assert\_
@@ -1446,8 +1449,9 @@ along with their deprecated aliases:
     :meth:`.assertAlmostEqual`      failUnlessAlmostEqual  assertAlmostEquals
     :meth:`.assertNotAlmostEqual`   failIfAlmostEqual      assertNotAlmostEquals
     :meth:`.assertRegex`                                   assertRegexpMatches
+    :meth:`.assertNotRegex`                                assertNotRegexpMatches
     :meth:`.assertRaisesRegex`                             assertRaisesRegexp
-   ==============================  ====================== ======================
+   ==============================  ====================== =======================
 
    .. deprecated:: 3.1
          the fail* aliases listed in the second column.
@@ -1455,8 +1459,9 @@ along with their deprecated aliases:
          the assert* aliases listed in the third column.
    .. deprecated:: 3.2
          ``assertRegexpMatches`` and ``assertRaisesRegexp`` have been renamed to
-         :meth:`.assertRegex` and :meth:`.assertRaisesRegex`
-
+         :meth:`.assertRegex` and :meth:`.assertRaisesRegex`.
+   .. deprecated:: 3.5
+         the ``assertNotRegexpMatches`` name in favor of :meth:`.assertNotRegex`.
 
 .. _testsuite-objects:
 
@@ -1465,7 +1470,7 @@ Grouping tests
 
 .. class:: TestSuite(tests=())
 
-   This class represents an aggregation of individual tests cases and test suites.
+   This class represents an aggregation of individual test cases and test suites.
    The class presents the interface needed by the test runner to allow it to be run
    as any other test case.  Running a :class:`TestSuite` instance is the same as
    iterating over the suite, running each test individually.
@@ -1573,7 +1578,7 @@ Loading and running tests
 
    .. method:: loadTestsFromTestCase(testCaseClass)
 
-      Return a suite of all tests cases contained in the :class:`TestCase`\ -derived
+      Return a suite of all test cases contained in the :class:`TestCase`\ -derived
       :class:`testCaseClass`.
 
       A test case instance is created for each method named by
@@ -1585,7 +1590,7 @@ Loading and running tests
 
    .. method:: loadTestsFromModule(module, pattern=None)
 
-      Return a suite of all tests cases contained in the given module. This
+      Return a suite of all test cases contained in the given module. This
       method searches *module* for classes derived from :class:`TestCase` and
       creates an instance of the class for each test method defined for the
       class.
@@ -1615,7 +1620,7 @@ Loading and running tests
 
    .. method:: loadTestsFromName(name, module=None)
 
-      Return a suite of all tests cases given a string specifier.
+      Return a suite of all test cases given a string specifier.
 
       The specifier *name* is a "dotted name" that may resolve either to a
       module, a test case class, a test method within a test case class, a
@@ -1637,11 +1642,11 @@ Loading and running tests
 
       The method optionally resolves *name* relative to the given *module*.
 
-   .. versionchanged:: 3.5
-      If an :exc:`ImportError` or :exc:`AttributeError` occurs while traversing
-      *name* then a synthetic test that raises that error when run will be
-      returned. These errors are included in the errors accumulated by
-      self.errors.
+      .. versionchanged:: 3.5
+         If an :exc:`ImportError` or :exc:`AttributeError` occurs while traversing
+         *name* then a synthetic test that raises that error when run will be
+         returned. These errors are included in the errors accumulated by
+         self.errors.
 
 
    .. method:: loadTestsFromNames(names, module=None)

@@ -638,14 +638,18 @@ class ReTests(unittest.TestCase):
         re.purge()  # for warnings
         for c in 'ceghijklmopqyzCEFGHIJKLMNOPQRTVXY':
             with self.subTest(c):
-                with self.assertWarns(DeprecationWarning):
+                with self.assertWarns(DeprecationWarning) as warns:
                     self.assertEqual(re.fullmatch('\\%c' % c, c).group(), c)
                     self.assertIsNone(re.match('\\%c' % c, 'a'))
+                self.assertRegex(str(warns.warnings[0].message), 'bad escape')
+                self.assertEqual(warns.warnings[0].filename, __file__)
         for c in 'ceghijklmopqyzABCEFGHIJKLMNOPQRTVXYZ':
             with self.subTest(c):
-                with self.assertWarns(DeprecationWarning):
+                with self.assertWarns(DeprecationWarning) as warns:
                     self.assertEqual(re.fullmatch('[\\%c]' % c, c).group(), c)
                     self.assertIsNone(re.match('[\\%c]' % c, 'a'))
+                self.assertRegex(str(warns.warnings[0].message), 'bad escape')
+                self.assertEqual(warns.warnings[0].filename, __file__)
 
     def test_string_boundaries(self):
         # See http://bugs.python.org/issue10713
@@ -1678,6 +1682,16 @@ SUBPATTERN None
         self.checkPatternError(r'(?<', 'unexpected end of pattern', 3)
         self.checkPatternError(r'(?<>)', 'unknown extension ?<>', 1)
         self.checkPatternError(r'(?', 'unexpected end of pattern', 2)
+
+    def test_bug_29444(self):
+        s = bytearray(b'abcdefgh')
+        m = re.search(b'[a-h]+', s)
+        m2 = re.search(b'[e-h]+', s)
+        self.assertEqual(m.group(), b'abcdefgh')
+        self.assertEqual(m2.group(), b'efgh')
+        s[:] = b'xyz'
+        self.assertEqual(m.group(), b'xyz')
+        self.assertEqual(m2.group(), b'')
 
 
 class PatternReprTests(unittest.TestCase):

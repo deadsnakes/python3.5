@@ -308,6 +308,14 @@ class BuiltinLevelsTest(BaseTest):
         self.assertEqual(logging.getLevelName('INFO'), logging.INFO)
         self.assertEqual(logging.getLevelName(logging.INFO), 'INFO')
 
+    def test_regression_29220(self):
+        """See issue #29220 for more information."""
+        logging.addLevelName(logging.INFO, '')
+        self.addCleanup(logging.addLevelName, logging.INFO, 'INFO')
+        self.assertEqual(logging.getLevelName(logging.INFO), '')
+        self.assertEqual(logging.getLevelName(logging.NOTSET), 'NOTSET')
+        self.assertEqual(logging.getLevelName('NOTSET'), logging.NOTSET)
+
 class BasicFilterTest(BaseTest):
 
     """Test the bundled Filter class."""
@@ -1563,7 +1571,7 @@ class SysLogHandlerTest(BaseTest):
         server.ready.wait()
         hcls = logging.handlers.SysLogHandler
         if isinstance(server.server_address, tuple):
-            self.sl_hdlr = hcls(('localhost', server.port))
+            self.sl_hdlr = hcls((server.server_address[0], server.port))
         else:
             self.sl_hdlr = hcls(server.server_address)
         self.log_output = ''
@@ -1618,6 +1626,24 @@ class UnixSysLogHandlerTest(SysLogHandlerTest):
     def tearDown(self):
         SysLogHandlerTest.tearDown(self)
         os.remove(self.address)
+
+@unittest.skipUnless(support.IPV6_ENABLED,
+                     'IPv6 support required for this test.')
+@unittest.skipUnless(threading, 'Threading required for this test.')
+class IPv6SysLogHandlerTest(SysLogHandlerTest):
+
+    """Test for SysLogHandler with IPv6 host."""
+
+    server_class = TestUDPServer
+    address = ('::1', 0)
+
+    def setUp(self):
+        self.server_class.address_family = socket.AF_INET6
+        super(IPv6SysLogHandlerTest, self).setUp()
+
+    def tearDown(self):
+        self.server_class.address_family = socket.AF_INET
+        super(IPv6SysLogHandlerTest, self).tearDown()
 
 @unittest.skipUnless(threading, 'Threading required for this test.')
 class HTTPHandlerTest(BaseTest):
@@ -3059,6 +3085,7 @@ if hasattr(logging.handlers, 'QueueListener'):
             handler.close()
 
         @patch.object(logging.handlers.QueueListener, 'handle')
+        @support.reap_threads
         def test_handle_called_with_queue_queue(self, mock_handle):
             for i in range(self.repeat):
                 log_queue = queue.Queue()
@@ -3068,10 +3095,13 @@ if hasattr(logging.handlers, 'QueueListener'):
 
         @support.requires_multiprocessing_queue
         @patch.object(logging.handlers.QueueListener, 'handle')
+        @support.reap_threads
         def test_handle_called_with_mp_queue(self, mock_handle):
             for i in range(self.repeat):
                 log_queue = multiprocessing.Queue()
                 self.setup_and_log(log_queue, '%s_%s' % (self.id(), i))
+                log_queue.close()
+                log_queue.join_thread()
             self.assertEqual(mock_handle.call_count, 5 * self.repeat,
                              'correct number of handled log messages')
 
@@ -3084,6 +3114,7 @@ if hasattr(logging.handlers, 'QueueListener'):
                 return []
 
         @support.requires_multiprocessing_queue
+        @support.reap_threads
         def test_no_messages_in_queue_after_stop(self):
             """
             Five messages are logged then the QueueListener is stopped. This
@@ -3096,6 +3127,9 @@ if hasattr(logging.handlers, 'QueueListener'):
                 self.setup_and_log(queue, '%s_%s' %(self.id(), i))
                 # time.sleep(1)
                 items = list(self.get_all_from_queue(queue))
+                queue.close()
+                queue.join_thread()
+
                 expected = [[], [logging.handlers.QueueListener._sentinel]]
                 self.assertIn(items, expected,
                               'Found unexpected messages in queue: %s' % (
@@ -4255,7 +4289,7 @@ def test_main():
         QueueHandlerTest, ShutdownTest, ModuleLevelMiscTest, BasicConfigTest,
         LoggerAdapterTest, LoggerTest, SMTPHandlerTest, FileHandlerTest,
         RotatingFileHandlerTest,  LastResortTest, LogRecordTest,
-        ExceptionTest, SysLogHandlerTest, HTTPHandlerTest,
+        ExceptionTest, SysLogHandlerTest, IPv6SysLogHandlerTest, HTTPHandlerTest,
         NTEventLogHandlerTest, TimedRotatingFileHandlerTest,
         UnixSocketHandlerTest, UnixDatagramHandlerTest, UnixSysLogHandlerTest,
     ]

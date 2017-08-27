@@ -50,7 +50,7 @@ static char *usage_1 = "\
 Options and arguments (and corresponding environment variables):\n\
 -b     : issue warnings about str(bytes_instance), str(bytearray_instance)\n\
          and comparing bytes/bytearray with str. (-bb: issue errors)\n\
--B     : don't write .py[co] files on import; also PYTHONDONTWRITEBYTECODE=x\n\
+-B     : don't write .pyc files on import; also PYTHONDONTWRITEBYTECODE=x\n\
 -c cmd : program passed in as string (terminates option list)\n\
 -d     : debug output from parser; also PYTHONDEBUG=x\n\
 -E     : ignore PYTHON* environment variables (such as PYTHONPATH)\n\
@@ -223,7 +223,7 @@ static int RunModule(wchar_t *modname, int set_argv0)
 static int
 RunMainFromImporter(wchar_t *filename)
 {
-    PyObject *argv0 = NULL, *importer, *sys_path;
+    PyObject *argv0 = NULL, *importer, *sys_path, *sys_path0;
     int sts;
 
     argv0 = PyUnicode_FromWideChar(filename, wcslen(filename));
@@ -248,7 +248,17 @@ RunMainFromImporter(wchar_t *filename)
         PyErr_SetString(PyExc_RuntimeError, "unable to get sys.path");
         goto error;
     }
-    if (PyList_SetItem(sys_path, 0, argv0)) {
+    sys_path0 = PyList_GetItem(sys_path, 0);
+    sts = 0;
+    if (!sys_path0) {
+        PyErr_Clear();
+        sts = PyList_Append(sys_path, argv0);
+    } else if (PyObject_IsTrue(sys_path0)) {
+        sts = PyList_Insert(sys_path, 0, argv0);
+    } else {
+        sts = PyList_SetItem(sys_path, 0, argv0);
+    }
+    if (sts) {
         argv0 = NULL;
         goto error;
     }

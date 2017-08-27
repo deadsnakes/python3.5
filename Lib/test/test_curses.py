@@ -81,7 +81,7 @@ class TestCurses(unittest.TestCase):
         win2 = curses.newwin(15,15, 5,5)
 
         for meth in [stdscr.addch, stdscr.addstr]:
-            for args in [('a'), ('a', curses.A_BOLD),
+            for args in [('a',), ('a', curses.A_BOLD),
                          (4,4, 'a'), (5,5, 'a', curses.A_BOLD)]:
                 with self.subTest(meth=meth.__qualname__, args=args):
                     meth(*args)
@@ -194,6 +194,15 @@ class TestCurses(unittest.TestCase):
         self.assertRaises(ValueError, stdscr.instr, -2)
         self.assertRaises(ValueError, stdscr.instr, 2, 3, -2)
 
+    def test_embedded_null_chars(self):
+        # reject embedded null bytes and characters
+        stdscr = self.stdscr
+        for arg in ['a', b'a']:
+            with self.subTest(arg=arg):
+                self.assertRaises(ValueError, stdscr.addstr, 'a\0')
+                self.assertRaises(ValueError, stdscr.addnstr, 'a\0', 1)
+                self.assertRaises(ValueError, stdscr.insstr, 'a\0')
+                self.assertRaises(ValueError, stdscr.insnstr, 'a\0', 1)
 
     def test_module_funcs(self):
         "Test module-level functions"
@@ -244,7 +253,7 @@ class TestCurses(unittest.TestCase):
     # Functions only available on a few platforms
     def test_colors_funcs(self):
         if not curses.has_colors():
-            self.skip('requires colors support')
+            self.skipTest('requires colors support')
         curses.start_color()
         curses.init_pair(2, 1,1)
         curses.color_content(1)
@@ -267,7 +276,7 @@ class TestCurses(unittest.TestCase):
     def test_getmouse(self):
         (availmask, oldmask) = curses.mousemask(curses.BUTTON1_PRESSED)
         if availmask == 0:
-            self.skip('mouse stuff not available')
+            self.skipTest('mouse stuff not available')
         curses.mouseinterval(10)
         # just verify these don't cause errors
         curses.ungetmouse(0, 0, 0, 0, curses.BUTTON1_PRESSED)

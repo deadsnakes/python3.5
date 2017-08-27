@@ -34,8 +34,8 @@ can be customized by end users easily.
 .. seealso::
 
    Module :mod:`shlex`
-      Support for a creating Unix shell-like mini-languages which can be used
-      as an alternate format for application configuration files.
+      Support for creating Unix shell-like mini-languages which can be used as
+      an alternate format for application configuration files.
 
    Module :mod:`json`
       The json module implements a subset of JavaScript syntax which can also
@@ -1161,20 +1161,20 @@ ConfigParser Objects
          Use :meth:`read_file` instead.
 
       .. versionchanged:: 3.2
-         :meth:`readfp` now iterates on *f* instead of calling ``f.readline()``.
+         :meth:`readfp` now iterates on *fp* instead of calling ``fp.readline()``.
 
       For existing code calling :meth:`readfp` with arguments which don't
       support iteration, the following generator may be used as a wrapper
       around the file-like object::
 
-         def readline_generator(f):
-             line = f.readline()
+         def readline_generator(fp):
+             line = fp.readline()
              while line:
                  yield line
-                 line = f.readline()
+                 line = fp.readline()
 
-      Instead of ``parser.readfp(f)`` use
-      ``parser.read_file(readline_generator(f))``.
+      Instead of ``parser.readfp(fp)`` use
+      ``parser.read_file(readline_generator(fp))``.
 
 
 .. data:: MAX_INTERPOLATION_DEPTH

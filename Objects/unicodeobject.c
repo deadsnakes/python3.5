@@ -2839,6 +2839,37 @@ PyUnicode_AsWideCharString(PyObject *unicode,
     return buffer;
 }
 
+wchar_t*
+_PyUnicode_AsWideCharString(PyObject *unicode)
+{
+    const wchar_t *wstr;
+    wchar_t *buffer;
+    Py_ssize_t buflen;
+
+    if (unicode == NULL) {
+        PyErr_BadInternalCall();
+        return NULL;
+    }
+
+    wstr = PyUnicode_AsUnicodeAndSize(unicode, &buflen);
+    if (wstr == NULL) {
+        return NULL;
+    }
+    if (wcslen(wstr) != (size_t)buflen) {
+        PyErr_SetString(PyExc_ValueError,
+                        "embedded null character");
+        return NULL;
+    }
+
+    buffer = PyMem_NEW(wchar_t, buflen + 1);
+    if (buffer == NULL) {
+        PyErr_NoMemory();
+        return NULL;
+    }
+    memcpy(buffer, wstr, (buflen + 1) * sizeof(wchar_t));
+    return buffer;
+}
+
 #endif /* HAVE_WCHAR_H */
 
 PyObject *
@@ -3654,6 +3685,7 @@ PyUnicode_FSDecoder(PyObject* arg, void* addr)
     PyObject *output = NULL;
     if (arg == NULL) {
         Py_DECREF(*(PyObject**)addr);
+        *(PyObject**)addr = NULL;
         return 1;
     }
     if (PyUnicode_Check(arg)) {
@@ -3860,6 +3892,20 @@ Py_UNICODE *
 PyUnicode_AsUnicode(PyObject *unicode)
 {
     return PyUnicode_AsUnicodeAndSize(unicode, NULL);
+}
+
+const Py_UNICODE *
+_PyUnicode_AsUnicode(PyObject *unicode)
+{
+    Py_ssize_t size;
+    const Py_UNICODE *wstr;
+
+    wstr = PyUnicode_AsUnicodeAndSize(unicode, &size);
+    if (wstr && wcslen(wstr) != (size_t)size) {
+        PyErr_SetString(PyExc_ValueError, "embedded null character");
+        return NULL;
+    }
+    return wstr;
 }
 
 
@@ -5163,13 +5209,12 @@ _PyUnicode_EncodeUTF32(PyObject *str,
         /* four bytes are reserved for each surrogate */
         if (moreunits > 1) {
             Py_ssize_t outpos = out - (PY_UINT32_T*) PyBytes_AS_STRING(v);
-            Py_ssize_t morebytes = 4 * (moreunits - 1);
-            if (PyBytes_GET_SIZE(v) > PY_SSIZE_T_MAX - morebytes) {
+            if (moreunits >= (PY_SSIZE_T_MAX - PyBytes_GET_SIZE(v)) / 4) {
                 /* integer overflow */
                 PyErr_NoMemory();
                 goto error;
             }
-            if (_PyBytes_Resize(&v, PyBytes_GET_SIZE(v) + morebytes) < 0)
+            if (_PyBytes_Resize(&v, PyBytes_GET_SIZE(v) + 4 * (moreunits - 1)) < 0)
                 goto error;
             out = (PY_UINT32_T*) PyBytes_AS_STRING(v) + outpos;
         }
@@ -5506,13 +5551,12 @@ _PyUnicode_EncodeUTF16(PyObject *str,
         /* two bytes are reserved for each surrogate */
         if (moreunits > 1) {
             Py_ssize_t outpos = out - (unsigned short*) PyBytes_AS_STRING(v);
-            Py_ssize_t morebytes = 2 * (moreunits - 1);
-            if (PyBytes_GET_SIZE(v) > PY_SSIZE_T_MAX - morebytes) {
+            if (moreunits >= (PY_SSIZE_T_MAX - PyBytes_GET_SIZE(v)) / 2) {
                 /* integer overflow */
                 PyErr_NoMemory();
                 goto error;
             }
-            if (_PyBytes_Resize(&v, PyBytes_GET_SIZE(v) + morebytes) < 0)
+            if (_PyBytes_Resize(&v, PyBytes_GET_SIZE(v) + 2 * (moreunits - 1)) < 0)
                 goto error;
             out = (unsigned short*) PyBytes_AS_STRING(v) + outpos;
         }
@@ -6204,6 +6248,10 @@ _PyUnicode_DecodeUnicodeInternal(const char *s,
                      1))
         return NULL;
 
+    if (size < 0) {
+        PyErr_BadInternalCall();
+        return NULL;
+    }
     if (size == 0)
         _Py_RETURN_UNICODE_EMPTY();
 
@@ -7004,6 +7052,10 @@ decode_code_page_stateful(int code_page,
 
     if (code_page < 0) {
         PyErr_SetString(PyExc_ValueError, "invalid code page number");
+        return NULL;
+    }
+    if (size < 0) {
+        PyErr_BadInternalCall();
         return NULL;
     }
 
@@ -9752,7 +9804,7 @@ PyUnicode_Join(PyObject *separator, PyObject *seq)
     use_memcpy = 1;
 #endif
     for (i = 0; i < seqlen; i++) {
-        const Py_ssize_t old_sz = sz;
+        size_t add_sz;
         item = items[i];
         if (!PyUnicode_Check(item)) {
             PyErr_Format(PyExc_TypeError,
@@ -9763,16 +9815,18 @@ PyUnicode_Join(PyObject *separator, PyObject *seq)
         }
         if (PyUnicode_READY(item) == -1)
             goto onError;
-        sz += PyUnicode_GET_LENGTH(item);
+        add_sz = PyUnicode_GET_LENGTH(item);
         item_maxchar = PyUnicode_MAX_CHAR_VALUE(item);
         maxchar = Py_MAX(maxchar, item_maxchar);
-        if (i != 0)
-            sz += seplen;
-        if (sz < old_sz || sz > PY_SSIZE_T_MAX) {
+        if (i != 0) {
+            add_sz += seplen;
+        }
+        if (add_sz > (size_t)(PY_SSIZE_T_MAX - sz)) {
             PyErr_SetString(PyExc_OverflowError,
                             "join() result is too long for a Python string");
             goto onError;
         }
+        sz += add_sz;
         if (use_memcpy && last_obj != NULL) {
             if (PyUnicode_KIND(last_obj) != PyUnicode_KIND(item))
                 use_memcpy = 0;
@@ -10418,7 +10472,7 @@ replace(PyObject *self, PyObject *str1,
             u = unicode_empty;
             goto done;
         }
-        if (new_size > (PY_SSIZE_T_MAX >> (rkind-1))) {
+        if (new_size > (PY_SSIZE_T_MAX / rkind)) {
             PyErr_SetString(PyExc_OverflowError,
                             "replace string is too long");
             goto error;
@@ -13802,10 +13856,11 @@ unicode_subscript(PyObject* self, PyObject* item)
         int src_kind, dest_kind;
         Py_UCS4 ch, max_char, kind_limit;
 
-        if (PySlice_GetIndicesEx(item, PyUnicode_GET_LENGTH(self),
-                                 &start, &stop, &step, &slicelength) < 0) {
+        if (PySlice_Unpack(item, &start, &stop, &step) < 0) {
             return NULL;
         }
+        slicelength = PySlice_AdjustIndices(PyUnicode_GET_LENGTH(self),
+                                            &start, &stop, step);
 
         if (slicelength <= 0) {
             _Py_RETURN_UNICODE_EMPTY();
