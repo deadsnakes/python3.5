@@ -477,7 +477,7 @@ class NewIMAPTests(NewIMAPTestsMixin, unittest.TestCase):
 
 @unittest.skipUnless(ssl, "SSL not available")
 class NewIMAPSSLTests(NewIMAPTestsMixin, unittest.TestCase):
-    imap_class = imaplib.IMAP4_SSL
+    imap_class = IMAP4_SSL
     server_class = SecureTCPServer
 
     def test_ssl_raises(self):
@@ -915,17 +915,6 @@ class RemoteIMAP_SSLTest(RemoteIMAPTest):
     def test_logincapa(self):
         with transient_internet(self.host):
             _server = self.imap_class(self.host, self.port)
-            self.check_logincapa(_server)
-
-    def test_logincapa_with_client_certfile(self):
-        with transient_internet(self.host):
-            _server = self.imap_class(self.host, self.port, certfile=CERTFILE)
-            self.check_logincapa(_server)
-
-    def test_logincapa_with_client_ssl_context(self):
-        with transient_internet(self.host):
-            _server = self.imap_class(
-                self.host, self.port, ssl_context=self.create_ssl_context())
             self.check_logincapa(_server)
 
     def test_logout(self):

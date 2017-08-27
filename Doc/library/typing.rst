@@ -299,7 +299,7 @@ comparable for equality.
 
 
 The :data:`Any` type
----------------------
+--------------------
 
 A special kind of type is :data:`Any`. A static type checker will treat
 every type as being compatible with :data:`Any` and :data:`Any` as being
@@ -557,6 +557,12 @@ The module defines the following classes, functions and decorators:
    As a shorthand for this type, :class:`bytes` can be used to
    annotate arguments of any of the types mentioned above.
 
+.. class:: Deque(deque, MutableSequence[T])
+
+   A generic version of :class:`collections.deque`.
+
+   .. versionadded:: 3.5.4
+
 .. class:: List(list, MutableSequence[T])
 
    Generic version of :class:`list`.
@@ -621,7 +627,7 @@ The module defines the following classes, functions and decorators:
 
 .. class:: AsyncIterator(AsyncIterable[T_co])
 
-  A generic version of :class:`collections.abc.AsyncIterator`.
+   A generic version of :class:`collections.abc.AsyncIterator`.
 
 .. class:: Dict(dict, MutableMapping[KT, VT])
 
@@ -665,6 +671,39 @@ The module defines the following classes, functions and decorators:
           while True:
               yield start
               start += 1
+
+.. class:: AsyncGenerator(AsyncIterator[T_co], Generic[T_co, T_contra])
+
+   An async generator can be annotated by the generic type
+   ``AsyncGenerator[YieldType, SendType]``. For example::
+
+      async def echo_round() -> AsyncGenerator[int, float]:
+          sent = yield 0
+          while sent >= 0.0:
+              rounded = await round(sent)
+              sent = yield rounded
+
+   Unlike normal generators, async generators cannot return a value, so there
+   is no ``ReturnType`` type parameter. As with :class:`Generator`, the
+   ``SendType`` behaves contravariantly.
+
+   If your generator will only yield values, set the ``SendType`` to
+   ``None``::
+
+      async def infinite_stream(start: int) -> AsyncGenerator[int, None]:
+          while True:
+              yield start
+              start = await increment(start)
+
+   Alternatively, annotate your generator as having a return type of
+   either ``AsyncIterable[YieldType]`` or ``AsyncIterator[YieldType]``::
+
+      async def infinite_stream(start: int) -> AsyncIterator[int]:
+          while True:
+              yield start
+              start = await increment(start)
+
+   .. versionadded:: 3.5.4
 
 .. class:: Text
 
@@ -822,7 +861,7 @@ The module defines the following classes, functions and decorators:
 
        Union[int, str] == Union[str, int]
 
-   * When a class and its subclass are present, the former is skipped, e.g.::
+   * When a class and its subclass are present, the latter is skipped, e.g.::
 
        Union[int, object] == object
 
@@ -924,5 +963,10 @@ The module defines the following classes, functions and decorators:
       if TYPE_CHECKING:
           import expensive_mod
 
-      def fun():
-          local_var: expensive_mod.some_type = other_fun()
+      def fun(arg: 'expensive_mod.SomeType') -> None:
+          local_var: expensive_mod.AnotherType = other_fun()
+
+   Note that the first type annotation must be enclosed in quotes, making it a
+   "forward reference", to hide the ``expensive_mod`` reference from the
+   interpreter runtime.  Type annotations for local variables are not
+   evaluated, so the second annotation does not need to be enclosed in quotes.

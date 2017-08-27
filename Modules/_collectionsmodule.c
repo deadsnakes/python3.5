@@ -913,8 +913,8 @@ deque_index(dequeobject *deque, PyObject *args)
     size_t start_state = deque->state;
 
     if (!PyArg_ParseTuple(args, "O|O&O&:index", &v,
-                                _PyEval_SliceIndex, &start,
-                                _PyEval_SliceIndex, &stop))
+                                _PyEval_SliceIndexNotNone, &start,
+                                _PyEval_SliceIndexNotNone, &stop))
         return NULL;
     if (start < 0) {
         start += Py_SIZE(deque);
@@ -2169,7 +2169,7 @@ static PyTypeObject defdict_type = {
 PyDoc_STRVAR(_count_elements_doc,
 "_count_elements(mapping, iterable) -> None\n\
 \n\
-Count elements in the iterable, updating the mappping");
+Count elements in the iterable, updating the mapping");
 
 static PyObject *
 _count_elements(PyObject *self, PyObject *args)

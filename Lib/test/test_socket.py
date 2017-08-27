@@ -876,6 +876,7 @@ class GeneralModuleTests(unittest.TestCase):
             self.assertEqual(swapped & mask, mask)
             self.assertRaises(OverflowError, func, 1<<34)
 
+    @support.cpython_only
     def testNtoHErrors(self):
         good_values = [ 1, 2, 3, 1, 2, 3 ]
         bad_values = [ -1, -2, -3, -1, -2, -3 ]
@@ -2843,6 +2844,7 @@ class SCMRightsTest(SendrecvmsgServerTimeoutBase):
             nbytes = self.sendmsgToServer([msg])
         self.assertEqual(nbytes, len(msg))
 
+    @unittest.skipIf(sys.platform == "darwin", "skipping, see issue #24725")
     def testFDPassEmpty(self):
         # Try to pass an empty FD array.  Can receive either no array
         # or an empty array.
@@ -4588,6 +4590,10 @@ class TestUnixDomain(unittest.TestCase):
             else:
                 raise
 
+    def testUnbound(self):
+        # Issue #30205
+        self.assertIn(self.sock.getsockname(), (None, ''))
+
     def testStrAddr(self):
         # Test binding to and retrieving a normal string pathname.
         path = os.path.abspath(support.TESTFN)
@@ -4719,14 +4725,10 @@ def isTipcAvailable():
         return False
     try:
         f = open("/proc/modules")
-    except IOError as e:
+    except (FileNotFoundError, IsADirectoryError, PermissionError):
         # It's ok if the file does not exist, is a directory or if we
-        # have not the permission to read it. In any other case it's a
-        # real error, so raise it again.
-        if e.errno in (errno.ENOENT, errno.EISDIR, errno.EACCES):
-            return False
-        else:
-            raise
+        # have not the permission to read it.
+        return False
     with f:
         for line in f:
             if line.startswith("tipc "):
