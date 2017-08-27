@@ -10,10 +10,10 @@ the cmath module build.
  2 files changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index c3bbe61..31da9cd 100644
+index 01ba6e8..466dd26 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
-@@ -590,15 +590,11 @@ pybuilddir.txt: $(BUILDPYTHON)
+@@ -559,15 +559,11 @@ pybuilddir.txt: $(BUILDPYTHON)
  		exit 1 ; \
  	fi
  

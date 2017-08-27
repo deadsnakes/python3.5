@@ -8,7 +8,7 @@ Subject: makesetup-bashism
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Modules/makesetup b/Modules/makesetup
-index e204a05..8d92a05 100755
+index 8db8de8..6d6ef38 100755
 --- a/Modules/makesetup
 +++ b/Modules/makesetup
 @@ -279,7 +279,7 @@ sed -e 's/[ 	]*#.*//' -e '/^[ 	]*$/d' |

@@ -9,7 +9,7 @@ Subject: platform-lsbrelease
  2 files changed, 24 insertions(+), 23 deletions(-)
 
 diff --git a/Lib/platform.py b/Lib/platform.py
-index 3e726a7..27cdf74 100755
+index d3ed5bf..26f04b6 100755
 --- a/Lib/platform.py
 +++ b/Lib/platform.py
 @@ -268,7 +268,7 @@ _release_version = re.compile(r'([^0-9]+)'
@@ -59,7 +59,7 @@ index 3e726a7..27cdf74 100755
          etc = os.listdir(_UNIXCONFDIR)
      except OSError:
 diff --git a/Lib/test/test_platform.py b/Lib/test/test_platform.py
-index 18de110..3d89e39 100644
+index e16b9fa..49fe665 100644
 --- a/Lib/test/test_platform.py
 +++ b/Lib/test/test_platform.py
 @@ -327,28 +327,6 @@ class PlatformTest(unittest.TestCase):

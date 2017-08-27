@@ -10,10 +10,10 @@ Subject: hurd-disable-nonworking-constants
  2 files changed, 4 insertions(+)
 
 diff --git a/Modules/posixmodule.c b/Modules/posixmodule.c
-index 3e446a5..73bce15 100644
+index d42416b..38c04e4 100644
 --- a/Modules/posixmodule.c
 +++ b/Modules/posixmodule.c
-@@ -12511,12 +12511,14 @@ all_ins(PyObject *m)
+@@ -12559,12 +12559,14 @@ all_ins(PyObject *m)
  #ifdef O_LARGEFILE
      if (PyModule_AddIntMacro(m, O_LARGEFILE)) return -1;
  #endif
@@ -29,7 +29,7 @@ index 3e446a5..73bce15 100644
      if (PyModule_AddIntMacro(m, O_EXEC)) return -1;
  #endif
 diff --git a/Modules/socketmodule.c b/Modules/socketmodule.c
-index af6cc94..e17f5e4 100644
+index 47abe8d..8b8d76b 100644
 --- a/Modules/socketmodule.c
 +++ b/Modules/socketmodule.c
 @@ -6485,9 +6485,11 @@ PyInit__socket(void)

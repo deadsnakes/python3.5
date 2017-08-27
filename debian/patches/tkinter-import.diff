@@ -8,7 +8,7 @@ Subject: tkinter-import
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/tkinter/__init__.py b/Lib/tkinter/__init__.py
-index 1eaab44..d2e115c 100644
+index 5eeefbb..bfb13fb 100644
 --- a/Lib/tkinter/__init__.py
 +++ b/Lib/tkinter/__init__.py
 @@ -32,7 +32,10 @@ tk.mainloop()

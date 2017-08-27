@@ -154,10 +154,10 @@ index c2a7d64..06010f8 100644
          self.outputs = [self.target]
  
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 573724d..e8e7a16 100644
+index bd19ebf..c488093 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
-@@ -125,6 +125,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -122,6 +122,7 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
      If 'prefix' is supplied, use it instead of sys.base_prefix or
      sys.base_exec_prefix -- i.e., ignore 'plat_specific'.
      """
@@ -165,7 +165,7 @@ index 573724d..e8e7a16 100644
      if prefix is None:
          if standard_lib:
              prefix = plat_specific and BASE_EXEC_PREFIX or BASE_PREFIX
-@@ -136,6 +137,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
+@@ -133,6 +134,12 @@ def get_python_lib(plat_specific=0, standard_lib=0, prefix=None):
                                   "lib", "python" + get_python_version())
          if standard_lib:
              return libpython
@@ -214,10 +214,10 @@ index 9313330..b74d7ae 100644
  
      def test_debug_mode(self):
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 2362845..b8e2edc 100755
+index 5d41bee..349d9d3 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
-@@ -405,6 +405,7 @@ class Doc:
+@@ -410,6 +410,7 @@ class Doc:
                                   'marshal', 'posix', 'signal', 'sys',
                                   '_thread', 'zipimport') or
               (file.startswith(basedir) and
@@ -244,10 +244,10 @@ index 4113ca8..44a6123 100644
  
  def getsitepackages(prefixes=None):
 diff --git a/Lib/test/test_site.py b/Lib/test/test_site.py
-index da20a3d..f8eeefa 100644
+index 755eb9c..2315832 100644
 --- a/Lib/test/test_site.py
 +++ b/Lib/test/test_site.py
-@@ -248,9 +248,10 @@ class HelperFunctionsTests(unittest.TestCase):
+@@ -261,9 +261,10 @@ class HelperFunctionsTests(unittest.TestCase):
              self.assertEqual(dirs[1], wanted)
          elif os.sep == '/':
              # OS X non-framwework builds, Linux, FreeBSD, etc

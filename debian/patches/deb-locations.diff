@@ -9,7 +9,7 @@ Subject: deb-locations
  2 files changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/Lib/pydoc.py b/Lib/pydoc.py
-index 0d0d0ab..2362845 100755
+index 729efba..5d41bee 100755
 --- a/Lib/pydoc.py
 +++ b/Lib/pydoc.py
 @@ -28,6 +28,10 @@ to a file named "<name>.html".

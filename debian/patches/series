@@ -35,5 +35,4 @@ deadsnakes-assert-use-system-ffi.diff
 distutils-packaging-link.diff
 turtledemo-add-shebang.diff
 deadsnakes-ignore-sphinx-version.diff
-deadsnakes-pyspecific-3.4.2.diff
 deadsnakes-revert-issue24421

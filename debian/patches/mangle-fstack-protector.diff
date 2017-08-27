@@ -9,7 +9,7 @@ Subject: mangle-fstack-protector
  1 file changed, 5 insertions(+)
 
 diff --git a/Lib/distutils/sysconfig.py b/Lib/distutils/sysconfig.py
-index 707f4f6..f238384 100644
+index 6eedb3d..fc2787a 100644
 --- a/Lib/distutils/sysconfig.py
 +++ b/Lib/distutils/sysconfig.py
 @@ -13,6 +13,7 @@ import _imp
@@ -20,7 +20,7 @@ index 707f4f6..f238384 100644
  
  from .errors import DistutilsPlatformError
  
-@@ -200,6 +201,10 @@ def customize_compiler(compiler):
+@@ -197,6 +198,10 @@ def customize_compiler(compiler):
              cc = newcc
          if 'CXX' in os.environ:
              cxx = os.environ['CXX']
