@@ -748,11 +748,13 @@
  PySet_Size@Base @VER@
  PySet_Type@Base @VER@
  PySignal_SetWakeupFd@Base @VER@
+ PySlice_AdjustIndices@Base 3.5.4
  PySlice_Fini@Base @VER@
  PySlice_GetIndices@Base @VER@
  PySlice_GetIndicesEx@Base @VER@
  PySlice_New@Base @VER@
  PySlice_Type@Base @VER@
+ PySlice_Unpack@Base 3.5.4
  PyState_AddModule@Base @VER@
  PyState_FindModule@Base @VER@
  PyState_RemoveModule@Base @VER@
@@ -1119,6 +1121,7 @@
  _PyDict_NewPresized@Base @VER@
  _PyDict_Next@Base @VER@
  _PyDict_Pop@Base @VER@
+ _PyDict_Pop_KnownHash@Base 3.5.4
  _PyDict_SizeOf@Base @VER@
  _PyDict_SetItemId@Base @VER@
  _PyDict_SetItem_KnownHash@Base @VER@
@@ -1134,6 +1137,7 @@
  _PyEval_SetSwitchInterval@Base @VER@
  _PyEval_SignalAsyncExc@Base @VER@
  _PyEval_SliceIndex@Base @VER@
+ _PyEval_SliceIndexNotNone@Base 3.5.4
  _PyExc_Fini@Base @VER@
  _PyExc_Init@Base @VER@
  _PyFaulthandler_Fini@Base @VER@
@@ -1368,6 +1372,8 @@
  _PyUnicode_AsKind@Base @VER@
  _PyUnicode_AsLatin1String@Base @VER@
  _PyUnicode_AsUTF8String@Base @VER@
+ _PyUnicode_AsUnicode@Base 3.5.4
+ _PyUnicode_AsWideCharString@Base 3.5.4
  _PyUnicode_BidirectionalNames@Base @VER@
  _PyUnicode_CategoryNames@Base @VER@
  _PyUnicode_ClearStaticStrings@Base @VER@
@@ -1436,6 +1442,8 @@
  _Py_Attribute@Base @VER@
  _Py_AugAssign@Base @VER@
  _Py_Await@Base @VER@
+ _Py_BACKCOMPAT_HALF_MAGIC@Base 3.5.4
+ _Py_BACKCOMPAT_MAGIC_NUMBER@Base 3.5.4
  _Py_BinOp@Base @VER@
  _Py_BoolOp@Base @VER@
  _Py_Break@Base @VER@
@@ -1582,6 +1590,9 @@
  (arch=amd64 i386 lpia)_Py_get_387controlword@Base @VER@
  _Py_get_blocking@Base @VER@
  _Py_get_inheritable@Base @VER@
+ _Py_gitidentifier@Base 3.5.4
+ _Py_gitversion@Base 3.5.4
+ _Py_get_inheritable@Base @VER@
  _Py_hashtable_clear@Base @VER@
  _Py_hashtable_compare_direct@Base @VER@
  _Py_hashtable_copy@Base @VER@
@@ -1597,8 +1608,6 @@
  _Py_hashtable_pop@Base @VER@
  _Py_hashtable_set@Base @VER@
  _Py_hashtable_size@Base @VER@
- _Py_hgidentifier@Base @VER@
- _Py_hgversion@Base @VER@
  _Py_isalnum__doc__@Base @VER@
  _Py_isalpha__doc__@Base @VER@
  _Py_isdigit__doc__@Base @VER@
