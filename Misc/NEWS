@@ -2,6 +2,65 @@
 Python News
 +++++++++++
 
+What's New in Python 3.5.5 final?
+=================================
+
+*Release date: 2018-02-04*
+
+There were no new changes in version 3.5.5.
+
+
+
+What's New in Python 3.5.5 release candidate 1?
+===============================================
+
+*Release date: 2018-01-23*
+
+Security
+--------
+
+- bpo-32551: The ``sys.path[0]`` initialization change for bpo-29139 caused
+  a regression by revealing an inconsistency in how sys.path is initialized
+  when executing ``__main__`` from a zipfile, directory, or other import
+  location. This is considered a potential security issue, as it may lead to
+  privileged processes unexpectedly loading code from user controlled
+  directories in situations where that was not previously the case.
+
+  The interpreter now consistently avoids ever adding the import location's
+  parent directory to ``sys.path``, and ensures no other ``sys.path``
+  entries are inadvertently modified when inserting the import location
+  named on the command line. (Originally reported as bpo-29723 against
+  Python 3.6rc1, but it was missed at the time that the then upcoming Python
+  3.5.4 release would also be affected)
+
+- bpo-30657: Fixed possible integer overflow in PyBytes_DecodeEscape,
+  CVE-2017-1000158. Original patch by Jay Bosamiya; rebased to Python 3 by
+  Miro Hrončok.
+
+- bpo-30947: Upgrade libexpat embedded copy from version 2.2.1 to 2.2.3 to
+  get security fixes.
+
+Core and Builtins
+-----------------
+
+- bpo-31095: Fix potential crash during GC caused by ``tp_dealloc`` which
+  doesn't call ``PyObject_GC_UnTrack()``.
+
+Library
+-------
+
+- bpo-32072: Fixed issues with binary plists:
+
+  * Fixed saving bytearrays.
+  * Identical objects will be saved only once.
+  * Equal references will be load as identical objects.
+  * Added support for saving and loading recursive data structures.
+
+- bpo-31170: expat: Update libexpat from 2.2.3 to 2.2.4. Fix copying of
+  partial characters for UTF-8 input (libexpat bug 115):
+  https://github.com/libexpat/libexpat/issues/115
+
+
 What's New in Python 3.5.4 final?
 =================================
 
