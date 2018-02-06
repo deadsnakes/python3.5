@@ -60,7 +60,7 @@ index 9c34be0..771c2be 100644
          srcdir = _CONFIG_VARS.get('srcdir', _PROJECT_BASE)
          if os.name == 'posix':
 diff --git a/Makefile.pre.in b/Makefile.pre.in
-index 5b0f627..452fcdf 100644
+index 1555346..6b40583 100644
 --- a/Makefile.pre.in
 +++ b/Makefile.pre.in
 @@ -749,6 +749,7 @@ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posix
@@ -79,7 +79,7 @@ index 5b0f627..452fcdf 100644
  		-o $@ $(srcdir)/Python/sysmodule.c
  
  $(IO_OBJS): $(IO_H)
-@@ -1326,6 +1328,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
+@@ -1327,6 +1329,10 @@ libinstall:	build_all $(srcdir)/Lib/$(PLATDIR) $(srcdir)/Modules/xxmodule.c
  $(srcdir)/Lib/$(PLATDIR):
  	mkdir $(srcdir)/Lib/$(PLATDIR)
  	cp $(srcdir)/Lib/plat-generic/regen $(srcdir)/Lib/$(PLATDIR)/regen
@@ -90,7 +90,7 @@ index 5b0f627..452fcdf 100644
  	export PATH; PATH="`pwd`:$$PATH"; \
  	export PYTHONPATH; PYTHONPATH="`pwd`/Lib"; \
  	export DYLD_FRAMEWORK_PATH; DYLD_FRAMEWORK_PATH="`pwd`"; \
-@@ -1376,7 +1382,7 @@ inclinstall:
+@@ -1377,7 +1383,7 @@ inclinstall:
  LIBPL=		@LIBPL@
  
  # pkgconfig directory

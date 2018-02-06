@@ -7,7 +7,7 @@ Subject: deadsnakes-ignore-sphinx-version
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Doc/conf.py b/Doc/conf.py
-index b3f26d5..3da8bba 100644
+index 4145fd5..4331e18 100644
 --- a/Doc/conf.py
 +++ b/Doc/conf.py
 @@ -34,7 +34,7 @@ today_fmt = '%B %d, %Y'
@@ -18,4 +18,4 @@ index b3f26d5..3da8bba 100644
 +#needs_sphinx = '1.2'
  
  # Ignore any .rst files in the venv/ directory.
- exclude_patterns = ['venv/*']
+ venvdir = os.getenv('VENVDIR', 'venv')
