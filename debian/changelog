@@ -1,3 +1,9 @@
+python3.5 (3.5.6-1+trusty1) trusty; urgency=medium
+
+  * Python 3.5.6 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Fri, 03 Aug 2018 17:54:43 -0700
+
 python3.5 (3.5.5-1+trusty1) trusty; urgency=medium
 
   * Python 3.5.5 release.
