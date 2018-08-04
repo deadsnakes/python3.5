@@ -2,6 +2,37 @@
 Python News
 +++++++++++
 
+What's New in Python 3.5.6 final?
+=================================
+
+*Release date: 2018-08-02*
+
+There were no changes between 3.5.6rc1 and 3.5.6 final.
+
+
+
+What's New in Python 3.5.6 release candidate 1?
+===============================================
+
+*Release date: 2018-07-19*
+
+Security
+--------
+
+- bpo-33001: Minimal fix to prevent buffer overrun in os.symlink on Windows
+
+- bpo-32981: Regexes in difflib and poplib were vulnerable to catastrophic
+  backtracking. These regexes formed potential DOS vectors (REDOS). They
+  have been refactored. This resolves CVE-2018-1060 and CVE-2018-1061. Patch
+  by Jamie Davis.
+
+Documentation
+-------------
+
+- bpo-33216: Clarify the documentation for CALL_FUNCTION_VAR,
+  CALL_FUNCTION_KW, and CALL_FUNCTION_VAR_KW.
+
+
 What's New in Python 3.5.5 final?
 =================================
 
@@ -117,8 +148,8 @@ Core and Builtins
   mutated during searching, inserting or comparing.  Based on patches by
   Duane Griffin and Tim Mitchell.
 
-- bpo-25794: Fixed type.__setattr__() and type.__delattr__() for non-
-  interned attribute names.  Based on patch by Eryk Sun.
+- bpo-25794: Fixed type.__setattr__() and type.__delattr__() for
+  non-interned attribute names.  Based on patch by Eryk Sun.
 
 - bpo-29935: Fixed error messages in the index() method of tuple, list and
   deque when pass indices of wrong type.
@@ -200,8 +231,9 @@ Library
 - bpo-23890: unittest.TestCase.assertRaises() now manually breaks a
   reference cycle to not keep objects alive longer than expected.
 
-- bpo-30149: inspect.signature() now supports callables with variable-
-  argument parameters wrapped with partialmethod. Patch by Dong-hee Na.
+- bpo-30149: inspect.signature() now supports callables with
+  variable-argument parameters wrapped with partialmethod. Patch by Dong-hee
+  Na.
 
 - bpo-29931: Fixed comparison check for ipaddress.ip_interface objects.
   Patch by Sanjay Sundaresan.
@@ -1466,8 +1498,8 @@ Library
   Xiang Zhang.
 
 - bpo-26804: urllib.request will prefer lower_case proxy environment
-  variables over UPPER_CASE or Mixed_Case ones. Patch contributed by Hans-
-  Peter Jansen.
+  variables over UPPER_CASE or Mixed_Case ones. Patch contributed by
+  Hans-Peter Jansen.
 
 - bpo-26837: assertSequenceEqual() now correctly outputs non-stringified
   differing items (like bytes in the -b mode).  This affects
@@ -1630,8 +1662,8 @@ Library
 
 - bpo-25911: Restored support of bytes paths in os.walk() on Windows.
 
-- bpo-26045: Add UTF-8 suggestion to error message when posting a non-
-  Latin-1 string with http.client.
+- bpo-26045: Add UTF-8 suggestion to error message when posting a
+  non-Latin-1 string with http.client.
 
 - bpo-12923: Reset FancyURLopener's redirect counter even if there is an
   exception. Based on patches by Brian Brazil and Daniel Rocco.
@@ -1641,8 +1673,8 @@ Library
   and "keywords" attributes of functools.partial have now always types tuple
   and dict correspondingly.
 
-- bpo-26202: copy.deepcopy() now correctly copies range() objects with non-
-  atomic attributes.
+- bpo-26202: copy.deepcopy() now correctly copies range() objects with
+  non-atomic attributes.
 
 - bpo-23076: Path.glob() now raises a ValueError if it's called with an
   invalid pattern. Patch by Thomas Nyberg.
@@ -1948,9 +1980,9 @@ Tools/Demos
 -----------
 
 - bpo-26799: Fix python-gdb.py: don't get C types once when the Python code
-  is loaded, but get C types on demand. The C types can change if python-
-  gdb.py is loaded before the Python executable. Patch written by Thomas
-  Ilsche.
+  is loaded, but get C types on demand. The C types can change if
+  python-gdb.py is loaded before the Python executable. Patch written by
+  Thomas Ilsche.
 
 - bpo-26271: Fix the Freeze tool to properly use flags passed through
   configure. Patch by Daniel Shaulov.
@@ -2629,10 +2661,11 @@ IDLE
 - bpo-23672: Allow Idle to edit and run files with astral chars in name.
   Patch by Mohd Sanad Zaki Rizvi.
 
-- bpo-24745: Idle editor default font. Switch from Courier to platform-
-  sensitive TkFixedFont.  This should not affect current customized font
-  selections.  If there is a problem, edit $HOME/.idlerc/config-main.cfg and
-  remove 'fontxxx' entries from [Editor Window].  Patch by Mark Roseman.
+- bpo-24745: Idle editor default font. Switch from Courier to
+  platform-sensitive TkFixedFont.  This should not affect current customized
+  font selections.  If there is a problem, edit
+  $HOME/.idlerc/config-main.cfg and remove 'fontxxx' entries from [Editor
+  Window].  Patch by Mark Roseman.
 
 - bpo-21192: Idle editor. When a file is run, put its name in the restart
   bar. Do not print false prompts. Original patch by Adnan Umer.
@@ -2658,8 +2691,8 @@ Tests
 -----
 
 - bpo-24751: When running regrtest with the ``-w`` command line option, a
-  test run is no longer marked as a failure if all tests succeed when re-
-  run.
+  test run is no longer marked as a failure if all tests succeed when
+  re-run.
 
 
 What's New in Python 3.5.0 beta 4?
@@ -3381,8 +3414,8 @@ Tests
 Tools/Demos
 -----------
 
-- bpo-18128: pygettext now uses standard +NNNN format in the POT-Creation-
-  Date header.
+- bpo-18128: pygettext now uses standard +NNNN format in the
+  POT-Creation-Date header.
 
 - bpo-23935: Argument Clinic's understanding of format units accepting
   bytes, bytearrays, and buffers is now consistent with both the
@@ -3425,8 +3458,8 @@ Core and Builtins
 
 - bpo-23681: The -b option now affects comparisons of bytes with int.
 
-- bpo-23632: Memoryviews now allow tuple indexing (including for multi-
-  dimensional memoryviews).
+- bpo-23632: Memoryviews now allow tuple indexing (including for
+  multi-dimensional memoryviews).
 
 - bpo-23192: Fixed generator lambdas.  Patch by Bruno Cauet.
 
@@ -3785,8 +3818,8 @@ Core and Builtins
 - bpo-20335: bytes constructor now raises TypeError when encoding or errors
   is specified with non-string argument.  Based on patch by Renaud Blanch.
 
-- bpo-22834: If the current working directory ends up being set to a non-
-  existent directory then import will no longer raise FileNotFoundError.
+- bpo-22834: If the current working directory ends up being set to a
+  non-existent directory then import will no longer raise FileNotFoundError.
 
 - bpo-22869: Move the interpreter startup & shutdown code to a new dedicated
   pylifecycle.c module
@@ -4003,8 +4036,8 @@ Library
   state is now always restored or swapped, not only if why is WHY_YIELD or
   WHY_RETURN. Patch co-written with Antoine Pitrou.
 
-- bpo-14099: Restored support of writing ZIP files to tellable but non-
-  seekable streams.
+- bpo-14099: Restored support of writing ZIP files to tellable but
+  non-seekable streams.
 
 - bpo-14099: Writing to ZipFile and reading multiple ZipExtFiles is
   threadsafe now.
@@ -4256,9 +4289,9 @@ Library
 - bpo-18216: gettext now raises an error when a .mo file has an unsupported
   major version number.  Patch by Aaron Hill.
 
-- bpo-13918: Provide a locale.delocalize() function which can remove locale-
-  specific number formatting from a string representing a number, without
-  then converting it to a specific type.  Patch by Cédric Krier.
+- bpo-13918: Provide a locale.delocalize() function which can remove
+  locale-specific number formatting from a string representing a number,
+  without then converting it to a specific type.  Patch by Cédric Krier.
 
 - bpo-22676: Make the pickling of global objects which don't have a
   __module__ attribute less slow.
@@ -4276,9 +4309,9 @@ Library
   without executing the test suite. The new `errors` attribute on TestLoader
   exposes these non-fatal errors encountered during discovery.
 
-- bpo-21991: Make email.headerregistry's header 'params' attributes be read-
-  only (MappingProxyType).  Previously the dictionary was modifiable but a
-  new one was created on each access of the attribute.
+- bpo-21991: Make email.headerregistry's header 'params' attributes be
+  read-only (MappingProxyType).  Previously the dictionary was modifiable
+  but a new one was created on each access of the attribute.
 
 - bpo-22638: SSLv3 is now disabled throughout the standard library. It can
   still be enabled by instantiating a SSLContext manually.
@@ -5119,8 +5152,9 @@ Library
   wording by David Gutteridge)
 
 - bpo-21117: Fix inspect.signature to better support functools.partial. Due
-  to the specifics of functools.partial implementation, positional-or-
-  keyword arguments passed as keyword arguments become keyword-only.
+  to the specifics of functools.partial implementation,
+  positional-or-keyword arguments passed as keyword arguments become
+  keyword-only.
 
 - bpo-20334: inspect.Signature and inspect.Parameter are now hashable.
   Thanks to Antony Lee for bug reports and suggestions.
@@ -5233,8 +5267,8 @@ IDLE
 - bpo-21284: Paragraph reformat test passes after user changes reformat
   width.
 
-- bpo-17654: Ensure IDLE menus are customized properly on OS X for non-
-  framework builds and for all variants of Tk.
+- bpo-17654: Ensure IDLE menus are customized properly on OS X for
+  non-framework builds and for all variants of Tk.
 
 - bpo-23180: Rename IDLE "Windows" menu item to "Window". Patch by Al
   Sweigart.
@@ -5251,8 +5285,8 @@ Build
 - bpo-22592: Drop support of the Borland C compiler to build Python. The
   distutils module still supports it to build extensions.
 
-- bpo-22591: Drop support of MS-DOS, especially of the DJGPP compiler (MS-
-  DOS port of GCC).
+- bpo-22591: Drop support of MS-DOS, especially of the DJGPP compiler
+  (MS-DOS port of GCC).
 
 - bpo-16537: Check whether self.extensions is empty in setup.py. Patch by
   Jonathan Hosmer.
@@ -5845,8 +5879,8 @@ Library
   use it) doesn't crash with unexpected AttributeError on classes defined in
   C without __module__.
 
-- bpo-20356: inspect.signature formatting uses '/' to separate positional-
-  only parameters from others.
+- bpo-20356: inspect.signature formatting uses '/' to separate
+  positional-only parameters from others.
 
 - bpo-20223: inspect.signature now supports methods defined with
   functools.partialmethods.
@@ -6217,9 +6251,9 @@ Core and Builtins
 - bpo-19969: PyBytes_FromFormatV() now raises an OverflowError if "%c"
   argument is not in range [0; 255].
 
-- bpo-19995: %c, %o, %x, and %X now issue a DeprecationWarning on non-
-  integer input; reworded docs to clarify that an integer type should define
-  both __int__ and __index__.
+- bpo-19995: %c, %o, %x, and %X now issue a DeprecationWarning on
+  non-integer input; reworded docs to clarify that an integer type should
+  define both __int__ and __index__.
 
 - bpo-19787: PyThread_set_key_value() now always set the value. In Python
   3.3, the function did nothing if the key already exists (if the current
@@ -6719,8 +6753,8 @@ Library
 
 - bpo-14455: plistlib now supports binary plists and has an updated API.
 
-- bpo-19633: Fixed writing not compressed 16- and 32-bit wave files on big-
-  endian platforms.
+- bpo-19633: Fixed writing not compressed 16- and 32-bit wave files on
+  big-endian platforms.
 
 - bpo-18379: SSLSocket.getpeercert() returns CA issuer AIA fields, OCSP and
   CRL distribution points.
@@ -6861,8 +6895,8 @@ Library
 
 - bpo-19329: Optimized compiling charsets in regular expressions.
 
-- bpo-19227: Try to fix deadlocks caused by re-seeding then OpenSSL pseudo-
-  random number generator on fork().
+- bpo-19227: Try to fix deadlocks caused by re-seeding then OpenSSL
+  pseudo-random number generator on fork().
 
 - bpo-16037: HTTPMessage.readheaders() raises an HTTPException when more
   than 100 headers are read.  Adapted from patch by Jyrki Pulliainen.
@@ -7023,10 +7057,10 @@ Build
 
 - bpo-19553: PEP 453 - "make install" and "make altinstall" now install or
   upgrade pip by default, using the bundled pip provided by the new
-  ensurepip module.  A new configure option, --with-
-  ensurepip[=upgrade|install|no], is available to override the default
-  ensurepip "--upgrade" option.  The option can also be set with "make
-  [alt]install ENSUREPIP=[upgrade|install|no]".
+  ensurepip module.  A new configure option,
+  --with-ensurepip[=upgrade|install|no], is available to override the
+  default ensurepip "--upgrade" option.  The option can also be set with
+  "make [alt]install ENSUREPIP=[upgrade|install|no]".
 
 - bpo-19551: PEP 453 - the OS X installer now installs pip by default.
 
@@ -7417,8 +7451,8 @@ Core and Builtins
 - bpo-11619: The parser and the import machinery do not encode Unicode
   filenames anymore on Windows.
 
-- bpo-18808: Non-daemon threads are now automatically joined when a sub-
-  interpreter is shutdown (it would previously dump a fatal error).
+- bpo-18808: Non-daemon threads are now automatically joined when a
+  sub-interpreter is shutdown (it would previously dump a fatal error).
 
 - Remove support for compiling on systems without getcwd().
 
@@ -7780,8 +7814,8 @@ Core and Builtins
   string of PyUnicode_FromFormat() function, original patch written by Ysj
   Ray.
 
-- bpo-1545463: Global variables caught in reference cycles are now garbage-
-  collected at shutdown.
+- bpo-1545463: Global variables caught in reference cycles are now
+  garbage-collected at shutdown.
 
 - bpo-17094: Clear stale thread states after fork().  Note that this is a
   potentially disruptive change since it may release some system resources
@@ -7891,8 +7925,8 @@ Core and Builtins
 - bpo-10156: In the interpreter's initialization phase, unicode globals are
   now initialized dynamically as needed.
 
-- bpo-16980: Fix processing of escaped non-ascii bytes in the unicode-
-  escape-decode decoder.
+- bpo-16980: Fix processing of escaped non-ascii bytes in the
+  unicode-escape-decode decoder.
 
 - bpo-16975: Fix error handling bug in the escape-decode bytes decoder.
 
@@ -8084,8 +8118,8 @@ Core and Builtins
 - bpo-15801: Make sure mappings passed to '%' formatting are actually
   subscriptable.
 
-- bpo-15111: __import__ should propagate ImportError when raised as a side-
-  effect of a module triggered from using fromlist.
+- bpo-15111: __import__ should propagate ImportError when raised as a
+  side-effect of a module triggered from using fromlist.
 
 - bpo-15022: Add pickle and comparison support to types.SimpleNamespace.
 
@@ -8432,8 +8466,8 @@ Library
 - bpo-11182: remove the unused and undocumented pydoc.Scanner class. Patch
   by Martin Morrison.
 
-- bpo-17741: Add ElementTree.XMLPullParser, an event-driven parser for non-
-  blocking applications.
+- bpo-17741: Add ElementTree.XMLPullParser, an event-driven parser for
+  non-blocking applications.
 
 - bpo-17555: Fix ForkAwareThreadLock so that size of after fork registry
   does not grow exponentially with generation of process.
@@ -8691,8 +8725,8 @@ Library
 - bpo-13153: Tkinter functions now raise TclError instead of ValueError when
   a string argument contains non-BMP character.
 
-- bpo-9669: Protect re against infinite loops on zero-width matching in non-
-  greedy repeat.  Patch by Matthew Barnett.
+- bpo-9669: Protect re against infinite loops on zero-width matching in
+  non-greedy repeat.  Patch by Matthew Barnett.
 
 - bpo-13169: The maximal repetition number in a regular expression has been
   increased from 65534 to 2147483647 (on 32-bit platform) or 4294967294 (on
@@ -8877,8 +8911,8 @@ Library
 - bpo-8109: The ssl module now has support for server-side SNI, thanks to a
   :meth:`SSLContext.set_servername_callback` method.  Patch by Daniel Black.
 
-- bpo-16860: In tempfile, use O_CLOEXEC when available to set the close-on-
-  exec flag atomically.
+- bpo-16860: In tempfile, use O_CLOEXEC when available to set the
+  close-on-exec flag atomically.
 
 - bpo-16674: random.getrandbits() is now 20-40% faster for small integers.
 
@@ -8912,8 +8946,8 @@ Library
 - bpo-10527: make multiprocessing use poll() instead of select() if
   available.
 
-- bpo-16688: Now regexes contained backreferences correctly work with non-
-  ASCII strings. Patch by Matthew Barnett.
+- bpo-16688: Now regexes contained backreferences correctly work with
+  non-ASCII strings. Patch by Matthew Barnett.
 
 - bpo-16486: Make aifc files act as context managers.
 
@@ -9158,8 +9192,8 @@ Library
 
 - bpo-16176: Properly identify Windows 8 via platform.platform()
 
-- bpo-16088: BaseHTTPRequestHandler's send_error method includes a Content-
-  Length header in its response now. Patch by Antoine Pitrou.
+- bpo-16088: BaseHTTPRequestHandler's send_error method includes a
+  Content-Length header in its response now. Patch by Antoine Pitrou.
 
 - bpo-16114: The subprocess module no longer provides a misleading error
   message stating that args[0] did not exist when either the cwd or
@@ -9474,8 +9508,8 @@ Tests
   new server-side SNI support in the ssl module.  Initial patch by Daniel
   Black.
 
-- bpo-17041: Fix testing when Python is configured with the --without-doc-
-  strings.
+- bpo-17041: Fix testing when Python is configured with the
+  --without-doc-strings.
 
 - bpo-16923: Fix ResourceWarnings in test_ssl.
 
