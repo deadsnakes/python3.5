@@ -2,6 +2,61 @@
 Python News
 +++++++++++
 
+What's New in Python 3.5.7 final?
+=================================
+
+*Release date: 2019-03-17*
+
+Security
+--------
+
+- bpo-36216: Changes urlsplit() to raise ValueError when the URL contains
+  characters that decompose under IDNA encoding (NFKC-normalization) into
+  characters that affect how the URL is parsed.
+
+- bpo-35121: Don't send cookies of domain A without Domain attribute to
+  domain B when domain A is a suffix match of domain B while using a
+  cookiejar with :class:`http.cookiejar.DefaultCookiePolicy` policy. Patch
+  by Karthikeyan Singaravelan.
+
+Library
+-------
+
+- bpo-35121: Don't set cookie for a request when the request path is a
+  prefix match of the cookie's path attribute but doesn't end with "/".
+  Patch by Karthikeyan Singaravelan.
+
+
+What's New in Python 3.5.7 release candidate 1?
+===============================================
+
+*Release date: 2019-03-03*
+
+Security
+--------
+
+- bpo-35746: [CVE-2019-5010] Fix a NULL pointer deref in ssl module. The
+  cert parser did not handle CRL distribution points with empty DP or URI
+  correctly. A malicious or buggy certificate can result into segfault.
+  Vulnerability (TALOS-2018-0758) reported by Colin Read and Nicolas Edet of
+  Cisco.
+
+- bpo-34791: The xml.sax and xml.dom.domreg no longer use environment
+  variables to override parser implementations when
+  sys.flags.ignore_environment is set by -E or -I arguments.
+
+- bpo-34623: CVE-2018-14647: The C accelerated _elementtree module now
+  initializes hash randomization salt from _Py_HashSecret instead of
+  libexpat's default CSPRNG.
+
+Library
+-------
+
+- bpo-33329: Fix multiprocessing regression on newer glibcs
+
+- bpo-33127: The ssl module now compiles with LibreSSL 2.7.1.
+
+
 What's New in Python 3.5.6 final?
 =================================
 
