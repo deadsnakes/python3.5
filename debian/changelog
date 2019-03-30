@@ -1,3 +1,9 @@
+python3.5 (3.5.7-1+bionic1) bionic; urgency=medium
+
+  * Python 3.5.7 release.
+
+ -- Anthony Sottile <asottile@umich.edu>  Fri, 29 Mar 2019 18:05:18 -0700
+
 python3.5 (3.5.6-1+bionic1) bionic; urgency=medium
 
   * Python 3.5.6 release.
