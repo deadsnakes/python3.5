@@ -3,18 +3,20 @@ Date: Sun, 3 Jul 2016 14:45:11 +0200
 Subject: deadsnakes-ignore-sphinx-version
 
 ---
- Doc/conf.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Doc/conf.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Doc/conf.py b/Doc/conf.py
-index f7073d1..f0bc560 100644
+index a5be21a..f0bc560 100644
 --- a/Doc/conf.py
 +++ b/Doc/conf.py
-@@ -34,7 +34,7 @@ today_fmt = '%B %d, %Y'
+@@ -33,8 +33,8 @@ today_fmt = '%B %d, %Y'
+ # By default, highlight as Python 3.
  highlight_language = 'python3'
  
- # Require Sphinx 1.2 for build.
--needs_sphinx = '1.2'
+-# Require Sphinx 1.8 for build.
+-needs_sphinx = '1.8'
++# Require Sphinx 1.2 for build.
 +#needs_sphinx = '1.2'
  
  # Ignore any .rst files in the venv/ directory.

@@ -36,4 +36,3 @@ distutils-packaging-link.diff
 turtledemo-add-shebang.diff
 deadsnakes-ignore-sphinx-version.diff
 deadsnakes-revert-issue24421
-0039-Use-C89-for-loops-in-backported-pickle-patch.patch
