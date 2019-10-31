@@ -141,6 +141,16 @@ _MAXHEADERS = 100
 _is_legal_header_name = re.compile(rb'[^:\s][^:\r\n]*').fullmatch
 _is_illegal_header_value = re.compile(rb'\n(?![ \t])|\r(?![ \t\n])').search
 
+# These characters are not allowed within HTTP URL paths.
+#  See https://tools.ietf.org/html/rfc3986#section-3.3 and the
+#  https://tools.ietf.org/html/rfc3986#appendix-A pchar definition.
+# Prevents CVE-2019-9740.  Includes control characters such as \r\n.
+# We don't restrict chars above \x7f as putrequest() limits us to ASCII.
+_contains_disallowed_url_pchar_re = re.compile('[\x00-\x20\x7f]')
+# Arguably only these _should_ allowed:
+#  _is_allowed_url_pchars_re = re.compile(r"^[/!$&'()*+,;=:@%a-zA-Z0-9._~-]+$")
+# We are more lenient for assumed real world compatibility purposes.
+
 # We always set the Content-Length header for these methods because some
 # servers will otherwise respond with a 411
 _METHODS_EXPECTING_BODY = {'PATCH', 'POST', 'PUT'}
@@ -974,14 +984,15 @@ class HTTPConnection:
         else:
             raise CannotSendRequest(self.__state)
 
-        # Save the method we use, we need it later in the response phase
+        # Save the method for use later in the response phase
         self._method = method
-        if not url:
-            url = '/'
+
+        url = url or '/'
+        self._validate_path(url)
+
         request = '%s %s %s' % (method, url, self._http_vsn_str)
 
-        # Non-ASCII characters should have been eliminated earlier
-        self._output(request.encode('ascii'))
+        self._output(self._encode_request(request))
 
         if self._http_vsn == 11:
             # Issue some standard headers for better HTTP/1.1 compliance
@@ -1058,6 +1069,21 @@ class HTTPConnection:
         else:
             # For HTTP/1.0, the server will assume "not chunked"
             pass
+
+    def _encode_request(self, request):
+        # ASCII also helps prevent CVE-2019-9740.
+        return request.encode('ascii')
+
+    def _validate_path(self, url):
+        """Validate a url for putrequest."""
+        # Prevent CVE-2019-9740.
+        match = _contains_disallowed_url_pchar_re.search(url)
+        if match:
+            msg = (
+                "URL can't contain control characters. {url!r} "
+                "(found at least {matched!r})"
+            ).format(matched=match.group(), **locals())
+            raise InvalidURL(msg)
 
     def putheader(self, header, *values):
         """Send a request header line to the server.
