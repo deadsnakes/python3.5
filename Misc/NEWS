@@ -2,6 +2,84 @@
 Python News
 +++++++++++
 
+What's New in Python 3.5.8 final?
+=================================
+
+*Release date: 2019-10-28*
+
+Security
+--------
+
+- bpo-38243: Escape the server title of
+  :class:`xmlrpc.server.DocXMLRPCServer` when rendering the document page as
+  HTML. (Contributed by Dong-hee Na in :issue:`38243`.)
+
+
+What's New in Python 3.5.8 release candidate 2?
+===============================================
+
+*Release date: 2019-10-12*
+
+Security
+--------
+
+- bpo-38174: Update vendorized expat library version to 2.2.8, which
+  resolves CVE-2019-15903.
+
+Library
+-------
+
+- bpo-38216: Allow the rare code that wants to send invalid http requests
+  from the `http.client` library a way to do so.  The fixes for bpo-30458
+  led to breakage for some projects that were relying on this ability to
+  test their own behavior in the face of bad requests.
+
+
+What's New in Python 3.5.8 release candidate 1?
+===============================================
+
+*Release date: 2019-09-09*
+
+Security
+--------
+
+- bpo-37461: Fix an infinite loop when parsing specially crafted email
+  headers. Patch by Abhilash Raj.
+
+- bpo-35907: CVE-2019-9948: Avoid file reading by disallowing
+  ``local-file://`` and ``local_file://`` URL schemes in
+  ``URLopener().open()`` and ``URLopener().retrieve()`` of
+  :mod:`urllib.request`.
+
+- bpo-34155: Fix parsing of invalid email addresses with more than one ``@``
+  (e.g. a@b@c.com.) to not return the part before 2nd ``@`` as valid email
+  address. Patch by maxking & jpic.
+
+- bpo-36742: Fixes mishandling of pre-normalization characters in
+  urlsplit().
+
+- bpo-30458: Address CVE-2019-9740 by disallowing URL paths with embedded
+  whitespace or control characters through into the underlying http client
+  request.  Such potentially malicious header injection URLs now cause an
+  http.client.InvalidURL exception to be raised.
+
+Tests
+-----
+
+- bpo-36816: Update Lib/test/selfsigned_pythontestdotnet.pem to match
+  self-signed.pythontest.net's new TLS certificate.
+
+- bpo-36576: Skip test_ssl and test_asyncio tests failing with OpenSSL
+  1.1.1.
+
+Build
+-----
+
+- bpo-36478: Fix compatibility with ISO C89 needed by "gnu89" standard of
+  GCC 4.8: use C89 for loops in backported pickle patch. Patch by Anthony
+  Sottile.
+
+
 What's New in Python 3.5.7 final?
 =================================
 
