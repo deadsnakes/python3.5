@@ -2,6 +2,72 @@
 Python News
 +++++++++++
 
+What's New in Python 3.5.10 final?
+==================================
+
+*Release date: 2020-09-05*
+
+Security
+--------
+
+- bpo-39603: Prevent http header injection by rejecting control characters
+  in http.client.putrequest(...).
+
+
+What's New in Python 3.5.10 release candidate 1?
+================================================
+
+*Release date: 2020-08-19*
+
+Security
+--------
+
+- bpo-29778: Ensure :file:`python3.dll` is loaded from correct locations
+  when Python is embedded (CVE-2020-15523).
+
+- bpo-41004: CVE-2020-14422: The __hash__() methods of
+  ipaddress.IPv4Interface and ipaddress.IPv6Interface incorrectly generated
+  constant hash values of 32 and 128 respectively. This resulted in always
+  causing hash collisions. The fix uses hash() to generate hash values for
+  the tuple of (address, mask length, network address).
+
+- bpo-39073: Disallow CR or LF in email.headerregistry.Address arguments to
+  guard against header injection attacks.
+
+- bpo-38576: Disallow control characters in hostnames in http.client,
+  addressing CVE-2019-18348. Such potentially malicious header injection
+  URLs now cause a InvalidURL to be raised.
+
+- bpo-39503: CVE-2020-8492: The
+  :class:`~urllib.request.AbstractBasicAuthHandler` class of the
+  :mod:`urllib.request` module uses an inefficient regular expression which
+  can be exploited by an attacker to cause a denial of service. Fix the
+  regex to prevent the catastrophic backtracking. Vulnerability reported by
+  Ben Caller and Matt Schwager.
+
+- bpo-38945: Newline characters have been escaped when performing uu
+  encoding to prevent them from overflowing into to content section of the
+  encoded file. This prevents malicious or accidental modification of data
+  during the decoding process.
+
+- bpo-38804: Fixes a ReDoS vulnerability in :mod:`http.cookiejar`. Patch by
+  Ben Caller.
+
+Library
+-------
+
+- bpo-39017: Avoid infinite loop when reading specially crafted TAR files
+  using the tarfile module (CVE-2019-20907).
+
+- bpo-41183: Use 3072 RSA keys and SHA-256 signature for test certs and
+  keys.
+
+- bpo-39503: :class:`~urllib.request.AbstractBasicAuthHandler` of
+  :mod:`urllib.request` now parses all WWW-Authenticate HTTP headers and
+  accepts multiple challenges per header: use the realm of the first Basic
+  challenge.
+
+
 What's New in Python 3.5.9 final?
 =================================
 
