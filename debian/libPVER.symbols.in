@@ -1,5 +1,0 @@
-libpython@VER@@ABIFLAGS@.so.1.0 libpython@VER@ #MINVER#
-#include "libpython.symbols"
- PyModule_Create2@Base @VER@
- PyModule_FromDefAndSpec2@Base @VER@
- (optional)__gnu_lto_v1@Base @VER@
