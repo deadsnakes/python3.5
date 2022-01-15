@@ -30,7 +30,7 @@ Architecture: any
 Multi-Arch: allowed
 Priority: @PRIO@
 Depends: @PVER@-minimal (= ${binary:Version}), lib@PVER@-stdlib (= ${binary:Version}), mime-support, ${shlibs:Depends}, ${misc:Depends}
-Suggests: @PVER@-venv, @PVER@-doc, binutils
+Suggests: @PVER@-venv, binutils
 Description: Interactive high-level object-oriented language (version @VER@)
  Python is a high-level, interactive, object-oriented language. Its @VER@ version
  includes an extensive class library with lots of goodies for
@@ -162,27 +162,6 @@ Enhances: @PVER@
 Description: IDE for Python (v@VER@) using Tkinter
  IDLE is an Integrated Development Environment for Python (v@VER@).
  IDLE is written using Tkinter and therefore quite platform-independent.
-
-Package: @PVER@-doc
-Section: doc
-Architecture: all
-Depends: libjs-jquery, libjs-underscore, ${misc:Depends}
-Suggests: @PVER@
-Description: Documentation for the high-level object-oriented language Python (v@VER@)
- These is the official set of documentation for the interactive high-level
- object-oriented language Python (v@VER@). All documents are provided
- in HTML format. The package consists of ten documents:
- .
-   * What's New in Python@VER@
-   * Tutorial
-   * Python Library Reference
-   * Macintosh Module Reference
-   * Python Language Reference
-   * Extending and Embedding Python
-   * Python/C API Reference
-   * Installing Python Modules
-   * Documenting Python
-   * Distributing Python Modules
 
 Package: @PVER@-dbg
 Section: debug
@@ -325,7 +304,6 @@ Depends:
  lib@PVER@-gdbm-dbg (>= ${binary:Version}),
  @PVER@-examples (>= ${binary:Version}),
  @PVER@-dev (>= ${binary:Version}),
- @PVER@-doc (>= ${binary:Version}),
  @PVER@-dbg (>= ${binary:Version}),
  @PVER@-venv (>= ${binary:Version}),
  idle-@PVER@ (>= ${binary:Version}),
