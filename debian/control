@@ -30,7 +30,7 @@ Architecture: any
 Multi-Arch: allowed
 Priority: optional
 Depends: python3.5-minimal (= ${binary:Version}), libpython3.5-stdlib (= ${binary:Version}), mime-support, ${shlibs:Depends}, ${misc:Depends}
-Suggests: python3.5-venv, python3.5-doc, binutils
+Suggests: python3.5-venv, binutils
 Description: Interactive high-level object-oriented language (version 3.5)
  Python is a high-level, interactive, object-oriented language. Its 3.5 version
  includes an extensive class library with lots of goodies for
@@ -162,27 +162,6 @@ Enhances: python3.5
 Description: IDE for Python (v3.5) using Tkinter
  IDLE is an Integrated Development Environment for Python (v3.5).
  IDLE is written using Tkinter and therefore quite platform-independent.
-
-Package: python3.5-doc
-Section: doc
-Architecture: all
-Depends: libjs-jquery, libjs-underscore, ${misc:Depends}
-Suggests: python3.5
-Description: Documentation for the high-level object-oriented language Python (v3.5)
- These is the official set of documentation for the interactive high-level
- object-oriented language Python (v3.5). All documents are provided
- in HTML format. The package consists of ten documents:
- .
-   * What's New in Python3.5
-   * Tutorial
-   * Python Library Reference
-   * Macintosh Module Reference
-   * Python Language Reference
-   * Extending and Embedding Python
-   * Python/C API Reference
-   * Installing Python Modules
-   * Documenting Python
-   * Distributing Python Modules
 
 Package: python3.5-dbg
 Section: debug
@@ -325,7 +304,6 @@ Depends:
  libpython3.5-gdbm-dbg (>= ${binary:Version}),
  python3.5-examples (>= ${binary:Version}),
  python3.5-dev (>= ${binary:Version}),
- python3.5-doc (>= ${binary:Version}),
  python3.5-dbg (>= ${binary:Version}),
  python3.5-venv (>= ${binary:Version}),
  idle-python3.5 (>= ${binary:Version}),

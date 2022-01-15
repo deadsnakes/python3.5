@@ -34,5 +34,4 @@ reproducible-buildinfo.diff
 deadsnakes-assert-use-system-ffi.diff
 distutils-packaging-link.diff
 turtledemo-add-shebang.diff
-deadsnakes-ignore-sphinx-version.diff
 deadsnakes-revert-issue24421
